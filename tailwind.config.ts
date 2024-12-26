@@ -25,9 +25,9 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#2563EB",
+          DEFAULT: "#D4AF37", // Changed to a gold color
           foreground: "#FFFFFF",
-          hover: "#1D4ED8",
+          hover: "#B8960C",
         },
         secondary: {
           DEFAULT: "#1A1F2C",
@@ -60,7 +60,7 @@ export default {
           background: "#1A1F2C",
           accent: "#2D3748",
           "accent-foreground": "#FFFFFF",
-          ring: "#2563EB",
+          ring: "#D4AF37",
         },
       },
       borderRadius: {
