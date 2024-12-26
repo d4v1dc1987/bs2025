@@ -53,6 +53,15 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        sidebar: {
+          DEFAULT: "#FFFFFF",
+          foreground: "#1A1F2C",
+          border: "#E5E7EB",
+          background: "#FFFFFF",
+          accent: "#F3F4F6",
+          "accent-foreground": "#1A1F2C",
+          ring: "#2563EB",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
