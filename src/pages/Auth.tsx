@@ -32,8 +32,8 @@ const Auth = () => {
             variables: {
               default: {
                 colors: {
-                  brand: "rgb(234 179 8)",
-                  brandAccent: "rgb(202 138 4)",
+                  brand: "#D4AF37",
+                  brandAccent: "#B8960C",
                 },
               },
             },
