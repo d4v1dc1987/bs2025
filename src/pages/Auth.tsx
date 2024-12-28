@@ -1,11 +1,14 @@
 import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { PasswordStrength } from "@/components/auth/PasswordStrength";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode") || "login";
 
   useEffect(() => {
     // Check if user is already logged in
@@ -22,7 +25,9 @@ const Auth = () => {
         <div className="text-center">
           <h2 className="text-3xl font-bold text-primary">Bobby Social</h2>
           <p className="mt-2 text-muted-foreground">
-            Connectez-vous ou créez un compte
+            {mode === "login" 
+              ? "Connectez-vous à votre compte" 
+              : "Créez votre compte"}
           </p>
         </div>
         <SupabaseAuth
@@ -40,6 +45,21 @@ const Auth = () => {
           }}
           theme="dark"
           providers={[]}
+          localization={{
+            variables: {
+              sign_in: {
+                email_label: "Email",
+                password_label: "Mot de passe",
+                button_label: "Se connecter",
+              },
+              sign_up: {
+                email_label: "Email",
+                password_label: "Mot de passe",
+                button_label: "Créer un compte",
+              },
+            },
+          }}
+          view={mode === "login" ? "sign_in" : "sign_up"}
         />
       </div>
     </div>

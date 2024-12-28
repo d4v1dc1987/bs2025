@@ -9,6 +9,7 @@ import { supabase } from "./integrations/supabase/client";
 import Index from "./pages/Index";
 import Generator from "./pages/Generator";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/generator" element={<Generator />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </MainLayout>
