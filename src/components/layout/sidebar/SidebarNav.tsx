@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BookOpen, MessageSquare, MessageCircleReply, Calendar, CheckSquare } from "lucide-react";
+import { useSidebar } from "./SidebarContext";
 
 const links = [
   {
@@ -33,6 +34,7 @@ const links = [
 
 export const SidebarNav = () => {
   const location = useLocation();
+  const { isOpen } = useSidebar();
   
   return (
     <nav className="grid gap-1 px-2">
@@ -45,14 +47,20 @@ export const SidebarNav = () => {
             key={link.to}
             variant={isActive ? "secondary" : "ghost"}
             className={cn(
-              "justify-start gap-2 text-base font-normal",
-              isActive && "bg-primary/20 hover:bg-primary/30"
+              "justify-start gap-2 text-base font-normal group",
+              isActive && "bg-primary/20 hover:bg-primary/30",
+              !isOpen && "px-0 justify-center"
             )}
             asChild
           >
             <Link to={link.to}>
-              <Icon className="h-5 w-5" />
-              <span>{link.label}</span>
+              <Icon className="h-5 w-5 shrink-0" />
+              <span className={cn(
+                "transition-all duration-300 overflow-hidden",
+                !isOpen && "w-0 opacity-0"
+              )}>
+                {link.label}
+              </span>
             </Link>
           </Button>
         );

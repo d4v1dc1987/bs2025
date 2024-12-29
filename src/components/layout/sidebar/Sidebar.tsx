@@ -20,13 +20,17 @@ export const Sidebar = () => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "shrink-0 w-72 bg-[#232228] border-r border-white/10 transition-all duration-300 ease-in-out",
-          !isOpen && "w-0 md:w-[72px]"
+          "shrink-0 bg-[#232228] border-r border-white/10 transition-all duration-300 ease-in-out",
+          isOpen ? "w-72" : "w-[72px]",
+          "md:block" // Always show on desktop
         )}
       >
         <div className={cn(
-          "h-full w-72 fixed top-0 left-0 bg-[#232228] border-r border-white/10 transition-transform duration-300 ease-in-out",
-          !isOpen && "-translate-x-full md:translate-x-0 md:w-[72px]"
+          "h-full fixed top-0 left-0 bg-[#232228] border-r border-white/10 transition-all duration-300 ease-in-out flex flex-col",
+          isOpen ? "w-72" : "w-[72px]",
+          "md:translate-x-0", // Always visible on desktop
+          !isOpen && "md:w-[72px]", // Collapsed width on desktop
+          !isOpen && "-translate-x-full md:translate-x-0" // Hide on mobile when closed, show on desktop
         )}>
           <SidebarLogo />
           <div className="flex-1 overflow-y-auto py-4">
