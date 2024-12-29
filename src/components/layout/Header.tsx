@@ -20,15 +20,27 @@ export const Header = () => {
         </div>
         <div className="flex items-center gap-2">
           {user ? (
-            <Button
-              variant="secondary"
-              size="sm"
-              className="gap-2"
-              onClick={() => navigate("/profile")}
-            >
-              <User className="w-4 h-4" />
-              Mon compte
-            </Button>
+            <>
+              <span className="text-sm text-muted-foreground hidden md:block">
+                Bonjour, {user.user_metadata.first_name}
+              </span>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="gap-2"
+                onClick={() => navigate("/profile")}
+              >
+                <User className="w-4 h-4" />
+                Mon compte
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => signOut()}
+              >
+                Déconnexion
+              </Button>
+            </>
           ) : (
             <>
               <Button
