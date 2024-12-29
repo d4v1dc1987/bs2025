@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useSidebar } from "./SidebarContext";
 import { SidebarNav } from "./SidebarNav";
+import { SidebarLogo } from "./SidebarLogo";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -25,6 +26,8 @@ export const Sidebar = () => {
           !isOpen && "-translate-x-full"
         )}
       >
+        <SidebarLogo />
+        
         {/* Mobile close button */}
         <Button
           variant="ghost"
@@ -35,7 +38,7 @@ export const Sidebar = () => {
           <X className="h-5 w-5" />
         </Button>
 
-        <div className="flex-1 overflow-y-auto py-4 mt-14 md:mt-0">
+        <div className="flex-1 overflow-y-auto py-4">
           <SidebarNav />
         </div>
       </aside>

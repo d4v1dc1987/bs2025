@@ -1,23 +1,19 @@
-import { PanelLeftClose, PanelLeft } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "./SidebarContext";
 
 export const SidebarToggle = () => {
-  const { isOpen, toggle } = useSidebar();
+  const { toggle } = useSidebar();
 
   return (
     <Button
       variant="ghost"
       size="icon"
       onClick={toggle}
-      className="h-9 w-9 text-white hover:bg-white/10"
-      aria-label={isOpen ? "Fermer la sidebar" : "Ouvrir la sidebar"}
+      className="h-10 w-10 text-muted-foreground hover:text-foreground"
     >
-      {isOpen ? (
-        <PanelLeftClose className="h-5 w-5" />
-      ) : (
-        <PanelLeft className="h-5 w-5" />
-      )}
+      <Menu className="h-5 w-5" />
+      <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );
 };
