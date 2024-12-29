@@ -60,10 +60,10 @@ export const SidebarNav = () => {
         className={cn(
           "justify-start gap-3 text-base font-normal group relative w-full",
           "transition-all duration-200",
-          "hover:bg-primary/10 hover:text-primary",
-          isActive && "bg-primary/20 hover:bg-primary/30 text-primary border border-primary/20",
+          "hover:bg-primary/20 hover:text-white",
+          isActive && "bg-primary/30 text-white border border-primary/30",
           !isOpen && "md:justify-center",
-          "my-1.5" // Added more vertical spacing between buttons
+          "my-1.5"
         )}
         asChild
         onClick={handleLinkClick}
@@ -72,7 +72,7 @@ export const SidebarNav = () => {
           <Icon className={cn(
             "h-5 w-5 shrink-0",
             !isOpen && "md:w-5 md:h-5",
-            isActive ? "text-primary" : "text-gray-400 group-hover:text-primary"
+            isActive ? "text-white" : "text-gray-400 group-hover:text-white"
           )} />
           <span className={cn(
             "transition-all duration-300",
