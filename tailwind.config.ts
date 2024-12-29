@@ -21,16 +21,17 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", ...fontFamily.sans],
+        poppins: ["Poppins", ...fontFamily.sans],
       },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        background: "#232228",
+        foreground: "#FFFFFF",
         primary: {
-          DEFAULT: "#FFD700",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#7b27fb",
+          foreground: "#FFFFFF",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
