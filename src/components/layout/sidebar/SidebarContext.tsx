@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 type SidebarContextType = {
   isOpen: boolean;
@@ -8,7 +8,22 @@ type SidebarContextType = {
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export const SidebarProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  // La sidebar est fermée par défaut sur mobile, ouverte par défaut sur desktop
+  const [isOpen, setIsOpen] = useState(window.innerWidth >= 768);
+
+  // Mettre à jour l'état de la sidebar lors du redimensionnement de la fenêtre
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsOpen(true);
+      } else {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const toggle = () => setIsOpen(!isOpen);
 

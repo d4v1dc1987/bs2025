@@ -2,30 +2,18 @@ import { Logo } from "../ui/Logo";
 import { Button } from "../ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
-import { User, PanelLeftClose, PanelLeft } from "lucide-react";
-import { useSidebar } from "./sidebar/SidebarContext";
+import { User } from "lucide-react";
+import { SidebarToggle } from "./sidebar/SidebarToggle";
 
 export const Header = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const { isOpen, toggle } = useSidebar();
 
   return (
-    <header className="border-b border-sidebar-border bg-sidebar py-4">
+    <header className="border-b border-white/10 bg-background py-4">
       <div className="container flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggle}
-            className="h-9 w-9"
-          >
-            {isOpen ? (
-              <PanelLeftClose className="h-5 w-5" />
-            ) : (
-              <PanelLeft className="h-5 w-5" />
-            )}
-          </Button>
+          <SidebarToggle />
           <Logo />
         </div>
         <div className="flex items-center gap-2">
