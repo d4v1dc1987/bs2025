@@ -3,25 +3,41 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { ONBOARDING_QUESTIONS } from "@/types/onboarding";
+import { ONBOARDING_QUESTIONS, AI_PROFILE_PROMPT } from "@/types/onboarding";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { OnboardingAnswers } from "@/types/onboarding";
 
 export const Onboarding = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0); // Start at 0 for intro
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [firstName, setFirstName] = useState<string>("");
 
   useEffect(() => {
-    // Load existing answers if any
-    const loadOnboardingData = async () => {
+    // Load existing answers and user data
+    const loadData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        const { data, error } = await supabase
+        // Get user's first name
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('first_name')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profileData?.first_name) {
+          setFirstName(profileData.first_name);
+        }
+
+        // Get onboarding data
+        const { data: onboardingData, error } = await supabase
           .from('onboarding')
           .select('current_step, answers')
           .eq('id', user.id)
@@ -32,23 +48,28 @@ export const Onboarding = () => {
           return;
         }
 
-        if (data) {
-          setCurrentStep(data.current_step || 1);
-          setAnswers(data.answers as OnboardingAnswers || {});
+        if (onboardingData) {
+          setCurrentStep(onboardingData.current_step || 0);
+          setAnswers(onboardingData.answers as OnboardingAnswers || {});
         }
       } catch (error) {
-        console.error('Error loading onboarding data:', error);
+        console.error('Error loading data:', error);
       }
     };
 
-    loadOnboardingData();
+    loadData();
   }, []);
 
-  const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
-
   const handleNext = async () => {
-    if (!answers[currentQuestion.id]) {
-      toast.error("Veuillez sélectionner une réponse avant de continuer");
+    const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
+    
+    if (currentStep === 0) {
+      setCurrentStep(1);
+      return;
+    }
+
+    if (currentQuestion && !answers[currentQuestion.id]) {
+      toast.error("Veuillez répondre à la question avant de continuer");
       return;
     }
 
@@ -57,6 +78,11 @@ export const Onboarding = () => {
 
     const nextStep = currentStep + 1;
     
+    // Skip children details question if not applicable
+    if (currentStep === 5 && answers.has_children !== 'yes') {
+      nextStep = 7;
+    }
+
     // Update Supabase with current progress
     const { error } = await supabase
       .from('onboarding')
@@ -77,16 +103,21 @@ export const Onboarding = () => {
       setIsSubmitting(true);
       // Generate AI summary
       try {
+        const formattedAnswers = Object.entries(answers)
+          .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+          .join('\n');
+
+        const prompt = AI_PROFILE_PROMPT
+          .replace('{firstName}', firstName)
+          .replace('{answers}', formattedAnswers);
+
         const response = await fetch('/functions/v1/generate-with-ai', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
           },
-          body: JSON.stringify({
-            prompt: `En tant qu'assistant marketing spécialisé, analyse ces réponses d'onboarding et crée un résumé professionnel du profil entrepreneurial. Voici les réponses : ${JSON.stringify(answers)}. 
-            Format souhaité : Un paragraphe concis qui capture l'essence de leur activité, leur niveau d'expérience, leurs objectifs principaux et leurs défis.`,
-          }),
+          body: JSON.stringify({ prompt }),
         });
 
         const { generatedText } = await response.json();
@@ -110,10 +141,17 @@ export const Onboarding = () => {
   };
 
   const handlePrevious = () => {
-    setCurrentStep(Math.max(1, currentStep - 1));
+    if (currentStep === 7 && answers.has_children !== 'yes') {
+      setCurrentStep(5);
+    } else {
+      setCurrentStep(Math.max(0, currentStep - 1));
+    }
   };
 
-  const handleAnswerChange = (value: string) => {
+  const handleAnswerChange = (value: string | string[]) => {
+    if (currentStep === 0) return;
+    
+    const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
     setAnswers(prev => ({
       ...prev,
       [currentQuestion.id]: value
@@ -133,6 +171,29 @@ export const Onboarding = () => {
     );
   }
 
+  // Show introduction
+  if (currentStep === 0) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle>Bienvenue dans Bobby Social</CardTitle>
+          <CardDescription className="text-lg space-y-4">
+            <p>Ok {firstName}, tout d'abord, j'ai quelques questions à te poser pour personnaliser ton expérience avec Bobby Social au maximum. 😎</p>
+            <p>🔥 Plus tu réponds de façon honnête et précise, mieux c'est!</p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={handleNext} className="w-full">
+            Commencer
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
+  const questionText = currentQuestion.question.replace('{firstName}', firstName);
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -144,19 +205,69 @@ export const Onboarding = () => {
       <CardContent>
         <div className="space-y-6">
           <div className="space-y-4">
-            <h3 className="font-medium text-lg">{currentQuestion.question}</h3>
-            <RadioGroup
-              value={answers[currentQuestion.id]}
-              onValueChange={handleAnswerChange}
-              className="space-y-3"
-            >
-              {currentQuestion.options.map((option) => (
-                <div key={option.value} className="flex items-center space-x-2">
-                  <RadioGroupItem value={option.value} id={option.value} />
-                  <Label htmlFor={option.value}>{option.label}</Label>
-                </div>
-              ))}
-            </RadioGroup>
+            <h3 className="font-medium text-lg whitespace-pre-line">{questionText}</h3>
+            
+            {currentQuestion.type === 'single' && (
+              <RadioGroup
+                value={answers[currentQuestion.id] as string}
+                onValueChange={handleAnswerChange}
+                className="space-y-3"
+              >
+                {currentQuestion.options?.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2">
+                    <RadioGroupItem value={option.value} id={option.value} />
+                    <Label htmlFor={option.value}>{option.label}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            )}
+
+            {currentQuestion.type === 'multiple' && (
+              <div className="space-y-3">
+                {currentQuestion.options?.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={option.value}
+                      checked={(answers[currentQuestion.id] as string[] || []).includes(option.value)}
+                      onCheckedChange={(checked) => {
+                        const currentValues = answers[currentQuestion.id] as string[] || [];
+                        const newValues = checked
+                          ? [...currentValues, option.value]
+                          : currentValues.filter(v => v !== option.value);
+                        handleAnswerChange(newValues);
+                      }}
+                    />
+                    <Label htmlFor={option.value}>{option.label}</Label>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {currentQuestion.type === 'text' && (
+              <Input
+                value={answers[currentQuestion.id] as string || ''}
+                onChange={(e) => handleAnswerChange(e.target.value)}
+                placeholder="Votre réponse..."
+              />
+            )}
+
+            {currentQuestion.type === 'textarea' && (
+              <Textarea
+                value={answers[currentQuestion.id] as string || ''}
+                onChange={(e) => handleAnswerChange(e.target.value)}
+                placeholder="Votre réponse..."
+                className="min-h-[120px]"
+              />
+            )}
+
+            {currentQuestion.type === 'date' && (
+              <Input
+                type="text"
+                value={answers[currentQuestion.id] as string || ''}
+                onChange={(e) => handleAnswerChange(e.target.value)}
+                placeholder="19 février 1987"
+              />
+            )}
           </div>
 
           <div className="flex justify-between pt-4">
