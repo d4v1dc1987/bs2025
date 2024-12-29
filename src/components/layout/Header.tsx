@@ -30,7 +30,7 @@ export const Header = () => {
         </Button>
         
         {user?.email && (
-          <span className="ml-4 text-sm text-muted-foreground truncate max-w-[200px] md:max-w-none">
+          <span className="ml-4 text-sm text-muted-foreground truncate max-w-[150px] md:max-w-none">
             {getGreeting()}, {user.user_metadata.first_name || user.email}
           </span>
         )}
