@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
@@ -26,6 +28,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -82,11 +86,24 @@ export const LoginForm = () => {
               <FormItem>
                 <FormLabel className="text-foreground/90">Mot de passe</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    className="bg-background/50 border-foreground/20"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      className="bg-background/50 border-foreground/20 pr-10"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/70 hover:text-foreground"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -120,7 +137,7 @@ export const LoginForm = () => {
           <Button
             type="button"
             variant="link"
-            className="text-sm text-foreground/70 hover:text-foreground"
+            className="text-sm text-[#c299ff] hover:text-[#c299ff]/90"
             onClick={() => navigate("/auth?mode=signup")}
           >
             Mot de passe oublié ?
@@ -131,7 +148,7 @@ export const LoginForm = () => {
             <Button
               type="button"
               variant="link"
-              className="text-primary hover:text-primary/90 p-0"
+              className="text-[#c299ff] hover:text-[#c299ff]/90 p-0"
               onClick={() => navigate("/auth?mode=signup")}
             >
               Créer un compte

@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { PasswordStrength } from "@/components/auth/PasswordStrength";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 const signUpSchema = z
   .object({
@@ -41,6 +43,9 @@ type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export const SignUpForm = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -142,11 +147,24 @@ export const SignUpForm = () => {
               <FormItem>
                 <FormLabel className="text-foreground/90">Mot de passe</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    className="bg-background/50 border-foreground/20"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      className="bg-background/50 border-foreground/20 pr-10"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/70 hover:text-foreground"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <PasswordStrength password={field.value} />
                 <FormMessage />
@@ -163,11 +181,24 @@ export const SignUpForm = () => {
                   Confirmer le mot de passe
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    className="bg-background/50 border-foreground/20"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showConfirmPassword ? "text" : "password"}
+                      className="bg-background/50 border-foreground/20 pr-10"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/70 hover:text-foreground"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -183,7 +214,7 @@ export const SignUpForm = () => {
           <Button
             type="button"
             variant="link"
-            className="text-sm text-foreground/70 hover:text-foreground"
+            className="text-[#c299ff] hover:text-[#c299ff]/90"
             onClick={() => navigate("/auth?mode=login")}
           >
             J'ai déjà un compte
