@@ -24,9 +24,10 @@ export const Sidebar = () => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[#232228] border-r border-white/10 transition-all duration-300 ease-in-out",
-          "md:relative md:translate-x-0",
-          !isOpen && "-translate-x-full"
+          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[#232228] border-r border-white/10",
+          "transition-all duration-300 ease-in-out",
+          "md:relative",
+          !isOpen && "md:w-[72px]"
         )}
       >
         <div className="flex items-center justify-between p-4 md:justify-center">
@@ -48,7 +49,7 @@ export const Sidebar = () => {
           <Button 
             variant="primary"
             onClick={signOut}
-            className="w-full bg-[#7b26fb] text-white hover:bg-[#7b26fb]/90"
+            className="w-full"
           >
             Déconnexion
           </Button>
