@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut, User } from "lucide-react";
+import { Menu, LogOut, User, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSidebar } from "@/components/layout/sidebar/SidebarContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -55,7 +55,7 @@ export const Header = () => {
                 <Avatar className="h-10 w-10">
                   <AvatarImage 
                     src={user?.user_metadata?.avatar_url || undefined} 
-                    alt="Profile picture" 
+                    alt="Photo de profil" 
                   />
                   <AvatarFallback className="bg-primary/10 text-primary">
                     {user?.user_metadata?.avatar_url ? getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name) : <User className="h-5 w-5" />}
@@ -76,9 +76,15 @@ export const Header = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
+                <Link to="/dashboard" className="flex items-center cursor-pointer">
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Tableau de bord</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link to="/profile" className="flex items-center cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <span>Mon Profil</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

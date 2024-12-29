@@ -8,8 +8,13 @@ import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
 import Index from "./pages/Index";
 import Generator from "./pages/Generator";
+import Comment from "./pages/Comment";
+import Reply from "./pages/Reply";
+import Calendar from "./pages/Calendar";
+import Close from "./pages/Close";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -46,10 +51,14 @@ const App = () => {
           {isAuthenticated ? (
             <MainLayout>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/generator" element={<Generator />} />
+                <Route path="/comment" element={<Comment />} />
+                <Route path="/reply" element={<Reply />} />
+                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/close" element={<Close />} />
                 <Route path="/profile" element={<Profile />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </MainLayout>
           ) : (
