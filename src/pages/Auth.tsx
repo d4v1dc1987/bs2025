@@ -33,7 +33,7 @@ const Auth = () => {
             <p className="text-foreground/80">
               {mode === "login"
                 ? "L'outil IA Ultime Des Entrepreneurs En Ligne Pour Dominer Facebook"
-                : "Créez votre compte"}
+                : "Créer un nouveau compte"}
             </p>
           </div>
 
