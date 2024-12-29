@@ -24,33 +24,33 @@ export const ProfileForm = ({
     <form onSubmit={onSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="first_name" className="text-secondary">
+          <Label htmlFor="first_name" className="text-[#c299ff]">
             Prénom
           </Label>
           <Input
             id="first_name"
             value={formData.first_name}
             onChange={(e) => onChange("first_name", e.target.value)}
-            placeholder="Votre prénom"
+            placeholder="Entrez votre prénom"
             className="bg-background/50 border-foreground/20"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="last_name" className="text-secondary">
+          <Label htmlFor="last_name" className="text-[#c299ff]">
             Nom
           </Label>
           <Input
             id="last_name"
             value={formData.last_name}
             onChange={(e) => onChange("last_name", e.target.value)}
-            placeholder="Votre nom"
+            placeholder="Entrez votre nom"
             className="bg-background/50 border-foreground/20"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-secondary">
+        <Label htmlFor="email" className="text-[#c299ff]">
           Email
         </Label>
         <Input

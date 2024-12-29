@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -18,10 +18,22 @@ const Profile = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    first_name: user?.user_metadata?.first_name || "",
-    last_name: user?.user_metadata?.last_name || "",
-    avatar_url: user?.user_metadata?.avatar_url || "",
+    first_name: "",
+    last_name: "",
+    avatar_url: "",
   });
+
+  // Fetch user profile data on component mount
+  useEffect(() => {
+    if (user) {
+      const { first_name, last_name, avatar_url } = user.user_metadata;
+      setFormData({
+        first_name: first_name || "",
+        last_name: last_name || "",
+        avatar_url: avatar_url || "",
+      });
+    }
+  }, [user]);
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -103,12 +115,12 @@ const Profile = () => {
     }
   };
 
-  const getInitials = () => {
-    return `${(formData.first_name?.[0] || "").toUpperCase()}${(formData.last_name?.[0] || "").toUpperCase()}` || "U";
-  };
-
   const handleFormChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const getInitials = () => {
+    return `${(formData.first_name?.[0] || "").toUpperCase()}${(formData.last_name?.[0] || "").toUpperCase()}` || "U";
   };
 
   return (
