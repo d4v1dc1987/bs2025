@@ -76,7 +76,7 @@ export const Onboarding = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const nextStep = currentStep + 1;
+    let nextStep = currentStep + 1;
     
     // Skip children details question if not applicable
     if (currentStep === 5 && answers.has_children !== 'yes') {
