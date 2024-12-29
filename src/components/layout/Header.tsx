@@ -54,11 +54,11 @@ export const Header = () => {
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="h-10 w-10">
                   <AvatarImage 
-                    src={user?.user_metadata?.avatar_url || "/placeholder.svg"} 
+                    src={user?.user_metadata?.avatar_url || undefined} 
                     alt="Profile picture" 
                   />
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    {getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name)}
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    {user?.user_metadata?.avatar_url ? getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name) : <User className="h-5 w-5" />}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -76,7 +76,7 @@ export const Header = () => {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/profile" className="flex items-center">
+                <Link to="/profile" className="flex items-center cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>
