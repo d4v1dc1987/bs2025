@@ -35,19 +35,46 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
+      // First check if we have a session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // If no session, just update local state and redirect
+      if (!session) {
+        setUser(null);
+        navigate("/auth?mode=login");
+        toast.success("Déconnexion réussie");
+        return;
+      }
+
+      // If we have a session, try to sign out
       const { error } = await supabase.auth.signOut();
       
       if (error) {
+        // Handle session_not_found gracefully
+        if (error.message.includes("session_not_found")) {
+          setUser(null);
+          navigate("/auth?mode=login");
+          toast.success("Déconnexion réussie");
+          return;
+        }
+        
+        // For other errors, show error toast
         console.error("Logout error:", error);
         toast.error("Une erreur est survenue lors de la déconnexion");
         return;
       }
 
-      // La redirection sera gérée par onAuthStateChange
+      // Successful logout
+      setUser(null);
+      navigate("/auth?mode=login");
       toast.success("Déconnexion réussie");
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("Une erreur est survenue lors de la déconnexion");
+      
+      // Even if there's an error, we should clear the local state
+      setUser(null);
+      navigate("/auth?mode=login");
     }
   };
 

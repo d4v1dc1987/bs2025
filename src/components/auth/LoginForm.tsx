@@ -116,7 +116,7 @@ export const LoginForm = () => {
           Connexion
         </Button>
 
-        <div className="text-center">
+        <div className="text-center space-y-2">
           <Button
             type="button"
             variant="link"
@@ -125,6 +125,18 @@ export const LoginForm = () => {
           >
             Mot de passe oublié ?
           </Button>
+          
+          <div className="flex items-center justify-center space-x-1 text-sm">
+            <span className="text-foreground/70">Pas encore de compte ?</span>
+            <Button
+              type="button"
+              variant="link"
+              className="text-primary hover:text-primary/90 p-0"
+              onClick={() => navigate("/auth?mode=signup")}
+            >
+              Créer un compte
+            </Button>
+          </div>
         </div>
       </form>
     </Form>
