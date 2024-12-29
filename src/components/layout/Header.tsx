@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSidebar } from "@/components/layout/sidebar/SidebarContext";
 
@@ -40,8 +40,9 @@ export const Header = () => {
               <Button 
                 variant="ghost" 
                 onClick={signOut}
-                className="text-sm text-muted-foreground hover:text-foreground"
+                className="text-sm bg-[#7b26fb] text-white hover:bg-[#7b26fb]/90 flex items-center gap-2"
               >
+                <LogOut className="h-4 w-4" />
                 Déconnexion
               </Button>
             )}

@@ -10,8 +10,8 @@ export const SidebarLogo = () => {
     <Link 
       to="/" 
       className={cn(
-        "flex items-center gap-3",
-        !isOpen && "md:justify-center"
+        "flex items-center gap-3 pl-4",
+        !isOpen && "md:justify-center md:pl-0"
       )}
     >
       <Zap className="h-6 w-6 text-primary shrink-0" />
