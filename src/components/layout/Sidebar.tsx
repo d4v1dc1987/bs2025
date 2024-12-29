@@ -33,14 +33,14 @@ const links = [
 ];
 
 export const Sidebar = () => {
-  const { isOpen } = useSidebar();
+  const { open } = useSidebar();
   const location = useLocation();
 
   return (
     <aside
       className={cn(
         "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-sidebar-border bg-sidebar transition-transform duration-300 ease-in-out md:relative md:translate-x-0",
-        !isOpen && "-translate-x-full"
+        !open && "-translate-x-full"
       )}
     >
       <div className="flex-1 overflow-y-auto py-4">
