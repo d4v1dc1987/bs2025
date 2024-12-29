@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -13,28 +12,11 @@ import {
 } from "@/components/ui/form";
 import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import { useState } from "react";
-
-const passwordSchema = z
-  .object({
-    password: z
-      .string()
-      .min(8, "Le mot de passe doit contenir au moins 8 caractères")
-      .regex(/[A-Z]/, "Le mot de passe doit contenir au moins une majuscule")
-      .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre")
-      .regex(
-        /[^A-Za-z0-9]/,
-        "Le mot de passe doit contenir au moins un caractère spécial"
-      ),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Les mots de passe ne correspondent pas",
-    path: ["confirmPassword"],
-  });
+import { passwordSchema, type PasswordFormValues } from "@/schemas/passwordSchema";
 
 interface SecurityFormProps {
   isLoading: boolean;
-  onSubmit: (values: z.infer<typeof passwordSchema>) => Promise<void>;
+  onSubmit: (values: PasswordFormValues) => Promise<void>;
 }
 
 export const SecurityForm = ({ isLoading, onSubmit }: SecurityFormProps) => {
@@ -52,8 +34,8 @@ export const SecurityForm = ({ isLoading, onSubmit }: SecurityFormProps) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4 mb-6">
-        <Lock className="h-6 w-6 text-secondary" />
-        <h2 className="text-xl font-semibold text-secondary">
+        <Lock className="h-6 w-6 text-[#c299ff]" />
+        <h2 className="text-xl font-semibold text-[#c299ff]">
           Changer mon mot de passe
         </h2>
       </div>
@@ -65,7 +47,7 @@ export const SecurityForm = ({ isLoading, onSubmit }: SecurityFormProps) => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-secondary">
+                <FormLabel className="text-[#c299ff]">
                   Nouveau mot de passe
                 </FormLabel>
                 <div className="relative">
@@ -98,7 +80,7 @@ export const SecurityForm = ({ isLoading, onSubmit }: SecurityFormProps) => {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-secondary">
+                <FormLabel className="text-[#c299ff]">
                   Confirmer le nouveau mot de passe
                 </FormLabel>
                 <div className="relative">

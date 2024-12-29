@@ -3,7 +3,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { z } from "zod";
 import {
   Tabs,
   TabsContent,
@@ -13,6 +12,7 @@ import {
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { SecurityForm } from "@/components/profile/SecurityForm";
+import type { PasswordFormValues } from "@/schemas/passwordSchema";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -86,7 +86,7 @@ const Profile = () => {
     }
   };
 
-  const handlePasswordUpdate = async (values: z.infer<typeof passwordSchema>) => {
+  const handlePasswordUpdate = async (values: PasswordFormValues) => {
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.updateUser({
@@ -113,7 +113,7 @@ const Profile = () => {
 
   return (
     <div className="container max-w-4xl py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">
+      <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-[#c299ff] to-primary bg-clip-text text-transparent">
         Mon Profil
       </h1>
       
@@ -137,7 +137,7 @@ const Profile = () => {
                   onAvatarChange={handleAvatarChange}
                   initials={getInitials()}
                 />
-                <p className="text-sm text-secondary">
+                <p className="text-sm text-[#c299ff]">
                   JPG, PNG ou GIF • Max 2MB
                 </p>
               </div>
