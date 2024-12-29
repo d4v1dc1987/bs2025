@@ -10,14 +10,17 @@ export const SidebarLogo = () => {
     <Link 
       to="/" 
       className={cn(
-        "flex items-center gap-3 px-4 py-6",
-        !isOpen && "justify-center"
+        "flex items-center gap-3",
+        !isOpen && "md:justify-center"
       )}
     >
       <Zap className="h-6 w-6 text-primary shrink-0" />
-      {isOpen && (
-        <span className="text-xl font-bold text-foreground">Bobby Social</span>
-      )}
+      <span className={cn(
+        "text-xl font-bold text-foreground",
+        !isOpen && "md:hidden"
+      )}>
+        Bobby Social
+      </span>
     </Link>
   );
 };
