@@ -9,15 +9,12 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { prompt } = await req.json();
-
-    console.log('Received prompt:', prompt);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -28,16 +25,16 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a helpful assistant that helps entrepreneurs improve their social media presence and sales.' },
+          {
+            role: 'system',
+            content: "Tu es un expert en marketing digital spécialisé dans l'analyse de profils entrepreneuriaux. Tu dois fournir des analyses concises et pertinentes."
+          },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
       }),
     });
 
     const data = await response.json();
-    console.log('OpenAI response:', data);
-
     const generatedText = data.choices[0].message.content;
 
     return new Response(JSON.stringify({ generatedText }), {

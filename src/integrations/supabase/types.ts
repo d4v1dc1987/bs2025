@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      onboarding: {
+        Row: {
+          ai_summary: string | null
+          answers: Json | null
+          created_at: string
+          current_step: number | null
+          id: string
+          status: Database["public"]["Enums"]["onboarding_status"] | null
+          updated_at: string
+        }
+        Insert: {
+          ai_summary?: string | null
+          answers?: Json | null
+          created_at?: string
+          current_step?: number | null
+          id: string
+          status?: Database["public"]["Enums"]["onboarding_status"] | null
+          updated_at?: string
+        }
+        Update: {
+          ai_summary?: string | null
+          answers?: Json | null
+          created_at?: string
+          current_step?: number | null
+          id?: string
+          status?: Database["public"]["Enums"]["onboarding_status"] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -47,6 +77,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      onboarding_status: "not_started" | "in_progress" | "completed"
       user_role: "user" | "admin" | "super-admin"
     }
     CompositeTypes: {
