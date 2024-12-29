@@ -90,10 +90,10 @@ export const SignUpForm = () => {
             name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-foreground/90">Prénom</FormLabel>
+                <FormLabel className="text-foreground/90">Prénom:</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="David"
+                    placeholder="Ex: John"
                     className="bg-background/50 border-foreground/20"
                     {...field}
                   />
@@ -108,10 +108,10 @@ export const SignUpForm = () => {
             name="lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-foreground/90">Nom</FormLabel>
+                <FormLabel className="text-foreground/90">Nom de famille:</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Cloutier"
+                    placeholder="Ex: Smith"
                     className="bg-background/50 border-foreground/20"
                     {...field}
                   />
@@ -126,7 +126,7 @@ export const SignUpForm = () => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-foreground/90">Email</FormLabel>
+                <FormLabel className="text-foreground/90">Email:</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
@@ -145,7 +145,7 @@ export const SignUpForm = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-foreground/90">Mot de passe</FormLabel>
+                <FormLabel className="text-foreground/90">Mot de passe:</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -178,7 +178,7 @@ export const SignUpForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-foreground/90">
-                  Confirmer le mot de passe
+                  Confirmer le mot de passe:
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
