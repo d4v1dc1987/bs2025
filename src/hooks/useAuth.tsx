@@ -30,18 +30,28 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
+      // First check if we have a session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // If no session, just update local state
+      if (!session) {
+        setUser(null);
+        toast.success("Déconnexion réussie");
+        return;
+      }
+
+      // If we have a session, try to sign out
       const { error } = await supabase.auth.signOut();
+      
       if (error) {
-        // If we get a session not found error, that's actually okay
-        // It means we're already logged out
+        // Handle session_not_found gracefully
         if (error.message.includes("session_not_found")) {
           setUser(null);
           toast.success("Déconnexion réussie");
           return;
         }
         
-        // For other errors, we should handle them
-        console.error("Error signing out:", error.message);
+        // For other errors, throw them
         throw error;
       }
 
