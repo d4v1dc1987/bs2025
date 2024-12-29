@@ -23,10 +23,12 @@ const Auth = () => {
       <div className="w-full max-w-md mx-auto p-6">
         <div className="rounded-lg backdrop-blur-sm bg-background/80 p-8 shadow-xl">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-              <Bolt className="h-8 w-8" fill="#7b27fb" strokeWidth={0} />
-              <span>Bobby Social</span>
-            </h1>
+            <div className="flex flex-col items-center gap-2">
+              <Bolt fill="#7b27fb" size={40} strokeWidth={0} />
+              <h1 className="text-4xl font-bold text-white">
+                Bobby Social
+              </h1>
+            </div>
             <p className="text-foreground/80">
               {mode === "login"
                 ? "L'outil IA Ultime Des Entrepreneurs En Ligne Pour Dominer Facebook"
