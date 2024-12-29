@@ -51,21 +51,25 @@ const Dashboard = () => {
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-      const { data, error } = await supabase
-        .from('onboarding')
-        .select('status')
-        .eq('id', user.id)
-        .single();
+        const { data, error } = await supabase
+          .from('onboarding')
+          .select('status')
+          .eq('id', user.id)
+          .maybeSingle();
 
-      if (error) {
+        if (error) {
+          console.error('Error checking onboarding status:', error);
+          return;
+        }
+
+        setOnboardingStatus(data?.status || 'not_started');
+      } catch (error) {
         console.error('Error checking onboarding status:', error);
-        return;
       }
-
-      setOnboardingStatus(data?.status || 'not_started');
     };
 
     checkOnboardingStatus();

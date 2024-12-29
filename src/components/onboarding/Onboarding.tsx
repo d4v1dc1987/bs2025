@@ -17,23 +17,27 @@ export const Onboarding = () => {
   useEffect(() => {
     // Load existing answers if any
     const loadOnboardingData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-      const { data, error } = await supabase
-        .from('onboarding')
-        .select('current_step, answers')
-        .eq('id', user.id)
-        .single();
+        const { data, error } = await supabase
+          .from('onboarding')
+          .select('current_step, answers')
+          .eq('id', user.id)
+          .maybeSingle();
 
-      if (error) {
+        if (error) {
+          console.error('Error loading onboarding data:', error);
+          return;
+        }
+
+        if (data) {
+          setCurrentStep(data.current_step || 1);
+          setAnswers(data.answers as OnboardingAnswers || {});
+        }
+      } catch (error) {
         console.error('Error loading onboarding data:', error);
-        return;
-      }
-
-      if (data) {
-        setCurrentStep(data.current_step);
-        setAnswers(data.answers || {});
       }
     };
 
@@ -56,12 +60,12 @@ export const Onboarding = () => {
     // Update Supabase with current progress
     const { error } = await supabase
       .from('onboarding')
-      .update({
+      .upsert({
+        id: user.id,
         current_step: nextStep,
         answers,
         status: nextStep > ONBOARDING_QUESTIONS.length ? 'completed' : 'in_progress',
-      })
-      .eq('id', user.id);
+      });
 
     if (error) {
       toast.error("Erreur lors de la sauvegarde de votre réponse");
