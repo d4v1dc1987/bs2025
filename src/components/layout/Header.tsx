@@ -35,7 +35,7 @@ export const Header = () => {
         )}
         
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <div className="flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-2">
             {user && (
               <Button 
                 variant="ghost" 
