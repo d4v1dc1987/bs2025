@@ -11,7 +11,7 @@ export const SidebarLogo = () => {
       to="/" 
       className={cn(
         "flex items-center gap-3",
-        !isOpen && "md:pl-4"
+        !isOpen && "md:w-full md:justify-center"
       )}
     >
       <Zap className="h-6 w-6 text-primary shrink-0" />
