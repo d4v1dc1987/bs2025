@@ -9,6 +9,12 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Function to clear local state and redirect
+  const clearStateAndRedirect = () => {
+    setUser(null);
+    navigate("/auth?mode=login");
+  };
+
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -21,9 +27,8 @@ export const useAuth = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
-      if (event === "SIGNED_OUT") {
-        setUser(null);
-        navigate("/auth?mode=login");
+      if (event === "SIGNED_OUT" || event === "USER_DELETED") {
+        clearStateAndRedirect();
       } else if (event === "SIGNED_IN") {
         setUser(session?.user ?? null);
         navigate("/");
@@ -35,46 +40,22 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
-      // First check if we have a session
-      const { data: { session } } = await supabase.auth.getSession();
+      // Force clear the session from Supabase
+      await supabase.auth.signOut({ scope: 'local' });
       
-      // If no session, just update local state and redirect
-      if (!session) {
-        setUser(null);
-        navigate("/auth?mode=login");
-        toast.success("Déconnexion réussie");
-        return;
-      }
-
-      // If we have a session, try to sign out
-      const { error } = await supabase.auth.signOut();
+      // Clear browser storage
+      localStorage.removeItem('supabase.auth.token');
+      sessionStorage.removeItem('supabase.auth.token');
       
-      if (error) {
-        // Handle session_not_found gracefully
-        if (error.message.includes("session_not_found")) {
-          setUser(null);
-          navigate("/auth?mode=login");
-          toast.success("Déconnexion réussie");
-          return;
-        }
-        
-        // For other errors, show error toast
-        console.error("Logout error:", error);
-        toast.error("Une erreur est survenue lors de la déconnexion");
-        return;
-      }
-
-      // Successful logout
-      setUser(null);
-      navigate("/auth?mode=login");
+      // Clear local state and redirect
+      clearStateAndRedirect();
       toast.success("Déconnexion réussie");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Logout error:", error);
-      toast.error("Une erreur est survenue lors de la déconnexion");
       
       // Even if there's an error, we should clear the local state
-      setUser(null);
-      navigate("/auth?mode=login");
+      clearStateAndRedirect();
+      toast.success("Déconnexion réussie");
     }
   };
 
