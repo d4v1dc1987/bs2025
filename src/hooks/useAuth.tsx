@@ -27,7 +27,7 @@ export const useAuth = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
-      if (event === "SIGNED_OUT" || event === "USER_DELETED") {
+      if (event === "SIGNED_OUT") {
         clearStateAndRedirect();
       } else if (event === "SIGNED_IN") {
         setUser(session?.user ?? null);
