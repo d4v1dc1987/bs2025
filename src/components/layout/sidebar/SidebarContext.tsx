@@ -8,10 +8,8 @@ type SidebarContextType = {
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export const SidebarProvider = ({ children }: { children: React.ReactNode }) => {
-  // La sidebar est fermée par défaut sur mobile, ouverte par défaut sur desktop
   const [isOpen, setIsOpen] = useState(window.innerWidth >= 768);
 
-  // Mettre à jour l'état de la sidebar lors du redimensionnement de la fenêtre
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
