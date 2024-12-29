@@ -30,7 +30,7 @@ export const Sidebar = () => {
           !isOpen && "-translate-x-full md:translate-x-0 md:w-[72px]"
         )}
       >
-        <div className="flex items-center justify-between p-4 md:justify-center">
+        <div className="flex items-center justify-between p-4">
           <SidebarLogo />
           <Button
             variant="ghost"
