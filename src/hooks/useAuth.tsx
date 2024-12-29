@@ -18,10 +18,13 @@ export const useAuth = () => {
     // Listen for changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      if (event === 'SIGNED_OUT') {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
         setUser(null);
+        // Clear any local session data
+        await supabase.auth.clearSession();
+      } else {
+        setUser(session?.user ?? null);
       }
     });
 
@@ -30,10 +33,13 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
+      // First try to clear the session locally
+      await supabase.auth.clearSession();
+      
       const { error } = await supabase.auth.signOut();
       if (error) {
-        console.error("Error signing out:", error.message);
-        // If we get a session not found error, we can still clear the local state
+        // If we get a session not found error, that's actually okay
+        // It means we're already logged out
         if (error.message.includes("session_not_found")) {
           setUser(null);
           toast({
@@ -42,18 +48,26 @@ export const useAuth = () => {
           });
           return;
         }
+        
+        // For other errors, we should handle them
+        console.error("Error signing out:", error.message);
         throw error;
       }
+
+      setUser(null);
       toast({
         title: "Déconnexion réussie",
         description: "Vous avez été déconnecté avec succès.",
       });
     } catch (error) {
+      console.error("Logout error:", error);
       toast({
         variant: "destructive",
         title: "Erreur lors de la déconnexion",
         description: "Une erreur est survenue lors de la déconnexion. Veuillez réessayer.",
       });
+      // Even if there's an error, we should try to clear the local state
+      setUser(null);
     }
   };
 
