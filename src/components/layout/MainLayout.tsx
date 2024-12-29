@@ -1,7 +1,7 @@
-import { SidebarProvider } from "./sidebar/SidebarContext";
-import { Sidebar } from "./sidebar/Sidebar";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { Sidebar } from "@/components/layout/sidebar/Sidebar";
+import { SidebarProvider } from "@/components/layout/sidebar/SidebarContext";
 
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (

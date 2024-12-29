@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSidebar } from "@/components/layout/sidebar/SidebarContext";
-import { cn } from "@/lib/utils";
 
 export const Header = () => {
   const { user, signOut } = useAuth();
@@ -31,7 +30,7 @@ export const Header = () => {
         
         {user && (
           <span className="ml-4 text-sm text-muted-foreground truncate max-w-[150px] md:max-w-none">
-            {getGreeting()} {user.user_metadata?.first_name || 'utilisateur'}!
+            {getGreeting()} {user.user_metadata.first_name}!
           </span>
         )}
         
