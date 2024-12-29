@@ -25,8 +25,8 @@ export const SidebarNav = () => {
         onClick={handleLinkClick}
       />
       
-      {/* Separator */}
-      <Separator className="my-4 bg-gray-700/50" />
+      {/* Separator with consistent margin */}
+      <Separator className="my-2 bg-gray-700/50" />
       
       {/* Main Navigation Links */}
       <MainNavigation 
