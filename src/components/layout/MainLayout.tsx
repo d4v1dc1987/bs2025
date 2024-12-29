@@ -6,9 +6,9 @@ import { Footer } from "./Footer";
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background text-white">
+      <div className="flex min-h-screen bg-background text-white">
         <Sidebar />
-        <div className="flex-1 flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col min-h-screen w-full">
           <Header />
           <main className="flex-1 p-6">{children}</main>
           <Footer />

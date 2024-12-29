@@ -20,13 +20,18 @@ export const Sidebar = () => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[#232228] border-r border-white/10 transition-transform duration-300 ease-in-out md:translate-x-0",
-          !isOpen && "-translate-x-full"
+          "shrink-0 w-72 bg-[#232228] border-r border-white/10 transition-all duration-300 ease-in-out",
+          !isOpen && "w-0 md:w-[72px]"
         )}
       >
-        <SidebarLogo />
-        <div className="flex-1 overflow-y-auto py-4">
-          <SidebarNav />
+        <div className={cn(
+          "h-full w-72 fixed top-0 left-0 bg-[#232228] border-r border-white/10 transition-transform duration-300 ease-in-out",
+          !isOpen && "-translate-x-full md:translate-x-0 md:w-[72px]"
+        )}>
+          <SidebarLogo />
+          <div className="flex-1 overflow-y-auto py-4">
+            <SidebarNav />
+          </div>
         </div>
       </aside>
     </>

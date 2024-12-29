@@ -29,9 +29,9 @@ export const Header = () => {
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
         
-        {user?.email && (
+        {user && (
           <span className="ml-4 text-sm text-muted-foreground truncate max-w-[150px] md:max-w-none">
-            {getGreeting()}, {user.user_metadata.first_name || user.email}
+            {getGreeting()}, {user.user_metadata.first_name || 'utilisateur'}
           </span>
         )}
         
