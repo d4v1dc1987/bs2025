@@ -20,11 +20,13 @@ export const useAuth = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_OUT') {
+      console.log("Auth state changed:", event, session);
+      if (event === "SIGNED_OUT") {
         setUser(null);
         navigate("/auth?mode=login");
-      } else {
+      } else if (event === "SIGNED_IN") {
         setUser(session?.user ?? null);
+        navigate("/");
       }
     });
 
@@ -33,42 +35,19 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
-      // First check if we have a session
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      // If no session, just update local state and redirect
-      if (!session) {
-        setUser(null);
-        navigate("/auth?mode=login");
-        toast.success("Déconnexion réussie");
-        return;
-      }
-
-      // If we have a session, try to sign out
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        // Handle session_not_found gracefully
-        if (error.message.includes("session_not_found")) {
-          setUser(null);
-          navigate("/auth?mode=login");
-          toast.success("Déconnexion réussie");
-          return;
-        }
-        
-        // For other errors, throw them
-        throw error;
+        console.error("Logout error:", error);
+        toast.error("Une erreur est survenue lors de la déconnexion");
+        return;
       }
 
-      setUser(null);
-      navigate("/auth?mode=login");
+      // La redirection sera gérée par onAuthStateChange
       toast.success("Déconnexion réussie");
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("Une erreur est survenue lors de la déconnexion. Veuillez réessayer.");
-      // Even if there's an error, we should try to clear the local state
-      setUser(null);
-      navigate("/auth?mode=login");
+      toast.error("Une erreur est survenue lors de la déconnexion");
     }
   };
 
