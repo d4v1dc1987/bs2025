@@ -24,7 +24,7 @@ const Auth = () => {
         <div className="rounded-lg backdrop-blur-sm bg-background/80 p-8 shadow-xl">
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2">
-              <Bolt fill="#7b27fb" size={40} strokeWidth={0} />
+              <Bolt size={40} color="#7b27fb" />
               <h1 className="text-4xl font-bold text-white">
                 Bobby Social
               </h1>
