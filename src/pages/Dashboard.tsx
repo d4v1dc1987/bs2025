@@ -59,13 +59,13 @@ const Dashboard = () => {
           const Icon = feature.icon;
           return (
             <Link key={feature.to} to={feature.to}>
-              <Card className="h-full transition-all duration-200 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1">
+              <Card className="h-full transition-all duration-200 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1 bg-[#2A2A30] backdrop-blur-sm border-[#3A3A40]">
                 <CardHeader>
                   <div className="flex items-center gap-2 mb-2">
                     <Icon className="h-6 w-6 text-primary" />
                     <CardTitle className="text-xl">{feature.title}</CardTitle>
                   </div>
-                  <CardDescription className="text-base">
+                  <CardDescription className="text-base text-gray-300">
                     {feature.description}
                   </CardDescription>
                 </CardHeader>
