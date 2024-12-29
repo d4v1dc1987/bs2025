@@ -58,9 +58,12 @@ export const SidebarNav = () => {
         key={link.to}
         variant={isActive ? "secondary" : "ghost"}
         className={cn(
-          "justify-start gap-2 text-base font-normal group relative",
-          isActive && "bg-primary/20 hover:bg-primary/30",
-          !isOpen && "md:justify-center"
+          "justify-start gap-3 text-base font-normal group relative w-full",
+          "transition-all duration-200",
+          "hover:bg-primary/10 hover:text-primary",
+          isActive && "bg-primary/20 hover:bg-primary/30 text-primary border border-primary/20",
+          !isOpen && "md:justify-center",
+          "my-1.5" // Added more vertical spacing between buttons
         )}
         asChild
         onClick={handleLinkClick}
@@ -68,7 +71,8 @@ export const SidebarNav = () => {
         <Link to={link.to}>
           <Icon className={cn(
             "h-5 w-5 shrink-0",
-            !isOpen && "md:w-5 md:h-5"
+            !isOpen && "md:w-5 md:h-5",
+            isActive ? "text-primary" : "text-gray-400 group-hover:text-primary"
           )} />
           <span className={cn(
             "transition-all duration-300",
@@ -82,15 +86,17 @@ export const SidebarNav = () => {
   };
   
   return (
-    <nav className="grid gap-1 px-2">
+    <nav className="grid gap-2 px-3 py-2">
       {/* Dashboard Section */}
       {renderNavButton(dashboardLink)}
       
-      {/* Separator */}
-      <Separator className="my-2" />
+      {/* Separator with increased margins */}
+      <Separator className="my-4 bg-gray-700/50" />
       
       {/* Main Navigation Links */}
-      {links.map((link) => renderNavButton(link))}
+      <div className="space-y-2">
+        {links.map((link) => renderNavButton(link))}
+      </div>
     </nav>
   );
 };
