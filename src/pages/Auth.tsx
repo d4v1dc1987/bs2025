@@ -3,7 +3,8 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignUpForm } from "@/components/auth/SignUpForm";
-import { Bolt } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBolt } from "@fortawesome/free-solid-svg-icons";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const Auth = () => {
         <div className="rounded-lg backdrop-blur-sm bg-background/80 p-8 shadow-xl">
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2">
-              <Bolt size={40} color="#7b27fb" />
+              <FontAwesomeIcon icon={faBolt} className="text-[#7b27fb] text-4xl" />
               <h1 className="text-4xl font-bold text-white">
                 Bobby Social
               </h1>
