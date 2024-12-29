@@ -29,7 +29,7 @@ export const NavButton = ({
         "hover:bg-primary/20 hover:text-white",
         isActive && "bg-primary/30 text-white border border-primary/30",
         !isOpen && "md:justify-center",
-        "my-1.5"
+        "mb-2" // Ajout d'une marge uniforme en bas
       )}
       asChild
       onClick={onClick}
