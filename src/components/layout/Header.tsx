@@ -31,7 +31,7 @@ export const Header = () => {
         
         {user && (
           <span className="ml-4 text-sm text-muted-foreground truncate max-w-[150px] md:max-w-none">
-            {getGreeting()} {user.user_metadata.first_name}!
+            {getGreeting()} {user.user_metadata?.first_name || user.email}!
           </span>
         )}
         

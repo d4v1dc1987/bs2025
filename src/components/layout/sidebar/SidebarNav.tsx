@@ -47,14 +47,17 @@ export const SidebarNav = () => {
             key={link.to}
             variant={isActive ? "secondary" : "ghost"}
             className={cn(
-              "justify-start gap-2 text-base font-normal group",
+              "justify-start gap-2 text-base font-normal group relative",
               isActive && "bg-primary/20 hover:bg-primary/30",
-              !isOpen && "px-0 justify-center"
+              !isOpen && "px-0 justify-center w-full"
             )}
             asChild
           >
             <Link to={link.to}>
-              <Icon className="h-5 w-5 shrink-0" />
+              <Icon className={cn(
+                "h-5 w-5 shrink-0",
+                !isOpen && "absolute left-1/2 -translate-x-1/2"
+              )} />
               <span className={cn(
                 "transition-all duration-300 overflow-hidden",
                 !isOpen && "w-0 opacity-0"
