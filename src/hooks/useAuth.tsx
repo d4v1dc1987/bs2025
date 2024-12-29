@@ -12,6 +12,9 @@ export const useAuth = () => {
   // Function to clear local state and redirect
   const clearStateAndRedirect = () => {
     setUser(null);
+    // Clear all Supabase related items from storage
+    localStorage.removeItem('sb-jxqeoenhiqdtzzqbjwqz-auth-token');
+    sessionStorage.removeItem('sb-jxqeoenhiqdtzzqbjwqz-auth-token');
     navigate("/auth?mode=login");
   };
 
@@ -40,20 +43,11 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
-      // Force clear the session from Supabase
-      await supabase.auth.signOut({ scope: 'local' });
-      
-      // Clear browser storage
-      localStorage.removeItem('supabase.auth.token');
-      sessionStorage.removeItem('supabase.auth.token');
-      
-      // Clear local state and redirect
-      clearStateAndRedirect();
-      toast.success("Déconnexion réussie");
+      await supabase.auth.signOut();
     } catch (error: any) {
       console.error("Logout error:", error);
-      
-      // Even if there's an error, we should clear the local state
+    } finally {
+      // Always clear local state and redirect, even if the API call fails
       clearStateAndRedirect();
       toast.success("Déconnexion réussie");
     }
