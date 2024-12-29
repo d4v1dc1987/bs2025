@@ -5,7 +5,7 @@ import { useSidebar } from "@/components/layout/sidebar/SidebarContext";
 
 export const Header = () => {
   const { user, signOut } = useAuth();
-  const { isOpen, toggle } = useSidebar();
+  const { toggle } = useSidebar();
   
   // Function to get greeting based on time of day
   const getGreeting = () => {

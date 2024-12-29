@@ -34,7 +34,13 @@ const links = [
 
 export const SidebarNav = () => {
   const location = useLocation();
-  const { isOpen } = useSidebar();
+  const { isOpen, close } = useSidebar();
+  
+  const handleLinkClick = () => {
+    if (window.innerWidth < 768) {
+      close();
+    }
+  };
   
   return (
     <nav className="grid gap-1 px-2">
@@ -52,6 +58,7 @@ export const SidebarNav = () => {
               !isOpen && "px-0 justify-center w-full"
             )}
             asChild
+            onClick={handleLinkClick}
           >
             <Link to={link.to}>
               <Icon className={cn(
@@ -59,7 +66,7 @@ export const SidebarNav = () => {
                 !isOpen && "absolute left-1/2 -translate-x-1/2"
               )} />
               <span className={cn(
-                "transition-all duration-300 overflow-hidden",
+                "transition-all duration-300",
                 !isOpen && "w-0 opacity-0"
               )}>
                 {link.label}

@@ -6,7 +6,7 @@ import { SidebarProvider } from "@/components/layout/sidebar/SidebarContext";
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
-      <div className="relative flex min-h-screen bg-background text-white">
+      <div className="relative flex min-h-screen w-full bg-background text-white">
         <Sidebar />
         <div className="flex-1 flex flex-col min-h-screen w-full">
           <Header />

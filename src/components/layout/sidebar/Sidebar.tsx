@@ -11,7 +11,7 @@ export const Sidebar = () => {
       {/* Mobile overlay */}
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-black/80 backdrop-blur-sm transition-opacity duration-300 md:hidden",
+          "fixed inset-0 z-40 bg-black/80 backdrop-blur-sm transition-all duration-300 md:hidden",
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
       />
@@ -19,7 +19,8 @@ export const Sidebar = () => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[#232228] border-r border-white/10 transition-transform duration-300 ease-in-out md:relative md:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-72 bg-[#232228] border-r border-white/10 transition-all duration-300 ease-in-out",
+          "md:relative md:translate-x-0",
           !isOpen && "-translate-x-full"
         )}
       >
