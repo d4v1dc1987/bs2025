@@ -47,22 +47,22 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   };
 
   const generateAIProfile = async () => {
+    // Always show the progress bar by setting these states immediately
     setIsGeneratingProfile(true);
     setGenerationProgress(0);
     
-    try {
-      // Start progress animation immediately with slower progression
-      const progressInterval = setInterval(() => {
-        setGenerationProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          // Slower progression to ensure visibility
-          return prev + 0.5;
-        });
-      }, 50); // Update every 50ms for smoother animation
+    // Start progress animation immediately
+    const progressInterval = setInterval(() => {
+      setGenerationProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return prev + 0.5;
+      });
+    }, 50);
 
+    try {
       const formattedAnswers = Object.entries(answers)
         .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
         .join('\n');
@@ -71,12 +71,12 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
         .replace('{firstName}', firstName)
         .replace('{answers}', formattedAnswers);
 
-      // Add minimum delay of 10 seconds before completing
+      // Add minimum delay of 3 seconds before completing to ensure progress bar is visible
       const [aiResponse] = await Promise.all([
         supabase.functions.invoke('generate-with-ai', {
           body: { prompt }
         }),
-        new Promise(resolve => setTimeout(resolve, 10000))
+        new Promise(resolve => setTimeout(resolve, 3000))
       ]);
 
       if (aiResponse.error) throw aiResponse.error;
@@ -88,7 +88,10 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
       console.error('Error generating AI summary:', error);
       toast.error("Erreur lors de la génération du profil");
     } finally {
-      setIsGeneratingProfile(false);
+      // Keep isGeneratingProfile true until the progress bar reaches 100%
+      setTimeout(() => {
+        setIsGeneratingProfile(false);
+      }, 500); // Small delay to ensure smooth transition
     }
   };
 
