@@ -7,14 +7,10 @@ import { useOnboarding } from "./OnboardingContext";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { QuestionForm } from "./QuestionForm";
 import { AIProfileReview } from "./AIProfileReview";
+import { isCustomAnswer } from "@/types/customAnswer";
 
 interface OnboardingProps {
   onComplete?: () => void;
-}
-
-interface CustomAnswer {
-  value: string;
-  customValue?: string;
 }
 
 export const Onboarding = ({ onComplete }: OnboardingProps) => {
@@ -110,6 +106,21 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     setCurrentStep(nextStep);
   };
 
+  const formatAnswerValue = (value: unknown): string => {
+    if (Array.isArray(value)) {
+      return value
+        .map(v => {
+          if (isCustomAnswer(v)) {
+            return v.customValue ? `${v.value} (${v.customValue})` : v.value;
+          }
+          return v;
+        })
+        .filter(Boolean)
+        .join(', ');
+    }
+    return String(value);
+  };
+
   const generateAIProfile = async () => {
     setIsGeneratingProfile(true);
     setGenerationProgress(0);
@@ -120,18 +131,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
       }, 500);
 
       const formattedAnswers = Object.entries(answers)
-        .map(([key, value]) => {
-          if (Array.isArray(value)) {
-            return `${key}: ${value.map(v => {
-              if (v && typeof v === 'object' && 'value' in v) {
-                const typedV = v as CustomAnswer;
-                return typedV?.customValue ? `${typedV.value} (${typedV.customValue})` : typedV.value;
-              }
-              return v;
-            }).filter(Boolean).join(', ')}`;
-          }
-          return `${key}: ${value}`;
-        })
+        .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
         .join('\n');
 
       const prompt = AI_PROFILE_PROMPT
