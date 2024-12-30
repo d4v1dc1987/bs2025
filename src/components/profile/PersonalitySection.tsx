@@ -3,34 +3,49 @@ import { OnboardingSection } from "@/components/profile/OnboardingSection";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 export const PersonalitySection = () => {
   const { user } = useAuth();
   const [aiProfile, setAiProfile] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchAiProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('onboarding')
+        .select('ai_summary')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      setAiProfile(data?.ai_summary);
+    } catch (error) {
+      console.error('Error fetching AI profile:', error);
+      toast.error("Erreur lors du chargement du profil");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch profile on component mount and when user changes
   useEffect(() => {
-    const fetchAiProfile = async () => {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('onboarding')
-          .select('ai_summary')
-          .eq('id', user.id)
-          .single();
-
-        if (error) throw error;
-        setAiProfile(data?.ai_summary);
-      } catch (error) {
-        console.error('Error fetching AI profile:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchAiProfile();
   }, [user]);
+
+  // Add a refetch when the component receives focus
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchAiProfile();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -50,7 +65,7 @@ export const PersonalitySection = () => {
               </div>
             </Card>
           )}
-          <OnboardingSection />
+          <OnboardingSection onProfileUpdate={fetchAiProfile} />
         </>
       )}
     </div>
