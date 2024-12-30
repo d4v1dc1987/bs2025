@@ -1,18 +1,12 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { ONBOARDING_QUESTIONS, AI_PROFILE_PROMPT, TEXT_LIMITS } from "@/types/onboarding";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ChoiceGroup } from "./ChoiceGroup";
-import { QuestionDescription } from "./QuestionDescription";
 import type { OnboardingAnswers } from "@/types/onboarding";
-import { Progress } from "@/components/ui/progress";
-import { AIProfileReview } from "./AIProfileReview";
+import { ONBOARDING_QUESTIONS, AI_PROFILE_PROMPT } from "@/types/onboarding";
 import { useOnboarding } from "./OnboardingContext";
+import { WelcomeScreen } from "./WelcomeScreen";
+import { QuestionForm } from "./QuestionForm";
+import { AIProfileReview } from "./AIProfileReview";
 
 interface CustomAnswer {
   value: string;
@@ -30,13 +24,11 @@ export const Onboarding = () => {
   const { closeOnboarding } = useOnboarding();
 
   useEffect(() => {
-    // Load existing answers and user data
     const loadData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // Get user's first name
         const { data: profileData } = await supabase
           .from('profiles')
           .select('first_name')
@@ -47,7 +39,6 @@ export const Onboarding = () => {
           setFirstName(profileData.first_name);
         }
 
-        // Get onboarding data
         const { data: onboardingData, error } = await supabase
           .from('onboarding')
           .select('current_step, answers')
@@ -109,56 +100,60 @@ export const Onboarding = () => {
     }
 
     if (nextStep > ONBOARDING_QUESTIONS.length) {
-      setIsGeneratingProfile(true);
-      setGenerationProgress(0);
-      
-      try {
-        const progressInterval = setInterval(() => {
-          setGenerationProgress(prev => Math.min(prev + 5, 90));
-        }, 500);
-
-        const formattedAnswers = Object.entries(answers)
-          .map(([key, value]) => {
-            if (Array.isArray(value)) {
-              return `${key}: ${value.map(v => {
-                if (v && typeof v === 'object' && 'value' in v && 'customValue' in v) {
-                  const typedV = v as CustomAnswer;
-                  if (!typedV) return '';
-                  return typedV.customValue ? `${typedV.value} (${typedV.customValue})` : typedV.value;
-                }
-                return v;
-              }).filter(Boolean).join(', ')}`;
-            }
-            return `${key}: ${value}`;
-          })
-          .join('\n');
-
-        const prompt = AI_PROFILE_PROMPT
-          .replace('{firstName}', firstName)
-          .replace('{answers}', formattedAnswers);
-
-        const response = await fetch('/functions/v1/generate-with-ai', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ prompt }),
-        });
-
-        clearInterval(progressInterval);
-        setGenerationProgress(100);
-
-        const { generatedText } = await response.json();
-        setGeneratedProfile(generatedText);
-      } catch (error: any) {
-        console.error('Error generating AI summary:', error);
-        toast.error("Erreur lors de la génération du profil");
-      } finally {
-        setIsGeneratingProfile(false);
-      }
+      await generateAIProfile();
     }
 
     setCurrentStep(nextStep);
+  };
+
+  const generateAIProfile = async () => {
+    setIsGeneratingProfile(true);
+    setGenerationProgress(0);
+    
+    try {
+      const progressInterval = setInterval(() => {
+        setGenerationProgress(prev => Math.min(prev + 5, 90));
+      }, 500);
+
+      const formattedAnswers = Object.entries(answers)
+        .map(([key, value]) => {
+          if (Array.isArray(value)) {
+            return `${key}: ${value.map(v => {
+              if (v && typeof v === 'object' && 'value' in v && 'customValue' in v) {
+                const typedV = v as CustomAnswer;
+                if (!typedV) return '';
+                return typedV.customValue ? `${typedV.value} (${typedV.customValue})` : typedV.value;
+              }
+              return v;
+            }).filter(Boolean).join(', ')}`;
+          }
+          return `${key}: ${value}`;
+        })
+        .join('\n');
+
+      const prompt = AI_PROFILE_PROMPT
+        .replace('{firstName}', firstName)
+        .replace('{answers}', formattedAnswers);
+
+      const response = await fetch('/functions/v1/generate-with-ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      clearInterval(progressInterval);
+      setGenerationProgress(100);
+
+      const { generatedText } = await response.json();
+      setGeneratedProfile(generatedText);
+    } catch (error: any) {
+      console.error('Error generating AI summary:', error);
+      toast.error("Erreur lors de la génération du profil");
+    } finally {
+      setIsGeneratingProfile(false);
+    }
   };
 
   const handleProfileConfirm = async (profile: string) => {
@@ -211,121 +206,24 @@ export const Onboarding = () => {
     );
   }
 
-  if (currentStep > ONBOARDING_QUESTIONS.length) {
-    return (
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Onboarding terminé !</CardTitle>
-          <CardDescription>
-            Merci d'avoir complété l'onboarding. Nous analysons vos réponses pour personnaliser votre expérience.
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
-
   if (currentStep === 0) {
     return (
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Bienvenue dans Bobby Social</CardTitle>
-          <CardDescription className="text-lg space-y-4">
-            <p>Ok {firstName}, tout d'abord, j'ai quelques questions à te poser pour personnaliser ton expérience avec Bobby Social au maximum. 😎</p>
-            <p>🔥 Plus tu réponds de façon honnête et précise, mieux c'est!</p>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button onClick={handleNext} className="w-full">
-            Commencer
-          </Button>
-        </CardContent>
-      </Card>
+      <WelcomeScreen
+        firstName={firstName}
+        onStart={handleNext}
+      />
     );
   }
 
-  const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
-  const questionText = currentQuestion.question.replace('{firstName}', firstName);
-
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Onboarding ({currentStep}/{ONBOARDING_QUESTIONS.length})</CardTitle>
-        <CardDescription>
-          Répondez à quelques questions pour personnaliser votre expérience
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          <div className="space-y-4">
-            <h3 className="font-medium text-lg whitespace-pre-line">{questionText}</h3>
-            
-            {(currentQuestion.type === 'single' || currentQuestion.type === 'multiple') && (
-              <ChoiceGroup
-                question={currentQuestion}
-                value={answers[currentQuestion.id]}
-                onChange={handleAnswerChange}
-              />
-            )}
-
-            {currentQuestion.type === 'text' && (
-              <Input
-                value={answers[currentQuestion.id] as string || ''}
-                onChange={(e) => handleAnswerChange(e.target.value)}
-                placeholder="Votre réponse..."
-                maxLength={TEXT_LIMITS.medium}
-              />
-            )}
-
-            {currentQuestion.type === 'textarea' && (
-              <Textarea
-                value={answers[currentQuestion.id] as string || ''}
-                onChange={(e) => handleAnswerChange(e.target.value)}
-                placeholder="Votre réponse..."
-                className="min-h-[120px]"
-                maxLength={TEXT_LIMITS.personal_story}
-              />
-            )}
-
-            {currentQuestion.type === 'date' && (
-              <Input
-                type="text"
-                value={answers[currentQuestion.id] as string || ''}
-                onChange={(e) => handleAnswerChange(e.target.value)}
-                placeholder="19 février 1987"
-              />
-            )}
-
-            <QuestionDescription description={currentQuestion.description} />
-          </div>
-
-          <div className="flex justify-between pt-4">
-            <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentStep === 1}
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Précédent
-            </Button>
-            <Button
-              onClick={handleNext}
-              disabled={!answers[currentQuestion.id] || isSubmitting}
-            >
-              {currentStep === ONBOARDING_QUESTIONS.length ? (
-                <>
-                  Terminer
-                  <Check className="w-4 h-4 ml-2" />
-                </>
-              ) : (
-                <>
-                  Suivant
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <QuestionForm
+      currentStep={currentStep}
+      firstName={firstName}
+      answers={answers}
+      onPrevious={handlePrevious}
+      onNext={handleNext}
+      onAnswerChange={handleAnswerChange}
+      isSubmitting={isSubmitting}
+    />
   );
 };

@@ -4,18 +4,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { SecurityForm } from "@/components/profile/SecurityForm";
 import type { PasswordFormValues } from "@/schemas/passwordSchema";
 import { useNavigate } from "react-router-dom";
 import { useOnboarding } from "@/components/onboarding/OnboardingContext";
+import { Onboarding } from "@/components/onboarding/Onboarding";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -26,8 +22,8 @@ const Profile = () => {
     last_name: "",
     avatar_url: "",
   });
+  const { isOnboardingOpen, openOnboarding } = useOnboarding();
 
-  // Fetch user profile data on component mount
   useEffect(() => {
     if (user) {
       const { first_name, last_name, avatar_url } = user.user_metadata;
@@ -127,17 +123,14 @@ const Profile = () => {
     return `${(formData.first_name?.[0] || "").toUpperCase()}${(formData.last_name?.[0] || "").toUpperCase()}` || "U";
   };
 
-  const { openOnboarding } = useOnboarding();
-
-  const handleEditPersonality = () => {
-    openOnboarding();
-  };
-
   return (
     <div className="container max-w-4xl py-8">
       <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-[#c299ff] to-primary bg-clip-text text-transparent">
         Mon Profil
       </h1>
+      
+      {isOnboardingOpen && <Onboarding />}
+      
       <Tabs defaultValue="profile" className="space-y-8">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="profile" className="text-lg">
@@ -147,7 +140,7 @@ const Profile = () => {
             Sécurité
           </TabsTrigger>
         </TabsList>
-
+        
         <TabsContent value="profile">
           <div className="space-y-8">
             <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
@@ -172,20 +165,21 @@ const Profile = () => {
                 onChange={handleFormChange}
               />
             </Card>
+            
             <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Ma personnalité Bobby Social</h3>
                 <p className="text-sm text-muted-foreground">
                   Modifiez vos réponses au questionnaire de personnalité pour mettre à jour votre profil.
                 </p>
-                <Button onClick={handleEditPersonality}>
+                <Button onClick={openOnboarding}>
                   Modifier ma personnalité
                 </Button>
               </div>
             </Card>
           </div>
         </TabsContent>
-
+        
         <TabsContent value="security">
           <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
             <SecurityForm
