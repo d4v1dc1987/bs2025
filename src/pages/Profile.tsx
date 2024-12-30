@@ -13,8 +13,10 @@ import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { SecurityForm } from "@/components/profile/SecurityForm";
 import type { PasswordFormValues } from "@/schemas/passwordSchema";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -123,12 +125,15 @@ const Profile = () => {
     return `${(formData.first_name?.[0] || "").toUpperCase()}${(formData.last_name?.[0] || "").toUpperCase()}` || "U";
   };
 
+  const handleEditPersonality = () => {
+    navigate("/dashboard", { state: { openOnboarding: true } });
+  };
+
   return (
     <div className="container max-w-4xl py-8">
       <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-[#c299ff] to-primary bg-clip-text text-transparent">
         Mon Profil
       </h1>
-      
       <Tabs defaultValue="profile" className="space-y-8">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="profile" className="text-lg">
@@ -162,6 +167,17 @@ const Profile = () => {
                 onSubmit={handleProfileUpdate}
                 onChange={handleFormChange}
               />
+            </Card>
+            <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Ma personnalité Bobby Social</h3>
+                <p className="text-sm text-muted-foreground">
+                  Modifiez vos réponses au questionnaire de personnalité pour mettre à jour votre profil.
+                </p>
+                <Button onClick={handleEditPersonality}>
+                  Modifier ma personnalité
+                </Button>
+              </div>
             </Card>
           </div>
         </TabsContent>

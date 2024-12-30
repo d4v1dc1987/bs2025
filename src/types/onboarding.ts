@@ -2,6 +2,7 @@ export interface OnboardingOption {
   value: string;
   label: string;
   emoji?: string;
+  allowCustom?: boolean; // Added to support custom input for "Other" option
 }
 
 export interface OnboardingQuestion {
@@ -14,6 +15,7 @@ export interface OnboardingQuestion {
     dependsOn: string;
     showIf: string[];
   };
+  maxLength?: number; // Added to enforce text limits
 }
 
 export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed';
@@ -21,6 +23,13 @@ export type OnboardingStatus = 'not_started' | 'in_progress' | 'completed';
 export interface OnboardingAnswers {
   [key: string]: string | string[];
 }
+
+export const TEXT_LIMITS = {
+  short: 100,
+  medium: 250,
+  long: 500,
+  personal_story: 1000
+} as const;
 
 export const AI_PROFILE_PROMPT = `Tu es un assistant expert en analyse de personnalité et en création de profils psychologiques. À partir des réponses obtenues d'un utilisateur, ton rôle est de construire un profil complet et nuancé, qui décrit non seulement ses traits de personnalité et ses comportements, mais aussi ses motivations profondes, ses modes de pensée, et son style de communication. Ce profil servira à personnaliser des contenus Facebook de manière à refléter fidèlement la manière dont cette personne s'exprime et interagit avec les autres. Note importante : Le résultat doit être rédigé à la première personne (parler en 'je') et ne pas dépasser 1500 caractères.
 
@@ -53,7 +62,7 @@ export const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
       { value: 'female', label: 'Une femme', emoji: '👩' },
       { value: 'male', label: 'Un homme', emoji: '👨' },
       { value: 'non_binary', label: 'Non binaire', emoji: '🌈' },
-      { value: 'other', label: 'Autre', emoji: '💫' }
+      { value: 'other', label: 'Autre', emoji: '💫', allowCustom: true }
     ]
   },
   {
@@ -101,8 +110,9 @@ export const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
   },
   {
     id: 'children_details',
-    question: "Cooooool!! 🤩\n\nDis moi-en un peu plus 😃 t'en as combien, prénom, âge?\n\n(Exemple: J'ai 2 garçons! William a 12 ans et Elly a 10 ans!) 👇",
+    question: "Cooooool!! 🤩\n\nDis moi-en un peu plus 😃 t'en as combien, prénom, âge?\n\n(Exemple: J'ai 2 garçons! William a 12 ans et Elly a 10 ans!)",
     type: 'textarea',
+    maxLength: TEXT_LIMITS.long,
     conditional: {
       dependsOn: 'has_children',
       showIf: ['yes']
@@ -111,7 +121,7 @@ export const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
   {
     id: 'passions',
     question: "Qu'est-ce qui te passionne dans la vie de tous les jours {firstName}?",
-    description: "👉 Ça va m'aider à te suggérer des sujets de conversation intéressants avec tes prospects! 👇",
+    description: "👉 Ça va m'aider à te suggérer des sujets de conversation intéressants avec tes prospects!",
     type: 'multiple',
     options: [
       { value: 'sport', label: 'Le sport', emoji: '🏋️‍♀️' },
@@ -137,7 +147,8 @@ export const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
       { value: 'science', label: 'Les sciences', emoji: '🌌' },
       { value: 'spirituality', label: 'La spiritualité', emoji: '🙏' },
       { value: 'history', label: "L'histoire", emoji: '📜' },
-      { value: 'hiking', label: 'La randonnée', emoji: '🚶‍♂️' }
+      { value: 'hiking', label: 'La randonnée', emoji: '🚶‍♂️' },
+      { value: 'other', label: 'Autre', emoji: '✨', allowCustom: true }
     ]
   },
   {
@@ -174,7 +185,8 @@ export const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
       { value: 'methodical', label: 'Méthodique', emoji: '🧮' },
       { value: 'reactive', label: 'Réactif/ve', emoji: '⚡' },
       { value: 'inspiring', label: 'Inspirant(e)', emoji: '🌈' },
-      { value: 'strategic', label: 'Stratège', emoji: '🧩' }
+      { value: 'strategic', label: 'Stratège', emoji: '🧩' },
+      { value: 'other', label: 'Autre', emoji: '✨', allowCustom: true }
     ]
   },
   {
@@ -207,16 +219,19 @@ export const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
   {
     id: 'favorite_movies',
     question: "OK, on va entrer un peu plus dans les détails!\n\nDisons que tu avais à citer tes 3 films préférés, ce serait quoi? 😜",
-    type: 'text'
+    type: 'text',
+    maxLength: TEXT_LIMITS.short
   },
   {
     id: 'favorite_books',
     question: "Disons que tu avais à citer 3 de tes livres préférés qui ont changé ta vie, ta manière de penser, d'agir, ce serait quoi? 🙂\n\nExemple: 📘 Père riche, père pauvre (Robert Kiyosaki), 📗 I Dare You (Frazer Brookes), 📕 Le Secret (Rhonda Byrne), 📙 L'Alchimiste (Paulo Coelho), 📓 Think and Grow Rich (Napoleon Hill), etc.",
-    type: 'text'
+    type: 'text',
+    maxLength: TEXT_LIMITS.medium
   },
   {
     id: 'personal_story',
     question: "OK dernière question {firstName}, après j'arrête promis haha.\n\nRaconte-moi brièvement quelque chose de toi, dans tes propres mots. Ajoute tout ce que tu penses qui pourrait m'aider à mieux te comprendre et cerner qui tu es vraiment.\n\nÇa peut être un élément de ton histoire personnelle, une expérience marquante, ou quelque chose qui te caractérise.\n\nQu'est-ce qui te rend unique et qu'aimerais-tu que je sache de plus pour que je puisse vraiment m'adapter à toi? 👇",
-    type: 'textarea'
+    type: 'textarea',
+    maxLength: TEXT_LIMITS.personal_story
   }
 ];

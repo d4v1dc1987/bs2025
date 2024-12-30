@@ -4,19 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { ONBOARDING_QUESTIONS, AI_PROFILE_PROMPT } from "@/types/onboarding";
+import { ONBOARDING_QUESTIONS, AI_PROFILE_PROMPT, TEXT_LIMITS } from "@/types/onboarding";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ChoiceGroup } from "./ChoiceGroup";
 import { QuestionDescription } from "./QuestionDescription";
 import type { OnboardingAnswers } from "@/types/onboarding";
+import { Progress } from "@/components/ui/progress";
+import { AIProfileReview } from "./AIProfileReview";
 
 export const Onboarding = () => {
-
   const [currentStep, setCurrentStep] = useState(0); // Start at 0 for intro
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [firstName, setFirstName] = useState<string>("");
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [generatedProfile, setGeneratedProfile] = useState<string | null>(null);
+  const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
 
   useEffect(() => {
     // Load existing answers and user data
@@ -100,11 +104,27 @@ export const Onboarding = () => {
     }
 
     if (nextStep > ONBOARDING_QUESTIONS.length) {
-      setIsSubmitting(true);
-      // Generate AI summary
+      setIsGeneratingProfile(true);
+      setGenerationProgress(0);
+      
       try {
+        // Start progress animation
+        const progressInterval = setInterval(() => {
+          setGenerationProgress(prev => Math.min(prev + 5, 90));
+        }, 500);
+
         const formattedAnswers = Object.entries(answers)
-          .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+          .map(([key, value]) => {
+            if (Array.isArray(value)) {
+              return `${key}: ${value.map(v => {
+                if (typeof v === 'object' && v.value && v.customValue) {
+                  return `${v.value} (${v.customValue})`;
+                }
+                return v;
+              }).join(', ')}`;
+            }
+            return `${key}: ${value}`;
+          })
           .join('\n');
 
         const prompt = AI_PROFILE_PROMPT
@@ -115,29 +135,43 @@ export const Onboarding = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({ prompt }),
         });
 
+        clearInterval(progressInterval);
+        setGenerationProgress(100);
+
         const { generatedText } = await response.json();
-
-        // Save AI summary
-        await supabase
-          .from('onboarding')
-          .update({ ai_summary: generatedText })
-          .eq('id', user.id);
-
-        toast.success("Onboarding terminé avec succès !");
+        setGeneratedProfile(generatedText);
       } catch (error) {
         console.error('Error generating AI summary:', error);
-        toast.error("Erreur lors de la génération du résumé");
+        toast.error("Erreur lors de la génération du profil");
       } finally {
-        setIsSubmitting(false);
+        setIsGeneratingProfile(false);
       }
     }
 
     setCurrentStep(nextStep);
+  };
+
+  const handleProfileConfirm = async (profile: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('onboarding')
+      .update({ 
+        ai_summary: profile,
+        status: 'completed'
+      })
+      .eq('id', user.id);
+
+    if (error) {
+      throw error;
+    }
+
+    toast.success("Votre profil a été enregistré avec succès! Vous pourrez le modifier à tout moment depuis votre profil.");
   };
 
   const handlePrevious = () => {
@@ -157,6 +191,18 @@ export const Onboarding = () => {
       [currentQuestion.id]: value
     }));
   };
+
+  if (currentStep > ONBOARDING_QUESTIONS.length) {
+    return (
+      <AIProfileReview
+        isGenerating={isGeneratingProfile}
+        progress={generationProgress}
+        generatedProfile={generatedProfile}
+        onEdit={() => setCurrentStep(1)}
+        onConfirm={handleProfileConfirm}
+      />
+    );
+  }
 
   if (currentStep > ONBOARDING_QUESTIONS.length) {
     return (
@@ -219,6 +265,7 @@ export const Onboarding = () => {
                 value={answers[currentQuestion.id] as string || ''}
                 onChange={(e) => handleAnswerChange(e.target.value)}
                 placeholder="Votre réponse..."
+                maxLength={TEXT_LIMITS.medium}
               />
             )}
 
@@ -228,6 +275,7 @@ export const Onboarding = () => {
                 onChange={(e) => handleAnswerChange(e.target.value)}
                 placeholder="Votre réponse..."
                 className="min-h-[120px]"
+                maxLength={TEXT_LIMITS.personal_story}
               />
             )}
 
