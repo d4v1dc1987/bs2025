@@ -8,38 +8,37 @@ export const useAIProfileGeneration = () => {
   const [generatedProfile, setGeneratedProfile] = useState<string | null>(null);
 
   const generateAIProfile = async (prompt: string) => {
-    // Start showing progress bar immediately
+    // Afficher immédiatement la barre de progression
     setIsGeneratingProfile(true);
     setGenerationProgress(0);
 
-    // Start progress animation immediately
+    // Démarrer l'animation de progression immédiatement
     const progressInterval = setInterval(() => {
       setGenerationProgress(prev => {
         if (prev >= 90) {
-          clearInterval(progressInterval);
           return 90;
         }
-        return prev + 1;
+        // Incrémenter plus lentement pour atteindre ~90% en 7 secondes
+        return prev + 0.5;
       });
-    }, 70); // Slower increment to make it smoother over 7 seconds
+    }, 40); // 40ms * 0.5 = ~90% en 7 secondes
 
     try {
-      // Make the API call in parallel with the 7-second timer
-      const [aiResponse] = await Promise.all([
-        supabase.functions.invoke('generate-with-ai', {
-          body: { prompt }
-        }),
-        // Force minimum 7 seconds wait
-        new Promise(resolve => setTimeout(resolve, 7000))
-      ]);
+      // Lancer l'appel API en parallèle avec le timer de 7 secondes
+      const aiResponse = await supabase.functions.invoke('generate-with-ai', {
+        body: { prompt }
+      });
 
       if (aiResponse.error) throw aiResponse.error;
 
-      // After 7 seconds and API response, complete the progress bar
+      // Attendre que les 7 secondes soient écoulées
+      await new Promise(resolve => setTimeout(resolve, 7000));
+
+      // Compléter la barre de progression
       clearInterval(progressInterval);
       setGenerationProgress(100);
 
-      // Wait a moment before showing the generated profile
+      // Attendre un moment avant d'afficher le profil généré
       await new Promise(resolve => setTimeout(resolve, 500));
       setGeneratedProfile(aiResponse.data.generatedText);
     } catch (error: any) {
@@ -47,7 +46,7 @@ export const useAIProfileGeneration = () => {
       toast.error("Erreur lors de la génération du profil");
     } finally {
       clearInterval(progressInterval);
-      // Keep progress bar visible for a smooth transition
+      // Garder la barre de progression visible pour une transition fluide
       setTimeout(() => {
         setIsGeneratingProfile(false);
       }, 500);
