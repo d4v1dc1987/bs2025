@@ -50,7 +50,7 @@ export const AIProfileReview = ({
           <div className="space-y-4 py-8">
             <Progress value={progress} className="w-full" />
             <p className="text-center text-sm text-muted-foreground">
-              {progress < 100 
+              {progress < 50 
                 ? "Analyse de vos réponses en cours..." 
                 : "Génération de votre profil..."}
             </p>

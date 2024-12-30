@@ -50,11 +50,17 @@ export const QuestionForm = ({
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col gap-4">
           <CardTitle>Questionnaire</CardTitle>
-          <div className="flex items-center gap-2">
+          <div className={cn(
+            "flex items-center gap-2",
+            isMobile ? "flex-col items-start" : "justify-end"
+          )}>
             <span className="text-sm font-medium">{currentStep}/{ONBOARDING_QUESTIONS.length}</span>
-            <Progress value={progress} className="w-24" />
+            <Progress value={progress} className={cn(
+              "transition-all",
+              isMobile ? "w-full" : "w-24"
+            )} />
           </div>
         </div>
         <CardDescription>
@@ -85,12 +91,13 @@ export const QuestionForm = ({
             )}
 
             {currentQuestion.type === 'text' && (
-              <Input
+              <Textarea
                 value={answers[currentQuestion.id] as string || ''}
                 onChange={(e) => onAnswerChange(e.target.value)}
                 placeholder="Votre réponse..."
                 maxLength={currentQuestion.maxLength}
-                className="w-full"
+                className="w-full min-h-[120px]"
+                rows={3}
               />
             )}
 

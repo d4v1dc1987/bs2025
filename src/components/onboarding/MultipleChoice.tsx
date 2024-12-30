@@ -31,7 +31,7 @@ export const MultipleChoice = ({
       <div
         onClick={() => onCheckedChange(!isChecked, localCustomValue)}
         className={cn(
-          "flex items-center space-x-2 bg-background/5 px-4 py-2 rounded-lg cursor-pointer transition-all",
+          "flex items-center space-x-2 bg-background/5 px-4 py-3 rounded-lg cursor-pointer transition-all",
           isChecked ? "bg-primary/20 ring-2 ring-primary" : "hover:bg-background/10"
         )}
       >
@@ -54,7 +54,7 @@ export const MultipleChoice = ({
             </svg>
           )}
         </div>
-        <Label className="cursor-pointer">
+        <Label className="cursor-pointer leading-relaxed">
           <span className="mr-2">{option.emoji}</span>
           {option.label}
         </Label>
