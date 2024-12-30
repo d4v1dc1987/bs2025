@@ -24,15 +24,15 @@ export const useAIProfileGeneration = () => {
     }, 40); // 40ms * 0.5 = ~90% en 7 secondes
 
     try {
-      // Lancer l'appel API en parallèle avec le timer de 7 secondes
-      const aiResponse = await supabase.functions.invoke('generate-with-ai', {
-        body: { prompt }
-      });
+      // Attendre 7 secondes tout en faisant l'appel API en parallèle
+      const [aiResponse] = await Promise.all([
+        supabase.functions.invoke('generate-with-ai', {
+          body: { prompt }
+        }),
+        new Promise(resolve => setTimeout(resolve, 7000))
+      ]);
 
       if (aiResponse.error) throw aiResponse.error;
-
-      // Attendre que les 7 secondes soient écoulées
-      await new Promise(resolve => setTimeout(resolve, 7000));
 
       // Compléter la barre de progression
       clearInterval(progressInterval);
