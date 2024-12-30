@@ -47,7 +47,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   };
 
   const generateAIProfile = async () => {
-    // Always show the progress bar by setting these states immediately
+    // Always show the progress bar immediately
     setIsGeneratingProfile(true);
     setGenerationProgress(0);
     
@@ -71,27 +71,31 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
         .replace('{firstName}', firstName)
         .replace('{answers}', formattedAnswers);
 
-      // Add minimum delay of 3 seconds before completing to ensure progress bar is visible
+      // Generate profile with minimum 7 seconds delay
       const [aiResponse] = await Promise.all([
         supabase.functions.invoke('generate-with-ai', {
           body: { prompt }
         }),
-        new Promise(resolve => setTimeout(resolve, 3000))
+        new Promise(resolve => setTimeout(resolve, 7000)) // Ensure minimum 7 seconds visibility
       ]);
 
       if (aiResponse.error) throw aiResponse.error;
 
+      // After 7 seconds, complete the progress bar
       clearInterval(progressInterval);
       setGenerationProgress(100);
+      
+      // Wait a moment before showing the generated profile
+      await new Promise(resolve => setTimeout(resolve, 500));
       setGeneratedProfile(aiResponse.data.generatedText);
     } catch (error: any) {
       console.error('Error generating AI summary:', error);
       toast.error("Erreur lors de la génération du profil");
     } finally {
-      // Keep isGeneratingProfile true until the progress bar reaches 100%
+      // Keep progress bar visible for a smooth transition
       setTimeout(() => {
         setIsGeneratingProfile(false);
-      }, 500); // Small delay to ensure smooth transition
+      }, 500);
     }
   };
 
