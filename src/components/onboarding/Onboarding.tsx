@@ -120,10 +120,10 @@ export const Onboarding = () => {
             if (Array.isArray(value)) {
               return `${key}: ${value.map(v => {
                 if (v && typeof v === 'object' && 'value' in v && 'customValue' in v) {
-                  return v.customValue ? `${v.value} (${v.customValue})` : v.value;
+                  return v?.customValue ? `${v?.value} (${v?.customValue})` : v?.value;
                 }
                 return v;
-              }).filter(Boolean).join(', ')}`;
+              }).filter((v): v is string => v !== null && v !== undefined).join(', ')}`;
             }
             return `${key}: ${value}`;
           })
