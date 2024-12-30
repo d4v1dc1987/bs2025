@@ -35,9 +35,17 @@ export const QuestionForm = ({
   const isMobile = useIsMobile();
   const progress = (currentStep / ONBOARDING_QUESTIONS.length) * 100;
 
-  // Détermine si le champ doit être multi-lignes
+  // Determine if the question should use a multi-line input
   const isMultilineQuestion = currentQuestion.id === 'favorite_books' || 
                             currentQuestion.id === 'personal_story';
+
+  // Determine textarea rows based on question
+  const getTextareaRows = () => {
+    if (currentQuestion.id === 'favorite_books' || currentQuestion.id === 'personal_story') {
+      return 5;
+    }
+    return 3;
+  };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -95,6 +103,7 @@ export const QuestionForm = ({
                   "resize-y w-full",
                   isMultilineQuestion ? "min-h-[120px]" : "min-h-[80px]"
                 )}
+                rows={getTextareaRows()}
                 maxLength={currentQuestion.maxLength}
               />
             )}
