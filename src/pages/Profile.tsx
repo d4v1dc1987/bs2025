@@ -1,40 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { SecurityForm } from "@/components/profile/SecurityForm";
+import { OnboardingSection } from "@/components/profile/OnboardingSection";
+import { OnboardingProvider } from "@/components/onboarding/OnboardingContext";
 import type { PasswordFormValues } from "@/schemas/passwordSchema";
-import { useNavigate } from "react-router-dom";
-import { Onboarding } from "@/components/onboarding/Onboarding";
-import { OnboardingProvider, useOnboarding } from "@/components/onboarding/OnboardingContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-// Séparation du contenu principal du profil dans un composant distinct
-const ProfileContent = () => {
-  const navigate = useNavigate();
+const Profile = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const { openOnboarding, closeOnboarding, isOnboardingOpen } = useOnboarding();
   const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    avatar_url: "",
+    first_name: user?.user_metadata?.first_name || "",
+    last_name: user?.user_metadata?.last_name || "",
+    avatar_url: user?.user_metadata?.avatar_url || "",
   });
-
-  useEffect(() => {
-    if (user) {
-      const { first_name, last_name, avatar_url } = user.user_metadata;
-      setFormData({
-        first_name: first_name || "",
-        last_name: last_name || "",
-        avatar_url: avatar_url || "",
-      });
-    }
-  }, [user]);
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -124,20 +108,13 @@ const ProfileContent = () => {
     return `${(formData.first_name?.[0] || "").toUpperCase()}${(formData.last_name?.[0] || "").toUpperCase()}` || "U";
   };
 
-  const handleOnboardingComplete = () => {
-    closeOnboarding();
-    toast.success("Votre profil a été mis à jour avec succès!");
-  };
-
   return (
     <div className="container max-w-4xl py-8">
       <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-[#c299ff] to-primary bg-clip-text text-transparent">
         Mon Profil
       </h1>
       
-      {isOnboardingOpen ? (
-        <Onboarding onComplete={handleOnboardingComplete} />
-      ) : (
+      <OnboardingProvider>
         <Tabs defaultValue="profile" className="space-y-8">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="profile" className="text-lg">
@@ -173,17 +150,7 @@ const ProfileContent = () => {
                 />
               </Card>
               
-              <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Ma personnalité Bobby Social</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Modifiez vos réponses au questionnaire de personnalité pour mettre à jour votre profil.
-                  </p>
-                  <Button onClick={openOnboarding}>
-                    Modifier ma personnalité
-                  </Button>
-                </div>
-              </Card>
+              <OnboardingSection />
             </div>
           </TabsContent>
           
@@ -196,17 +163,8 @@ const ProfileContent = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      )}
+      </OnboardingProvider>
     </div>
-  );
-};
-
-// Composant principal qui fournit le contexte
-const Profile = () => {
-  return (
-    <OnboardingProvider>
-      <ProfileContent />
-    </OnboardingProvider>
   );
 };
 

@@ -1,79 +1,33 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { OnboardingAnswers } from "@/types/onboarding";
 import { ONBOARDING_QUESTIONS, AI_PROFILE_PROMPT } from "@/types/onboarding";
 import { useOnboarding } from "./OnboardingContext";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { QuestionForm } from "./QuestionForm";
 import { AIProfileReview } from "./AIProfileReview";
 import { isCustomAnswer } from "@/types/customAnswer";
+import { useOnboardingData } from "@/hooks/useOnboardingData";
 
 interface OnboardingProps {
   onComplete?: () => void;
 }
 
 export const Onboarding = ({ onComplete }: OnboardingProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<OnboardingAnswers>({});
+  const {
+    isLoading,
+    currentStep,
+    setCurrentStep,
+    answers,
+    setAnswers,
+    firstName
+  } = useOnboardingData();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [firstName, setFirstName] = useState<string>("");
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generatedProfile, setGeneratedProfile] = useState<string | null>(null);
   const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
   const { closeOnboarding } = useOnboarding();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          console.error('No user found');
-          return;
-        }
-
-        console.log('Loading onboarding data for user:', user.id);
-
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('first_name')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (profileData?.first_name) {
-          setFirstName(profileData.first_name);
-        }
-
-        const { data: onboardingData, error } = await supabase
-          .from('onboarding')
-          .select('current_step, answers, status')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (error) {
-          console.error('Error loading onboarding data:', error);
-          return;
-        }
-
-        console.log('Onboarding data loaded:', onboardingData);
-
-        if (onboardingData) {
-          // Si l'onboarding est déjà complété, on commence à l'étape 1
-          setCurrentStep(onboardingData.status === 'completed' ? 1 : (onboardingData.current_step || 0));
-          setAnswers(onboardingData.answers as OnboardingAnswers || {});
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
-        toast.error("Une erreur est survenue lors du chargement de vos données");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
 
   const formatAnswerValue = (value: unknown): string => {
     if (Array.isArray(value)) {
