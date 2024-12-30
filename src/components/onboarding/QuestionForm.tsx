@@ -7,6 +7,7 @@ import { ONBOARDING_QUESTIONS } from "@/types/onboarding";
 import { ChoiceGroup } from "./ChoiceGroup";
 import { QuestionDescription } from "./QuestionDescription";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 import type { OnboardingAnswers } from "@/types/onboarding";
 import { Progress } from "@/components/ui/progress";
 
