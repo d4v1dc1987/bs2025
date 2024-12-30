@@ -49,17 +49,16 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     setGenerationProgress(0);
     
     try {
-      // Start progress animation immediately with slower progression
+      // Start progress animation immediately
       const progressInterval = setInterval(() => {
         setGenerationProgress(prev => {
           if (prev >= 90) {
             clearInterval(progressInterval);
             return 90;
           }
-          // Slower progression to ensure minimum 10 seconds duration
           return prev + 1;
         });
-      }, 100); // Update every 100ms for smooth animation
+      }, 100);
 
       const formattedAnswers = Object.entries(answers)
         .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
@@ -74,7 +73,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
         supabase.functions.invoke('generate-with-ai', {
           body: { prompt }
         }),
-        new Promise(resolve => setTimeout(resolve, 10000)) // 10 seconds minimum delay
+        new Promise(resolve => setTimeout(resolve, 10000))
       ]);
 
       if (aiResponse.error) throw aiResponse.error;
