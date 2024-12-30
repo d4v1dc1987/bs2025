@@ -18,6 +18,7 @@ const Profile = () => {
     first_name: user?.user_metadata?.first_name || "",
     last_name: user?.user_metadata?.last_name || "",
     avatar_url: user?.user_metadata?.avatar_url || "",
+    email: user?.email || "",
   });
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,7 +144,7 @@ const Profile = () => {
 
               <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
                 <ProfileForm
-                  formData={{ ...formData, email: user?.email }}
+                  formData={formData}
                   isLoading={isLoading}
                   onSubmit={handleProfileUpdate}
                   onChange={handleFormChange}

@@ -29,7 +29,7 @@ export const ProfileForm = ({
           </Label>
           <Input
             id="first_name"
-            value={formData.first_name}
+            value={formData.first_name || ""}
             onChange={(e) => onChange("first_name", e.target.value)}
             placeholder="Entrez votre prénom"
             className="bg-background/50 border-foreground/20"
@@ -41,7 +41,7 @@ export const ProfileForm = ({
           </Label>
           <Input
             id="last_name"
-            value={formData.last_name}
+            value={formData.last_name || ""}
             onChange={(e) => onChange("last_name", e.target.value)}
             placeholder="Entrez votre nom"
             className="bg-background/50 border-foreground/20"
