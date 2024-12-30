@@ -129,7 +129,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     );
   }
 
-  if (currentStep > ONBOARDING_QUESTIONS.length) {
+  if (isSubmitting || currentStep > ONBOARDING_QUESTIONS.length) {
     return (
       <AIProfileGenerator
         firstName={firstName}

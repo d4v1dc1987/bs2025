@@ -62,7 +62,7 @@ export const QuestionForm = ({
               />
             )}
 
-            {currentQuestion.type === 'text' && (
+            {(currentQuestion.type === 'text' || currentQuestion.type === 'date') && (
               <Input
                 value={answers[currentQuestion.id] as string || ''}
                 onChange={(e) => onAnswerChange(e.target.value)}
