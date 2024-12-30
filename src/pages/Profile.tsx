@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileSection } from "@/components/profile/ProfileSection";
 import { SecuritySection } from "@/components/profile/SecuritySection";
 import { PersonalitySection } from "@/components/profile/PersonalitySection";
-import { PersonStanding } from "lucide-react";
+import { PersonStanding, User, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
@@ -50,38 +50,43 @@ const Profile = () => {
   }, [user]);
 
   return (
-    <div className="flex-1 px-4 md:px-6 py-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-[#c299ff] to-primary bg-clip-text text-transparent">
-          Mon Profil
-        </h1>
-        
-        <Tabs defaultValue={defaultTab} className="space-y-6">
-          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 border-b border-border/40">
-            <TabsList className="flex flex-col w-full gap-2 md:flex-row md:w-fit mx-auto">
+    <div className="space-y-6">
+      <div className="flex items-center gap-2">
+        <User className="h-8 w-8 text-primary" />
+        <h1 className="text-3xl font-bold">Mon Profil</h1>
+      </div>
+
+      <Tabs defaultValue={defaultTab} className="w-full space-y-8">
+        <div className="sticky top-[3.5rem] z-30 -mx-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40">
+          <div className="px-4">
+            <TabsList className="h-12 w-full justify-start gap-4 rounded-none border-b border-border/40 bg-transparent p-0">
               <TabsTrigger 
                 value="profile" 
-                className="w-full md:w-auto text-base font-medium px-6"
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
               >
+                <User className="mr-2 h-4 w-4" />
                 Informations
               </TabsTrigger>
               <TabsTrigger 
                 value="personality" 
-                className="w-full md:w-auto text-base font-medium px-6 flex items-center gap-2 justify-center"
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
               >
-                <PersonStanding className="w-4 h-4" />
-                <span>Personnalité</span>
+                <PersonStanding className="mr-2 h-4 w-4" />
+                Personnalité
               </TabsTrigger>
               <TabsTrigger 
                 value="security" 
-                className="w-full md:w-auto text-base font-medium px-6"
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
               >
+                <Shield className="mr-2 h-4 w-4" />
                 Sécurité
               </TabsTrigger>
             </TabsList>
           </div>
-          
-          <TabsContent value="profile" className="mt-6">
+        </div>
+
+        <div className="space-y-8">
+          <TabsContent value="profile" className="m-0">
             <ProfileSection
               formData={formData}
               isLoading={isLoading}
@@ -90,18 +95,18 @@ const Profile = () => {
             />
           </TabsContent>
 
-          <TabsContent value="personality" className="mt-6">
+          <TabsContent value="personality" className="m-0">
             <PersonalitySection />
           </TabsContent>
           
-          <TabsContent value="security" className="mt-6">
+          <TabsContent value="security" className="m-0">
             <SecuritySection
               isLoading={isLoading}
               setIsLoading={setIsLoading}
             />
           </TabsContent>
-        </Tabs>
-      </div>
+        </div>
+      </Tabs>
     </div>
   );
 };
