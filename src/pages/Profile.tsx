@@ -8,12 +8,14 @@ import { PersonStanding } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Profile = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('tab') || 'profile';
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const isMobile = useIsMobile();
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -56,13 +58,13 @@ const Profile = () => {
       </h1>
       
       <Tabs defaultValue={defaultTab} className="space-y-8">
-        <TabsList className="grid w-full grid-cols-3 mb-8">
+        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-3'} mb-8`}>
           <TabsTrigger value="profile" className="text-lg">
             Informations
           </TabsTrigger>
-          <TabsTrigger value="personality" className="text-lg">
-            <PersonStanding className="w-4 h-4 mr-2" />
-            Personnalité
+          <TabsTrigger value="personality" className="text-lg flex items-center gap-2">
+            <PersonStanding className="w-4 h-4" />
+            {isMobile ? 'Bobby Social' : 'Personnalité'}
           </TabsTrigger>
           <TabsTrigger value="security" className="text-lg">
             Sécurité
