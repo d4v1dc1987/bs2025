@@ -24,13 +24,13 @@ const Auth = () => {
       <div className="w-full max-w-md mx-auto p-6">
         <div className="rounded-lg backdrop-blur-sm bg-background/80 p-8 shadow-xl">
           <div className="text-center mb-8">
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-4">
               <FontAwesomeIcon icon={faBolt} className="text-[#7b27fb] text-4xl" />
               <h1 className="text-4xl font-bold text-white">
                 Bobby Social
               </h1>
             </div>
-            <p className="text-foreground/80">
+            <p className="text-foreground/80 mt-4">
               {mode === "login"
                 ? "L'outil IA Ultime Des Entrepreneurs En Ligne Pour Dominer Facebook"
                 : "Créer un nouveau compte"}

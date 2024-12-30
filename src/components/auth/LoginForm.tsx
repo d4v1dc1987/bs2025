@@ -54,6 +54,26 @@ export const LoginForm = () => {
     }
   };
 
+  const handleResetPassword = async () => {
+    const email = form.getValues("email");
+    if (!email) {
+      toast.error("Veuillez entrer votre email");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
+      if (error) throw error;
+
+      toast.success("Un email de réinitialisation vous a été envoyé");
+    } catch (error: any) {
+      toast.error("Une erreur est survenue");
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -133,18 +153,18 @@ export const LoginForm = () => {
           Connexion
         </Button>
 
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-4">
           <Button
             type="button"
             variant="link"
             className="text-sm text-[#c299ff] hover:text-[#c299ff]/90"
-            onClick={() => navigate("/auth?mode=signup")}
+            onClick={handleResetPassword}
           >
-            Mot de passe oublié ?
+            Mot de passe oublié?
           </Button>
           
-          <div className="flex items-center justify-center space-x-1 text-sm">
-            <span className="text-foreground/70">Pas encore de compte ?</span>
+          <div className="flex flex-col items-center space-y-1 text-sm">
+            <span className="text-foreground/70">Pas encore de compte?</span>
             <Button
               type="button"
               variant="link"
