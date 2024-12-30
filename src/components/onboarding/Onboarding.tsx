@@ -135,6 +135,8 @@ export const Onboarding = () => {
         setIsSubmitting(false);
       }
     }
+
+    setCurrentStep(nextStep);
   };
 
   const handlePrevious = () => {
@@ -192,7 +194,9 @@ export const Onboarding = () => {
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
+      <Car
+
+dHeader>
         <CardTitle>Onboarding ({currentStep}/{ONBOARDING_QUESTIONS.length})</CardTitle>
         <CardDescription>
           Répondez à quelques questions pour personnaliser votre expérience
