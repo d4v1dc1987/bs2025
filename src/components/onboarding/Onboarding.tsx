@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ONBOARDING_QUESTIONS, AI_PROFILE_PROMPT } from "@/types/onboarding";
+import { ONBOARDING_QUESTIONS } from "@/types/onboarding";
 import { useOnboarding } from "./OnboardingContext";
 import { WelcomeScreen } from "./WelcomeScreen";
 import { QuestionForm } from "./QuestionForm";
-import { AIProfileReview } from "./AIProfileReview";
-import { isCustomAnswer } from "@/types/customAnswer";
+import { AIProfileGenerator } from "./AIProfileGenerator";
 import { useOnboardingData } from "@/hooks/useOnboardingData";
 import { useNavigate } from "react-router-dom";
-import { useAIProfileGeneration } from "@/hooks/useAIProfileGeneration";
 
 interface OnboardingProps {
   onComplete?: () => void;
@@ -26,32 +24,8 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     firstName
   } = useOnboardingData();
 
-  const {
-    isGeneratingProfile,
-    generationProgress,
-    generatedProfile,
-    generateAIProfile,
-    setGeneratedProfile,
-    setGenerationProgress
-  } = useAIProfileGeneration();
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { closeOnboarding } = useOnboarding();
-
-  const formatAnswerValue = (value: unknown): string => {
-    if (Array.isArray(value)) {
-      return value
-        .map(v => {
-          if (isCustomAnswer(v)) {
-            return v.customValue ? `${v.value} (${v.customValue})` : v.value;
-          }
-          return v;
-        })
-        .filter(Boolean)
-        .join(', ');
-    }
-    return String(value);
-  };
 
   const handleProfileConfirm = async (profile: string) => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -120,39 +94,12 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
 
       if (nextStep > ONBOARDING_QUESTIONS.length) {
         setIsSubmitting(true);
-        
-        // Start the progress animation immediately
-        const startTime = Date.now();
-        const animationDuration = 7000; // 7 seconds
-        
-        const progressInterval = setInterval(() => {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min((elapsed / animationDuration) * 100, 90);
-          setGenerationProgress(progress);
-        }, 50);
-
-        // Wait for 7 seconds before making the API call
-        await new Promise(resolve => setTimeout(resolve, animationDuration));
-        
-        clearInterval(progressInterval);
-
-        const formattedAnswers = Object.entries(answers)
-          .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
-          .join('\n');
-
-        const prompt = AI_PROFILE_PROMPT
-          .replace('{firstName}', firstName)
-          .replace('{answers}', formattedAnswers);
-
-        await generateAIProfile(prompt);
       }
 
       setCurrentStep(nextStep);
     } catch (error) {
       console.error('Error in handleNext:', error);
       toast.error("Une erreur est survenue");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -184,12 +131,11 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
 
   if (currentStep > ONBOARDING_QUESTIONS.length) {
     return (
-      <AIProfileReview
-        isGenerating={isGeneratingProfile}
-        progress={generationProgress}
-        generatedProfile={generatedProfile}
+      <AIProfileGenerator
+        firstName={firstName}
+        answers={answers}
         onEdit={() => setCurrentStep(1)}
-        onConfirm={handleProfileConfirm}
+        onComplete={handleProfileConfirm}
       />
     );
   }
