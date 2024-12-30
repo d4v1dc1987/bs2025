@@ -59,6 +59,7 @@ export const QuestionForm = ({
                 onChange={(e) => onAnswerChange(e.target.value)}
                 placeholder="Votre réponse..."
                 maxLength={currentQuestion.maxLength}
+                className="w-full"
               />
             )}
 
@@ -67,7 +68,7 @@ export const QuestionForm = ({
                 value={answers[currentQuestion.id] as string || ''}
                 onChange={(e) => onAnswerChange(e.target.value)}
                 placeholder="Votre réponse..."
-                className="min-h-[120px]"
+                className="min-h-[120px] w-full resize-y"
                 maxLength={currentQuestion.maxLength}
               />
             )}
@@ -78,6 +79,7 @@ export const QuestionForm = ({
                 value={answers[currentQuestion.id] as string || ''}
                 onChange={(e) => onAnswerChange(e.target.value)}
                 placeholder="19 février 1987"
+                className="w-full"
               />
             )}
 
