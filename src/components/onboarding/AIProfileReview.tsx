@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Loader2, Pencil, Save } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 
 interface AIProfileReviewProps {
@@ -22,6 +22,21 @@ export const AIProfileReview = ({
 }: AIProfileReviewProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedProfile, setEditedProfile] = useState(generatedProfile || "");
+  const [loadingMessage, setLoadingMessage] = useState("Analyse de vos réponses en cours...");
+
+  useEffect(() => {
+    if (progress < 25) {
+      setLoadingMessage("Analyse de vos réponses en cours...");
+    } else if (progress < 40) {
+      setLoadingMessage("Préparation de votre profil personnalisé...");
+    } else if (progress < 60) {
+      setLoadingMessage("Analyse de vos objectifs et aspirations...");
+    } else if (progress < 80) {
+      setLoadingMessage("Optimisation de votre profil entrepreneurial...");
+    } else {
+      setLoadingMessage("Génération de votre profil...");
+    }
+  }, [progress]);
 
   const handleSave = () => {
     setIsEditing(false);
@@ -50,9 +65,7 @@ export const AIProfileReview = ({
           <div className="space-y-4 py-8">
             <Progress value={progress} className="w-full" />
             <p className="text-center text-sm text-muted-foreground">
-              {progress < 50 
-                ? "Analyse de vos réponses en cours..." 
-                : "Génération de votre profil..."}
+              {loadingMessage}
             </p>
           </div>
         ) : generatedProfile ? (
