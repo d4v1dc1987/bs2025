@@ -8,14 +8,12 @@ import { PersonStanding } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const Profile = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('tab') || 'profile';
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const isMobile = useIsMobile();
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -52,29 +50,38 @@ const Profile = () => {
   }, [user]);
 
   return (
-    <div className="container max-w-4xl py-4 md:py-8">
-      <div className="space-y-4 md:space-y-8">
+    <div className="flex-1 px-4 md:px-6 py-6">
+      <div className="max-w-4xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-[#c299ff] to-primary bg-clip-text text-transparent">
           Mon Profil
         </h1>
         
-        <Tabs defaultValue={defaultTab} className="space-y-4 md:space-y-8">
-          <div className="flex justify-center w-full mt-4">
-            <TabsList className="flex flex-col gap-2 w-full md:w-auto md:flex-row">
-              <TabsTrigger value="profile" className="text-lg w-full md:w-auto">
+        <Tabs defaultValue={defaultTab} className="space-y-6">
+          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4 border-b border-border/40">
+            <TabsList className="flex flex-col w-full gap-2 md:flex-row md:w-fit mx-auto">
+              <TabsTrigger 
+                value="profile" 
+                className="w-full md:w-auto text-base font-medium px-6"
+              >
                 Informations
               </TabsTrigger>
-              <TabsTrigger value="personality" className="text-lg w-full md:w-auto flex items-center gap-2 justify-center">
+              <TabsTrigger 
+                value="personality" 
+                className="w-full md:w-auto text-base font-medium px-6 flex items-center gap-2 justify-center"
+              >
                 <PersonStanding className="w-4 h-4" />
-                {isMobile ? 'Bobby Social' : 'Personnalité'}
+                <span>Personnalité</span>
               </TabsTrigger>
-              <TabsTrigger value="security" className="text-lg w-full md:w-auto">
+              <TabsTrigger 
+                value="security" 
+                className="w-full md:w-auto text-base font-medium px-6"
+              >
                 Sécurité
               </TabsTrigger>
             </TabsList>
           </div>
           
-          <TabsContent value="profile">
+          <TabsContent value="profile" className="mt-6">
             <ProfileSection
               formData={formData}
               isLoading={isLoading}
@@ -83,11 +90,11 @@ const Profile = () => {
             />
           </TabsContent>
 
-          <TabsContent value="personality">
+          <TabsContent value="personality" className="mt-6">
             <PersonalitySection />
           </TabsContent>
           
-          <TabsContent value="security">
+          <TabsContent value="security" className="mt-6">
             <SecuritySection
               isLoading={isLoading}
               setIsLoading={setIsLoading}
