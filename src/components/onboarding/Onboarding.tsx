@@ -61,19 +61,15 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
         .replace('{firstName}', firstName)
         .replace('{answers}', formattedAnswers);
 
-      const response = await fetch('/functions/v1/generate-with-ai', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt }),
+      const { data, error } = await supabase.functions.invoke('generate-with-ai', {
+        body: { prompt }
       });
+
+      if (error) throw error;
 
       clearInterval(progressInterval);
       setGenerationProgress(100);
-
-      const { generatedText } = await response.json();
-      setGeneratedProfile(generatedText);
+      setGeneratedProfile(data.generatedText);
     } catch (error: any) {
       console.error('Error generating AI summary:', error);
       toast.error("Erreur lors de la génération du profil");
