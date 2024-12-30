@@ -14,6 +14,8 @@ import Reply from "./pages/Reply";
 import Calendar from "./pages/Calendar";
 import Close from "./pages/Close";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
+import UpdatePassword from "./pages/UpdatePassword";
 import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 
@@ -65,6 +67,8 @@ const App = () => {
             ) : (
               <Routes>
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/reset-password" element={<ResetPassword />} />
+                <Route path="/auth/update-password" element={<UpdatePassword />} />
                 <Route path="*" element={<Navigate to="/auth" replace />} />
               </Routes>
             )}
