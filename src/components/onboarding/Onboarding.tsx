@@ -31,7 +31,8 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     generationProgress,
     generatedProfile,
     generateAIProfile,
-    setGeneratedProfile
+    setGeneratedProfile,
+    setGenerationProgress
   } = useAIProfileGeneration();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
