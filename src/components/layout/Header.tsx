@@ -55,7 +55,8 @@ export const Header = () => {
                 <Avatar className="h-10 w-10">
                   <AvatarImage 
                     src={user?.user_metadata?.avatar_url || undefined} 
-                    alt="Photo de profil" 
+                    alt="Photo de profil"
+                    className="object-cover w-full h-full" 
                   />
                   <AvatarFallback className="bg-primary/10 text-primary">
                     {user?.user_metadata?.avatar_url ? getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name) : <User className="h-5 w-5" />}
