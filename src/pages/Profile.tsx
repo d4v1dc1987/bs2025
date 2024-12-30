@@ -11,6 +11,7 @@ import { SecurityForm } from "@/components/profile/SecurityForm";
 import type { PasswordFormValues } from "@/schemas/passwordSchema";
 import { useNavigate } from "react-router-dom";
 import { Onboarding } from "@/components/onboarding/Onboarding";
+import { OnboardingProvider } from "@/components/onboarding/OnboardingContext";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -134,7 +135,9 @@ const Profile = () => {
       </h1>
       
       {showOnboarding ? (
-        <Onboarding onComplete={handleOnboardingComplete} />
+        <OnboardingProvider>
+          <Onboarding onComplete={handleOnboardingComplete} />
+        </OnboardingProvider>
       ) : (
         <Tabs defaultValue="profile" className="space-y-8">
           <TabsList className="grid w-full grid-cols-2">
