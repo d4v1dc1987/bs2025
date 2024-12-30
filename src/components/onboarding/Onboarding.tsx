@@ -119,7 +119,7 @@ export const Onboarding = () => {
         .map(([key, value]) => {
           if (Array.isArray(value)) {
             return `${key}: ${value.map(v => {
-              if (v && typeof v === 'object' && 'value' in v && 'customValue' in v) {
+              if (v && typeof v === 'object' && 'value' in v) {
                 const typedV = v as CustomAnswer;
                 if (!typedV) return '';
                 return typedV.customValue ? `${typedV.value} (${typedV.customValue})` : typedV.value;
