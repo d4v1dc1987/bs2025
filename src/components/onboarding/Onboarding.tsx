@@ -117,7 +117,7 @@ export const Onboarding = () => {
           .map(([key, value]) => {
             if (Array.isArray(value)) {
               return `${key}: ${value.map(v => {
-                if (typeof v === 'object' && v.value && v.customValue) {
+                if (typeof v === 'object' && v !== null && 'value' in v && 'customValue' in v) {
                   return `${v.value} (${v.customValue})`;
                 }
                 return v;
