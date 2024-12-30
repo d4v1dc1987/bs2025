@@ -58,25 +58,25 @@ const Profile = () => {
 
       <Tabs defaultValue={defaultTab} className="w-full space-y-8">
         <div className="sticky top-[3.5rem] z-30 -mx-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40">
-          <div className="px-4">
-            <TabsList className="h-12 w-full justify-start gap-4 rounded-none border-b border-border/40 bg-transparent p-0">
+          <div className="px-4 overflow-x-auto scrollbar-none">
+            <TabsList className="h-12 w-full md:w-auto justify-start gap-4 rounded-none border-b border-border/40 bg-transparent p-0 flex-nowrap">
               <TabsTrigger 
                 value="profile" 
-                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none whitespace-nowrap"
               >
                 <User className="mr-2 h-4 w-4" />
                 Informations
               </TabsTrigger>
               <TabsTrigger 
                 value="personality" 
-                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none whitespace-nowrap"
               >
                 <PersonStanding className="mr-2 h-4 w-4" />
                 Personnalité
               </TabsTrigger>
               <TabsTrigger 
                 value="security" 
-                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none whitespace-nowrap"
               >
                 <Shield className="mr-2 h-4 w-4" />
                 Sécurité

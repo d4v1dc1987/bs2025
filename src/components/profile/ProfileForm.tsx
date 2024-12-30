@@ -62,11 +62,11 @@ export const ProfileForm = ({
         />
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-center w-full">
         <Button
           type="submit"
           disabled={isLoading}
-          className="bg-primary hover:bg-primary/90"
+          className="bg-primary hover:bg-primary/90 w-full md:w-auto"
         >
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Sauvegarder les modifications
