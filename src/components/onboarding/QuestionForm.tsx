@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { ONBOARDING_QUESTIONS } from "@/types/onboarding";
 import { ChoiceGroup } from "./ChoiceGroup";
 import { QuestionDescription } from "./QuestionDescription";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { OnboardingAnswers } from "@/types/onboarding";
 
 interface QuestionFormProps {
@@ -29,6 +30,7 @@ export const QuestionForm = ({
 }: QuestionFormProps) => {
   const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
   const questionText = currentQuestion.question.replace('{firstName}', firstName);
+  const isMobile = useIsMobile();
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -82,11 +84,12 @@ export const QuestionForm = ({
             <QuestionDescription description={currentQuestion.description} />
           </div>
 
-          <div className="flex justify-between pt-4">
+          <div className={`flex ${isMobile ? 'flex-col' : 'justify-between'} gap-4 pt-4`}>
             <Button
               variant="outline"
               onClick={onPrevious}
               disabled={currentStep === 1}
+              className="w-full md:w-auto"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Précédent
@@ -94,6 +97,7 @@ export const QuestionForm = ({
             <Button
               onClick={onNext}
               disabled={!answers[currentQuestion.id] || isSubmitting}
+              className="w-full md:w-auto"
             >
               {currentStep === ONBOARDING_QUESTIONS.length ? (
                 <>
