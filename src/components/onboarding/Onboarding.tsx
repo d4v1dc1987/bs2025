@@ -14,6 +14,11 @@ import { Progress } from "@/components/ui/progress";
 import { AIProfileReview } from "./AIProfileReview";
 import { useOnboarding } from "./OnboardingContext";
 
+interface CustomAnswer {
+  value: string;
+  customValue?: string;
+}
+
 export const Onboarding = () => {
   const [currentStep, setCurrentStep] = useState(0); // Start at 0 for intro
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
@@ -84,12 +89,10 @@ export const Onboarding = () => {
 
     let nextStep = currentStep + 1;
     
-    // Skip children details question if not applicable
     if (currentStep === 5 && answers.has_children !== 'yes') {
       nextStep = 7;
     }
 
-    // Update Supabase with current progress
     const { error } = await supabase
       .from('onboarding')
       .upsert({
@@ -110,7 +113,6 @@ export const Onboarding = () => {
       setGenerationProgress(0);
       
       try {
-        // Start progress animation
         const progressInterval = setInterval(() => {
           setGenerationProgress(prev => Math.min(prev + 5, 90));
         }, 500);
@@ -120,10 +122,11 @@ export const Onboarding = () => {
             if (Array.isArray(value)) {
               return `${key}: ${value.map(v => {
                 if (v && typeof v === 'object' && 'value' in v && 'customValue' in v) {
-                  return v?.customValue ? `${v?.value} (${v?.customValue})` : v?.value;
+                  const typedV = v as CustomAnswer;
+                  return typedV.customValue ? `${typedV.value} (${typedV.customValue})` : typedV.value;
                 }
                 return v;
-              }).filter((v): v is string => v !== null && v !== undefined).join(', ')}`;
+              }).filter((v): v is string => typeof v === 'string').join(', ')}`;
             }
             return `${key}: ${value}`;
           })
@@ -146,7 +149,7 @@ export const Onboarding = () => {
 
         const { generatedText } = await response.json();
         setGeneratedProfile(generatedText);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error generating AI summary:', error);
         toast.error("Erreur lors de la génération du profil");
       } finally {
