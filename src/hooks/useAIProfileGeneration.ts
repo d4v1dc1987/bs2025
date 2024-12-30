@@ -55,6 +55,7 @@ export const useAIProfileGeneration = () => {
     generationProgress,
     generatedProfile,
     generateAIProfile,
-    setGeneratedProfile
+    setGeneratedProfile,
+    setGenerationProgress // Added this line to export the function
   };
 };
