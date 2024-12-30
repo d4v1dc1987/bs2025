@@ -129,17 +129,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     );
   }
 
-  if (isSubmitting || currentStep > ONBOARDING_QUESTIONS.length) {
-    return (
-      <AIProfileGenerator
-        firstName={firstName}
-        answers={answers}
-        onEdit={() => setCurrentStep(1)}
-        onComplete={handleProfileConfirm}
-      />
-    );
-  }
-
+  // Show welcome screen when currentStep is 0
   if (currentStep === 0) {
     return (
       <WelcomeScreen
@@ -149,6 +139,22 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     );
   }
 
+  // Show AI Profile Generator when submitting or after last question
+  if (isSubmitting || currentStep > ONBOARDING_QUESTIONS.length) {
+    return (
+      <AIProfileGenerator
+        firstName={firstName}
+        answers={answers}
+        onEdit={() => {
+          setIsSubmitting(false);
+          setCurrentStep(1);
+        }}
+        onComplete={handleProfileConfirm}
+      />
+    );
+  }
+
+  // Show question form for all other steps
   return (
     <QuestionForm
       currentStep={currentStep}

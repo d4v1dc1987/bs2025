@@ -5,7 +5,7 @@ import type { OnboardingAnswers } from "@/types/onboarding";
 
 export const useOnboardingData = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0); // Start at 0 for welcome screen
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const [firstName, setFirstName] = useState("");
 
@@ -44,7 +44,8 @@ export const useOnboardingData = () => {
         console.log('Onboarding data loaded:', onboardingData);
 
         if (onboardingData) {
-          setCurrentStep(onboardingData.status === 'completed' ? 1 : (onboardingData.current_step || 0));
+          // If onboarding is not completed, start from welcome screen
+          setCurrentStep(onboardingData.status === 'completed' ? 1 : 0);
           setAnswers(onboardingData.answers as OnboardingAnswers || {});
         }
       } catch (error) {
