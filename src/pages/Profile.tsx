@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,11 +15,39 @@ const Profile = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    first_name: user?.user_metadata?.first_name || "",
-    last_name: user?.user_metadata?.last_name || "",
-    avatar_url: user?.user_metadata?.avatar_url || "",
-    email: user?.email || "",
+    first_name: "",
+    last_name: "",
+    avatar_url: "",
+    email: "",
   });
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('first_name, last_name, avatar_url')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        setFormData({
+          first_name: profile.first_name || "",
+          last_name: profile.last_name || "",
+          avatar_url: profile.avatar_url || "",
+          email: user.email || "",
+        });
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        toast.error("Erreur lors du chargement du profil");
+      }
+    };
+
+    fetchProfileData();
+  }, [user]);
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -45,11 +73,19 @@ const Profile = () => {
         .from('avatars')
         .getPublicUrl(filePath);
 
-      const { error: updateError } = await supabase.auth.updateUser({
+      // Update both auth metadata and profiles table
+      const { error: updateAuthError } = await supabase.auth.updateUser({
         data: { avatar_url: publicUrl }
       });
 
-      if (updateError) throw updateError;
+      if (updateAuthError) throw updateAuthError;
+
+      const { error: updateProfileError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user?.id);
+
+      if (updateProfileError) throw updateProfileError;
 
       setFormData(prev => ({ ...prev, avatar_url: publicUrl }));
       toast.success("Photo de profil mise à jour avec succès");
@@ -66,14 +102,25 @@ const Profile = () => {
     try {
       setIsLoading(true);
 
-      const { error } = await supabase.auth.updateUser({
+      // Update both auth metadata and profiles table
+      const { error: updateAuthError } = await supabase.auth.updateUser({
         data: {
           first_name: formData.first_name,
           last_name: formData.last_name,
         }
       });
 
-      if (error) throw error;
+      if (updateAuthError) throw updateAuthError;
+
+      const { error: updateProfileError } = await supabase
+        .from('profiles')
+        .update({
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+        })
+        .eq('id', user?.id);
+
+      if (updateProfileError) throw updateProfileError;
 
       toast.success("Profil mis à jour avec succès");
     } catch (error: any) {
