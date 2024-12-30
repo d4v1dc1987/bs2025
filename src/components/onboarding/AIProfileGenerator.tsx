@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { useAIProfileGeneration } from '@/hooks/useAIProfileGeneration';
 import { AIProfileReview } from './AIProfileReview';
 import type { OnboardingAnswers } from '@/types/onboarding';
+import { AI_PROFILE_PROMPT } from '@/types/onboarding';
 
 interface AIProfileGeneratorProps {
   firstName: string;
@@ -25,7 +26,7 @@ export const AIProfileGenerator = ({
     generatedProfile,
     generateAIProfile,
     setGeneratedProfile,
-    setGenerationProgress
+    generationProgress
   } = useAIProfileGeneration();
 
   useEffect(() => {
@@ -53,10 +54,6 @@ export const AIProfileGenerator = ({
     handleGeneration();
   }, [isAnimating, isSubmitting]);
 
-  useEffect(() => {
-    setGenerationProgress(progress);
-  }, [progress]);
-
   if (!isSubmitting && !isGeneratingProfile && !generatedProfile) {
     return null;
   }
@@ -75,7 +72,7 @@ export const AIProfileGenerator = ({
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-4">
-      <Progress value={progress} className="w-full" />
+      <Progress value={generationProgress} className="w-full" />
       <p className="text-center text-sm text-muted-foreground">
         Génération de votre profil en cours...
       </p>
