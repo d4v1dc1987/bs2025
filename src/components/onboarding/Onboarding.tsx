@@ -49,16 +49,17 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     setGenerationProgress(0);
     
     try {
-      // Start progress animation immediately
+      // Start progress animation immediately with slower progression
       const progressInterval = setInterval(() => {
         setGenerationProgress(prev => {
           if (prev >= 90) {
             clearInterval(progressInterval);
             return 90;
           }
-          return prev + 2;
+          // Slower progression to ensure minimum 10 seconds duration
+          return prev + 1;
         });
-      }, 300);
+      }, 100); // Update every 100ms for smooth animation
 
       const formattedAnswers = Object.entries(answers)
         .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
@@ -68,15 +69,19 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
         .replace('{firstName}', firstName)
         .replace('{answers}', formattedAnswers);
 
-      const { data, error } = await supabase.functions.invoke('generate-with-ai', {
-        body: { prompt }
-      });
+      // Add minimum delay of 10 seconds before completing
+      const [aiResponse] = await Promise.all([
+        supabase.functions.invoke('generate-with-ai', {
+          body: { prompt }
+        }),
+        new Promise(resolve => setTimeout(resolve, 10000)) // 10 seconds minimum delay
+      ]);
 
-      if (error) throw error;
+      if (aiResponse.error) throw aiResponse.error;
 
       clearInterval(progressInterval);
       setGenerationProgress(100);
-      setGeneratedProfile(data.generatedText);
+      setGeneratedProfile(aiResponse.data.generatedText);
     } catch (error: any) {
       console.error('Error generating AI summary:', error);
       toast.error("Erreur lors de la génération du profil");
