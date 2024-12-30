@@ -3,6 +3,7 @@ import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProfileSectionProps {
   formData: {
@@ -13,9 +14,21 @@ interface ProfileSectionProps {
   };
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
+  setFormData: (data: any) => void;
 }
 
-export const ProfileSection = ({ formData, isLoading, setIsLoading }: ProfileSectionProps) => {
+export const ProfileSection = ({ 
+  formData, 
+  isLoading, 
+  setIsLoading,
+  setFormData 
+}: ProfileSectionProps) => {
+  const { user } = useAuth();
+
+  const handleFormChange = (field: string, value: string) => {
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
+  };
+
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setIsLoading(true);

@@ -5,6 +5,8 @@ import { ProfileSection } from "@/components/profile/ProfileSection";
 import { SecuritySection } from "@/components/profile/SecuritySection";
 import { PersonalitySection } from "@/components/profile/PersonalitySection";
 import { PersonStanding } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -69,6 +71,7 @@ const Profile = () => {
             formData={formData}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
+            setFormData={setFormData}
           />
         </TabsContent>
 
