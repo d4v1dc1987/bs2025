@@ -68,7 +68,10 @@ const Dashboard = () => {
           return;
         }
 
-        setOnboardingStatus(data?.status || 'not_started');
+        // Only set the status if we got data back
+        if (data) {
+          setOnboardingStatus(data.status || 'not_started');
+        }
       } catch (error) {
         console.error('Error checking onboarding status:', error);
       }
@@ -76,6 +79,11 @@ const Dashboard = () => {
 
     checkOnboardingStatus();
   }, []);
+
+  // Don't render anything until we know the onboarding status
+  if (onboardingStatus === null) {
+    return null;
+  }
 
   return (
     <div className="space-y-6">

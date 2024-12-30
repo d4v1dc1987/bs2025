@@ -10,7 +10,6 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { SecurityForm } from "@/components/profile/SecurityForm";
 import type { PasswordFormValues } from "@/schemas/passwordSchema";
 import { useNavigate } from "react-router-dom";
-import { useOnboarding } from "@/components/onboarding/OnboardingContext";
 import { Onboarding } from "@/components/onboarding/Onboarding";
 
 const Profile = () => {
@@ -23,7 +22,6 @@ const Profile = () => {
     last_name: "",
     avatar_url: "",
   });
-  const { openOnboarding } = useOnboarding();
 
   useEffect(() => {
     if (user) {
@@ -124,15 +122,20 @@ const Profile = () => {
     return `${(formData.first_name?.[0] || "").toUpperCase()}${(formData.last_name?.[0] || "").toUpperCase()}` || "U";
   };
 
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    toast.success("Votre profil a été mis à jour avec succès!");
+  };
+
   return (
     <div className="container max-w-4xl py-8">
       <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-[#c299ff] to-primary bg-clip-text text-transparent">
         Mon Profil
       </h1>
       
-      {showOnboarding && <Onboarding onComplete={() => setShowOnboarding(false)} />}
-      
-      {!showOnboarding && (
+      {showOnboarding ? (
+        <Onboarding onComplete={handleOnboardingComplete} />
+      ) : (
         <Tabs defaultValue="profile" className="space-y-8">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="profile" className="text-lg">
