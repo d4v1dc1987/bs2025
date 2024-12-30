@@ -80,13 +80,13 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   };
 
   const handleNext = async () => {
-    const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
-    
     if (currentStep === 0) {
       setCurrentStep(1);
       return;
     }
 
+    const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
+    
     if (currentQuestion && !answers[currentQuestion.id]) {
       toast.error("Veuillez répondre à la question avant de continuer");
       return;
