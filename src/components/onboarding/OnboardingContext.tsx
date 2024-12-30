@@ -11,8 +11,15 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(undef
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
 
-  const openOnboarding = () => setIsOnboardingOpen(true);
-  const closeOnboarding = () => setIsOnboardingOpen(false);
+  const openOnboarding = () => {
+    console.log("Opening onboarding...");
+    setIsOnboardingOpen(true);
+  };
+  
+  const closeOnboarding = () => {
+    console.log("Closing onboarding...");
+    setIsOnboardingOpen(false);
+  };
 
   return (
     <OnboardingContext.Provider value={{ isOnboardingOpen, openOnboarding, closeOnboarding }}>

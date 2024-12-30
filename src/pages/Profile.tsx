@@ -11,13 +11,14 @@ import { SecurityForm } from "@/components/profile/SecurityForm";
 import type { PasswordFormValues } from "@/schemas/passwordSchema";
 import { useNavigate } from "react-router-dom";
 import { Onboarding } from "@/components/onboarding/Onboarding";
-import { OnboardingProvider } from "@/components/onboarding/OnboardingContext";
+import { OnboardingProvider, useOnboarding } from "@/components/onboarding/OnboardingContext";
 
-const Profile = () => {
+// Séparation du contenu principal du profil dans un composant distinct
+const ProfileContent = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const { openOnboarding, closeOnboarding, isOnboardingOpen } = useOnboarding();
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -124,7 +125,7 @@ const Profile = () => {
   };
 
   const handleOnboardingComplete = () => {
-    setShowOnboarding(false);
+    closeOnboarding();
     toast.success("Votre profil a été mis à jour avec succès!");
   };
 
@@ -134,10 +135,8 @@ const Profile = () => {
         Mon Profil
       </h1>
       
-      {showOnboarding ? (
-        <OnboardingProvider>
-          <Onboarding onComplete={handleOnboardingComplete} />
-        </OnboardingProvider>
+      {isOnboardingOpen ? (
+        <Onboarding onComplete={handleOnboardingComplete} />
       ) : (
         <Tabs defaultValue="profile" className="space-y-8">
           <TabsList className="grid w-full grid-cols-2">
@@ -180,7 +179,7 @@ const Profile = () => {
                   <p className="text-sm text-muted-foreground">
                     Modifiez vos réponses au questionnaire de personnalité pour mettre à jour votre profil.
                   </p>
-                  <Button onClick={() => setShowOnboarding(true)}>
+                  <Button onClick={openOnboarding}>
                     Modifier ma personnalité
                   </Button>
                 </div>
@@ -199,6 +198,15 @@ const Profile = () => {
         </Tabs>
       )}
     </div>
+  );
+};
+
+// Composant principal qui fournit le contexte
+const Profile = () => {
+  return (
+    <OnboardingProvider>
+      <ProfileContent />
+    </OnboardingProvider>
   );
 };
 
