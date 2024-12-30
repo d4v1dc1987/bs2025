@@ -22,12 +22,19 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   const [generatedProfile, setGeneratedProfile] = useState<string | null>(null);
   const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
   const { closeOnboarding } = useOnboarding();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
+        setIsLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          console.error('No user found');
+          return;
+        }
+
+        console.log('Loading onboarding data for user:', user.id);
 
         const { data: profileData } = await supabase
           .from('profiles')
@@ -41,7 +48,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
 
         const { data: onboardingData, error } = await supabase
           .from('onboarding')
-          .select('current_step, answers')
+          .select('current_step, answers, status')
           .eq('id', user.id)
           .maybeSingle();
 
@@ -50,61 +57,23 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
           return;
         }
 
+        console.log('Onboarding data loaded:', onboardingData);
+
         if (onboardingData) {
-          setCurrentStep(onboardingData.current_step || 0);
+          // Si l'onboarding est déjà complété, on commence à l'étape 1
+          setCurrentStep(onboardingData.status === 'completed' ? 1 : (onboardingData.current_step || 0));
           setAnswers(onboardingData.answers as OnboardingAnswers || {});
         }
       } catch (error) {
         console.error('Error loading data:', error);
+        toast.error("Une erreur est survenue lors du chargement de vos données");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadData();
   }, []);
-
-  const handleNext = async () => {
-    const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
-    
-    if (currentStep === 0) {
-      setCurrentStep(1);
-      return;
-    }
-
-    if (currentQuestion && !answers[currentQuestion.id]) {
-      toast.error("Veuillez répondre à la question avant de continuer");
-      return;
-    }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    let nextStep = currentStep + 1;
-    
-    if (currentStep === 5 && answers.has_children !== 'yes') {
-      nextStep = 7;
-    }
-
-    const { error } = await supabase
-      .from('onboarding')
-      .upsert({
-        id: user.id,
-        current_step: nextStep,
-        answers,
-        status: nextStep > ONBOARDING_QUESTIONS.length ? 'completed' : 'in_progress',
-      });
-
-    if (error) {
-      toast.error("Erreur lors de la sauvegarde de votre réponse");
-      console.error('Error updating onboarding:', error);
-      return;
-    }
-
-    if (nextStep > ONBOARDING_QUESTIONS.length) {
-      await generateAIProfile();
-    }
-
-    setCurrentStep(nextStep);
-  };
 
   const formatAnswerValue = (value: unknown): string => {
     if (Array.isArray(value)) {
@@ -180,6 +149,55 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     toast.success("Votre profil a été enregistré avec succès! Vous pourrez le modifier à tout moment depuis votre profil.");
   };
 
+  const handleNext = async () => {
+    const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
+    
+    if (currentStep === 0) {
+      setCurrentStep(1);
+      return;
+    }
+
+    if (currentQuestion && !answers[currentQuestion.id]) {
+      toast.error("Veuillez répondre à la question avant de continuer");
+      return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    let nextStep = currentStep + 1;
+    
+    if (currentStep === 5 && answers.has_children !== 'yes') {
+      nextStep = 7;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('onboarding')
+        .upsert({
+          id: user.id,
+          current_step: nextStep,
+          answers,
+          status: nextStep > ONBOARDING_QUESTIONS.length ? 'completed' : 'in_progress',
+        });
+
+      if (error) {
+        toast.error("Erreur lors de la sauvegarde de votre réponse");
+        console.error('Error updating onboarding:', error);
+        return;
+      }
+
+      if (nextStep > ONBOARDING_QUESTIONS.length) {
+        await generateAIProfile();
+      }
+
+      setCurrentStep(nextStep);
+    } catch (error) {
+      console.error('Error in handleNext:', error);
+      toast.error("Une erreur est survenue");
+    }
+  };
+
   const handlePrevious = () => {
     if (currentStep === 7 && answers.has_children !== 'yes') {
       setCurrentStep(5);
@@ -197,6 +215,14 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
       [currentQuestion.id]: value
     }));
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (currentStep > ONBOARDING_QUESTIONS.length) {
     return (
