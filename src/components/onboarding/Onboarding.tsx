@@ -20,7 +20,7 @@ interface CustomAnswer {
 }
 
 export const Onboarding = () => {
-  const [currentStep, setCurrentStep] = useState(0); // Start at 0 for intro
+  const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [firstName, setFirstName] = useState<string>("");
@@ -123,10 +123,11 @@ export const Onboarding = () => {
               return `${key}: ${value.map(v => {
                 if (v && typeof v === 'object' && 'value' in v && 'customValue' in v) {
                   const typedV = v as CustomAnswer;
+                  if (!typedV) return '';
                   return typedV.customValue ? `${typedV.value} (${typedV.customValue})` : typedV.value;
                 }
                 return v;
-              }).filter((v): v is string => typeof v === 'string').join(', ')}`;
+              }).filter(Boolean).join(', ')}`;
             }
             return `${key}: ${value}`;
           })
