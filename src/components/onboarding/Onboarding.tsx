@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { ONBOARDING_QUESTIONS, AI_PROFILE_PROMPT } from "@/types/onboarding";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { ChoiceGroup } from "./ChoiceGroup";
+import { QuestionDescription } from "./QuestionDescription";
 import type { OnboardingAnswers } from "@/types/onboarding";
 
 export const Onboarding = () => {
@@ -136,8 +135,6 @@ export const Onboarding = () => {
         setIsSubmitting(false);
       }
     }
-
-    setCurrentStep(nextStep);
   };
 
   const handlePrevious = () => {
@@ -160,7 +157,7 @@ export const Onboarding = () => {
 
   if (currentStep > ONBOARDING_QUESTIONS.length) {
     return (
-      <Card>
+      <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Onboarding terminé !</CardTitle>
           <CardDescription>
@@ -171,7 +168,6 @@ export const Onboarding = () => {
     );
   }
 
-  // Show introduction
   if (currentStep === 0) {
     return (
       <Card className="w-full max-w-2xl mx-auto">
@@ -207,40 +203,12 @@ export const Onboarding = () => {
           <div className="space-y-4">
             <h3 className="font-medium text-lg whitespace-pre-line">{questionText}</h3>
             
-            {currentQuestion.type === 'single' && (
-              <RadioGroup
-                value={answers[currentQuestion.id] as string}
-                onValueChange={handleAnswerChange}
-                className="space-y-3"
-              >
-                {currentQuestion.options?.map((option) => (
-                  <div key={option.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={option.value} id={option.value} />
-                    <Label htmlFor={option.value}>{option.label}</Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            )}
-
-            {currentQuestion.type === 'multiple' && (
-              <div className="space-y-3">
-                {currentQuestion.options?.map((option) => (
-                  <div key={option.value} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={option.value}
-                      checked={(answers[currentQuestion.id] as string[] || []).includes(option.value)}
-                      onCheckedChange={(checked) => {
-                        const currentValues = answers[currentQuestion.id] as string[] || [];
-                        const newValues = checked
-                          ? [...currentValues, option.value]
-                          : currentValues.filter(v => v !== option.value);
-                        handleAnswerChange(newValues);
-                      }}
-                    />
-                    <Label htmlFor={option.value}>{option.label}</Label>
-                  </div>
-                ))}
-              </div>
+            {(currentQuestion.type === 'single' || currentQuestion.type === 'multiple') && (
+              <ChoiceGroup
+                question={currentQuestion}
+                value={answers[currentQuestion.id]}
+                onChange={handleAnswerChange}
+              />
             )}
 
             {currentQuestion.type === 'text' && (
@@ -268,6 +236,8 @@ export const Onboarding = () => {
                 placeholder="19 février 1987"
               />
             )}
+
+            <QuestionDescription description={currentQuestion.description} />
           </div>
 
           <div className="flex justify-between pt-4">
