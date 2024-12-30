@@ -12,6 +12,7 @@ import { QuestionDescription } from "./QuestionDescription";
 import type { OnboardingAnswers } from "@/types/onboarding";
 import { Progress } from "@/components/ui/progress";
 import { AIProfileReview } from "./AIProfileReview";
+import { useOnboarding } from "./OnboardingContext";
 
 export const Onboarding = () => {
   const [currentStep, setCurrentStep] = useState(0); // Start at 0 for intro
@@ -21,6 +22,7 @@ export const Onboarding = () => {
   const [generationProgress, setGenerationProgress] = useState(0);
   const [generatedProfile, setGeneratedProfile] = useState<string | null>(null);
   const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
+  const { closeOnboarding } = useOnboarding();
 
   useEffect(() => {
     // Load existing answers and user data
@@ -171,6 +173,7 @@ export const Onboarding = () => {
       throw error;
     }
 
+    closeOnboarding();
     toast.success("Votre profil a été enregistré avec succès! Vous pourrez le modifier à tout moment depuis votre profil.");
   };
 
@@ -322,4 +325,3 @@ export const Onboarding = () => {
     </Card>
   );
 };
-

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "./components/layout/MainLayout";
 import { useEffect, useState } from "react";
 import { supabase } from "./integrations/supabase/client";
+import { OnboardingProvider } from "./components/onboarding/OnboardingContext";
 import Index from "./pages/Index";
 import Generator from "./pages/Generator";
 import Comment from "./pages/Comment";
@@ -37,7 +38,6 @@ const App = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Show nothing while checking auth state
   if (isAuthenticated === null) {
     return null;
   }
@@ -45,29 +45,31 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          {isAuthenticated ? (
-            <MainLayout>
+        <OnboardingProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            {isAuthenticated ? (
+              <MainLayout>
+                <Routes>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/generator" element={<Generator />} />
+                  <Route path="/comment" element={<Comment />} />
+                  <Route path="/reply" element={<Reply />} />
+                  <Route path="/calendar" element={<Calendar />} />
+                  <Route path="/close" element={<Close />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+              </MainLayout>
+            ) : (
               <Routes>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/generator" element={<Generator />} />
-                <Route path="/comment" element={<Comment />} />
-                <Route path="/reply" element={<Reply />} />
-                <Route path="/calendar" element={<Calendar />} />
-                <Route path="/close" element={<Close />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="*" element={<Navigate to="/auth" replace />} />
               </Routes>
-            </MainLayout>
-          ) : (
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="*" element={<Navigate to="/auth" replace />} />
-            </Routes>
-          )}
-        </BrowserRouter>
+            )}
+          </BrowserRouter>
+        </OnboardingProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

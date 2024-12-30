@@ -11,6 +11,7 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Onboarding } from "@/components/onboarding/Onboarding";
 import { supabase } from "@/integrations/supabase/client";
+import { useOnboarding } from "@/components/onboarding/OnboardingContext";
 import type { OnboardingStatus } from "@/types/onboarding";
 
 const features = [
@@ -48,6 +49,7 @@ const features = [
 
 const Dashboard = () => {
   const [onboardingStatus, setOnboardingStatus] = useState<OnboardingStatus | null>(null);
+  const { isOnboardingOpen } = useOnboarding();
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
@@ -86,7 +88,7 @@ const Dashboard = () => {
         Bienvenue sur votre tableau de bord Bobby Social
       </p>
 
-      {onboardingStatus !== 'completed' && (
+      {(onboardingStatus !== 'completed' || isOnboardingOpen) && (
         <div className="mb-8">
           <Onboarding />
         </div>

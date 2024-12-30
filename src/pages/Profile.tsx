@@ -15,6 +15,7 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { SecurityForm } from "@/components/profile/SecurityForm";
 import type { PasswordFormValues } from "@/schemas/passwordSchema";
 import { useNavigate } from "react-router-dom";
+import { useOnboarding } from "@/components/onboarding/OnboardingContext";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -126,8 +127,10 @@ const Profile = () => {
     return `${(formData.first_name?.[0] || "").toUpperCase()}${(formData.last_name?.[0] || "").toUpperCase()}` || "U";
   };
 
+  const { openOnboarding } = useOnboarding();
+
   const handleEditPersonality = () => {
-    navigate("/dashboard", { state: { openOnboarding: true } });
+    openOnboarding();
   };
 
   return (
