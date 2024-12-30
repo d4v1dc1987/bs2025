@@ -49,9 +49,16 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     setGenerationProgress(0);
     
     try {
+      // Start progress animation immediately
       const progressInterval = setInterval(() => {
-        setGenerationProgress(prev => Math.min(prev + 5, 90));
-      }, 500);
+        setGenerationProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 2;
+        });
+      }, 300);
 
       const formattedAnswers = Object.entries(answers)
         .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
@@ -96,7 +103,6 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
 
     closeOnboarding();
     onComplete?.();
-    toast.success("Votre profil a été enregistré avec succès! Vous pourrez le modifier à tout moment depuis votre profil.");
   };
 
   const handleNext = async () => {

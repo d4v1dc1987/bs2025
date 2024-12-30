@@ -29,7 +29,7 @@ export const AIProfileReview = ({
     try {
       setIsSaving(true);
       await onConfirm(editedProfile);
-      toast.success("Profil enregistré avec succès!");
+      toast.success("Profil enregistré avec succès! Vous pouvez le modifier à tout moment depuis votre profil.");
     } catch (error) {
       console.error('Error saving profile:', error);
       toast.error("Erreur lors de l'enregistrement du profil");
@@ -48,10 +48,15 @@ export const AIProfileReview = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Progress value={progress} className="w-full" />
-          <p className="text-sm text-muted-foreground">
-            Cette opération peut prendre quelques secondes...
-          </p>
+          <div className="space-y-2">
+            <Progress value={progress} className="w-full h-2" />
+            <p className="text-sm text-muted-foreground text-center">
+              {progress < 33 && "Analyse de vos réponses en cours..."}
+              {progress >= 33 && progress < 66 && "Création de votre profil personnalisé..."}
+              {progress >= 66 && progress < 100 && "Finalisation de votre expérience Bobby Social..."}
+              {progress === 100 && "Votre profil est prêt !"}
+            </p>
+          </div>
         </CardContent>
       </Card>
     );
