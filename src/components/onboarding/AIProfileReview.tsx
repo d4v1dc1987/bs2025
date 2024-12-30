@@ -5,7 +5,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Check, Edit } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 interface AIProfileReviewProps {
   isGenerating: boolean;
@@ -49,7 +48,7 @@ export const AIProfileReview = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Progress value={progress} className="w-full h-2" />
+            <Progress value={progress} className="w-full h-2 transition-all duration-500" />
             <p className="text-sm text-muted-foreground text-center">
               {progress < 33 && "Analyse de vos réponses en cours..."}
               {progress >= 33 && progress < 66 && "Création de votre profil personnalisé..."}
