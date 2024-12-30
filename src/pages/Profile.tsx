@@ -17,12 +17,13 @@ const Profile = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     avatar_url: "",
   });
-  const { isOnboardingOpen, openOnboarding } = useOnboarding();
+  const { openOnboarding } = useOnboarding();
 
   useEffect(() => {
     if (user) {
@@ -129,66 +130,68 @@ const Profile = () => {
         Mon Profil
       </h1>
       
-      {isOnboardingOpen && <Onboarding />}
+      {showOnboarding && <Onboarding onComplete={() => setShowOnboarding(false)} />}
       
-      <Tabs defaultValue="profile" className="space-y-8">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="profile" className="text-lg">
-            Informations
-          </TabsTrigger>
-          <TabsTrigger value="security" className="text-lg">
-            Sécurité
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="profile">
-          <div className="space-y-8">
-            <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
-              <div className="flex flex-col items-center space-y-4">
-                <ProfileAvatar
-                  avatarUrl={formData.avatar_url}
-                  isLoading={isLoading}
-                  onAvatarChange={handleAvatarChange}
-                  initials={getInitials()}
-                />
-                <p className="text-sm text-[#c299ff]">
-                  JPG, PNG ou GIF • Max 2MB
-                </p>
-              </div>
-            </Card>
+      {!showOnboarding && (
+        <Tabs defaultValue="profile" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="profile" className="text-lg">
+              Informations
+            </TabsTrigger>
+            <TabsTrigger value="security" className="text-lg">
+              Sécurité
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="profile">
+            <div className="space-y-8">
+              <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
+                <div className="flex flex-col items-center space-y-4">
+                  <ProfileAvatar
+                    avatarUrl={formData.avatar_url}
+                    isLoading={isLoading}
+                    onAvatarChange={handleAvatarChange}
+                    initials={getInitials()}
+                  />
+                  <p className="text-sm text-[#c299ff]">
+                    JPG, PNG ou GIF • Max 2MB
+                  </p>
+                </div>
+              </Card>
 
+              <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
+                <ProfileForm
+                  formData={{ ...formData, email: user?.email }}
+                  isLoading={isLoading}
+                  onSubmit={handleProfileUpdate}
+                  onChange={handleFormChange}
+                />
+              </Card>
+              
+              <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Ma personnalité Bobby Social</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Modifiez vos réponses au questionnaire de personnalité pour mettre à jour votre profil.
+                  </p>
+                  <Button onClick={() => setShowOnboarding(true)}>
+                    Modifier ma personnalité
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="security">
             <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
-              <ProfileForm
-                formData={{ ...formData, email: user?.email }}
+              <SecurityForm
                 isLoading={isLoading}
-                onSubmit={handleProfileUpdate}
-                onChange={handleFormChange}
+                onSubmit={handlePasswordUpdate}
               />
             </Card>
-            
-            <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Ma personnalité Bobby Social</h3>
-                <p className="text-sm text-muted-foreground">
-                  Modifiez vos réponses au questionnaire de personnalité pour mettre à jour votre profil.
-                </p>
-                <Button onClick={openOnboarding}>
-                  Modifier ma personnalité
-                </Button>
-              </div>
-            </Card>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="security">
-          <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
-            <SecurityForm
-              isLoading={isLoading}
-              onSubmit={handlePasswordUpdate}
-            />
-          </Card>
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };

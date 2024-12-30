@@ -8,12 +8,16 @@ import { WelcomeScreen } from "./WelcomeScreen";
 import { QuestionForm } from "./QuestionForm";
 import { AIProfileReview } from "./AIProfileReview";
 
+interface OnboardingProps {
+  onComplete?: () => void;
+}
+
 interface CustomAnswer {
   value: string;
   customValue?: string;
 }
 
-export const Onboarding = () => {
+export const Onboarding = ({ onComplete }: OnboardingProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -121,8 +125,7 @@ export const Onboarding = () => {
             return `${key}: ${value.map(v => {
               if (v && typeof v === 'object' && 'value' in v) {
                 const typedV = v as CustomAnswer;
-                if (!typedV) return '';
-                return typedV.customValue ? `${typedV.value} (${typedV.customValue})` : typedV.value;
+                return typedV?.customValue ? `${typedV.value} (${typedV.customValue})` : typedV.value;
               }
               return v;
             }).filter(Boolean).join(', ')}`;
@@ -173,6 +176,7 @@ export const Onboarding = () => {
     }
 
     closeOnboarding();
+    onComplete?.();
     toast.success("Votre profil a été enregistré avec succès! Vous pourrez le modifier à tout moment depuis votre profil.");
   };
 
