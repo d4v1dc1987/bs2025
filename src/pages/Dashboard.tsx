@@ -79,6 +79,8 @@ const Dashboard = () => {
     checkOnboardingStatus();
   }, []);
 
+  const showOnboarding = onboardingStatus === 'not_started' || onboardingStatus === null;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -90,7 +92,7 @@ const Dashboard = () => {
         Bienvenue sur votre tableau de bord Bobby Social
       </p>
 
-      {(onboardingStatus !== 'completed' || isOnboardingOpen) && (
+      {showOnboarding && (
         <div className="mb-8">
           <Onboarding />
         </div>

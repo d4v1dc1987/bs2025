@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Onboarding } from "@/components/onboarding/Onboarding";
 import { useOnboarding } from "@/components/onboarding/OnboardingContext";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const OnboardingSection = () => {
   const { openOnboarding, closeOnboarding, isOnboardingOpen } = useOnboarding();
+  const isMobile = useIsMobile();
 
   const handleOnboardingComplete = () => {
     closeOnboarding();
@@ -23,9 +25,11 @@ export const OnboardingSection = () => {
         <p className="text-sm text-muted-foreground">
           Modifiez vos réponses au questionnaire de personnalité pour mettre à jour votre profil.
         </p>
-        <Button onClick={openOnboarding}>
-          Modifier ma personnalité
-        </Button>
+        <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-4`}>
+          <Button onClick={openOnboarding} className="w-full">
+            Modifier ma personnalité
+          </Button>
+        </div>
       </div>
     </Card>
   );

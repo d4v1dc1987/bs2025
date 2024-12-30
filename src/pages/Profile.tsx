@@ -58,18 +58,20 @@ const Profile = () => {
       </h1>
       
       <Tabs defaultValue={defaultTab} className="space-y-8">
-        <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-3'} mb-8`}>
-          <TabsTrigger value="profile" className="text-lg">
-            Informations
-          </TabsTrigger>
-          <TabsTrigger value="personality" className="text-lg flex items-center gap-2">
-            <PersonStanding className="w-4 h-4" />
-            {isMobile ? 'Bobby Social' : 'Personnalité'}
-          </TabsTrigger>
-          <TabsTrigger value="security" className="text-lg">
-            Sécurité
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex justify-center w-full">
+          <TabsList className="flex flex-col gap-2 w-full md:w-auto md:flex-row">
+            <TabsTrigger value="profile" className="text-lg w-full md:w-auto">
+              Informations
+            </TabsTrigger>
+            <TabsTrigger value="personality" className="text-lg w-full md:w-auto flex items-center gap-2 justify-center">
+              <PersonStanding className="w-4 h-4" />
+              {isMobile ? 'Bobby Social' : 'Personnalité'}
+            </TabsTrigger>
+            <TabsTrigger value="security" className="text-lg w-full md:w-auto">
+              Sécurité
+            </TabsTrigger>
+          </TabsList>
+        </div>
         
         <TabsContent value="profile">
           <ProfileSection
