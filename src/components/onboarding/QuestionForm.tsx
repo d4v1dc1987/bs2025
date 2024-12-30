@@ -35,6 +35,10 @@ export const QuestionForm = ({
   const isMobile = useIsMobile();
   const progress = (currentStep / ONBOARDING_QUESTIONS.length) * 100;
 
+  // Détermine si le champ doit être multi-lignes
+  const isMultilineQuestion = currentQuestion.id === 'favorite_books' || 
+                            currentQuestion.id === 'personal_story';
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -62,11 +66,21 @@ export const QuestionForm = ({
               />
             )}
 
-            {(currentQuestion.type === 'text' || currentQuestion.type === 'date') && (
+            {currentQuestion.type === 'date' && (
+              <Input
+                type="text"
+                value={answers[currentQuestion.id] as string || ''}
+                onChange={(e) => onAnswerChange(e.target.value)}
+                placeholder="Ex: 19 février 1987"
+                className="w-full"
+              />
+            )}
+
+            {currentQuestion.type === 'text' && (
               <Input
                 value={answers[currentQuestion.id] as string || ''}
                 onChange={(e) => onAnswerChange(e.target.value)}
-                placeholder={currentQuestion.id === 'birth_date' ? "Ex: 19 février 1987" : "Votre réponse..."}
+                placeholder="Votre réponse..."
                 maxLength={currentQuestion.maxLength}
                 className="w-full"
               />
@@ -78,8 +92,8 @@ export const QuestionForm = ({
                 onChange={(e) => onAnswerChange(e.target.value)}
                 placeholder="Votre réponse..."
                 className={cn(
-                  "min-h-[120px] w-full resize-y",
-                  (currentQuestion.id === 'favorite_books' || currentQuestion.id === 'personal_story') && "min-h-[180px]"
+                  "resize-y w-full",
+                  isMultilineQuestion ? "min-h-[120px]" : "min-h-[80px]"
                 )}
                 maxLength={currentQuestion.maxLength}
               />

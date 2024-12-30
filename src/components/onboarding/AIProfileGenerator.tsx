@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useProgressAnimation } from '@/hooks/useProgressAnimation';
-import { Progress } from "@/components/ui/progress";
 import { useAIProfileGeneration } from '@/hooks/useAIProfileGeneration';
 import { AIProfileReview } from './AIProfileReview';
 import type { OnboardingAnswers } from '@/types/onboarding';
@@ -20,63 +19,50 @@ export const AIProfileGenerator = ({
   onComplete 
 }: AIProfileGeneratorProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { progress, isAnimating, startAnimation } = useProgressAnimation();
+  const { progress, isAnimating, startAnimation } = useProgressAnimation(7000); // Exactement 7 secondes
   const {
     isGeneratingProfile,
     generatedProfile,
     generateAIProfile,
-    setGeneratedProfile,
-    generationProgress
+    setGeneratedProfile
   } = useAIProfileGeneration();
 
   useEffect(() => {
-    if (isSubmitting) {
-      startAnimation();
-    }
-  }, [isSubmitting]);
-
-  useEffect(() => {
+    if (!isSubmitting) return;
+    
     const handleGeneration = async () => {
-      if (!isAnimating && isSubmitting) {
-        const formattedAnswers = Object.entries(answers)
-          .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
-          .join('\n');
+      startAnimation();
+      
+      // Attendre exactement 7 secondes avant de générer le profil
+      await new Promise(resolve => setTimeout(resolve, 7000));
+      
+      const formattedAnswers = Object.entries(answers)
+        .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
+        .join('\n');
 
-        const prompt = AI_PROFILE_PROMPT
-          .replace('{firstName}', firstName)
-          .replace('{answers}', formattedAnswers);
+      const prompt = AI_PROFILE_PROMPT
+        .replace('{firstName}', firstName)
+        .replace('{answers}', formattedAnswers);
 
-        await generateAIProfile(prompt);
-        setIsSubmitting(false);
-      }
+      await generateAIProfile(prompt);
+      setIsSubmitting(false);
     };
 
     handleGeneration();
-  }, [isAnimating, isSubmitting]);
+  }, [isSubmitting]);
 
-  if (!isSubmitting && !isGeneratingProfile && !generatedProfile) {
-    return null;
-  }
-
-  if (generatedProfile) {
-    return (
-      <AIProfileReview
-        isGenerating={false}
-        progress={100}
-        generatedProfile={generatedProfile}
-        onEdit={onEdit}
-        onConfirm={onComplete}
-      />
-    );
-  }
+  useEffect(() => {
+    setIsSubmitting(true);
+  }, []);
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-4">
-      <Progress value={generationProgress} className="w-full" />
-      <p className="text-center text-sm text-muted-foreground">
-        Génération de votre profil en cours...
-      </p>
-    </div>
+    <AIProfileReview
+      isGenerating={isSubmitting || isGeneratingProfile}
+      progress={isSubmitting ? progress : (isGeneratingProfile ? 100 : 0)}
+      generatedProfile={generatedProfile}
+      onEdit={onEdit}
+      onConfirm={onComplete}
+    />
   );
 };
 
