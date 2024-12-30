@@ -35,7 +35,7 @@ export const QuestionForm = ({
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Onboarding ({currentStep}/{ONBOARDING_QUESTIONS.length})</CardTitle>
+        <CardTitle>Questionnaire ({currentStep}/{ONBOARDING_QUESTIONS.length})</CardTitle>
         <CardDescription>
           Répondez à quelques questions pour personnaliser votre expérience
         </CardDescription>
