@@ -12,6 +12,7 @@ import { QuestionDescription } from "./QuestionDescription";
 import type { OnboardingAnswers } from "@/types/onboarding";
 
 export const Onboarding = () => {
+
   const [currentStep, setCurrentStep] = useState(0); // Start at 0 for intro
   const [answers, setAnswers] = useState<OnboardingAnswers>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -194,9 +195,7 @@ export const Onboarding = () => {
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
-      <Car
-
-dHeader>
+      <CardHeader>
         <CardTitle>Onboarding ({currentStep}/{ONBOARDING_QUESTIONS.length})</CardTitle>
         <CardDescription>
           Répondez à quelques questions pour personnaliser votre expérience
