@@ -8,6 +8,7 @@ import { ChoiceGroup } from "./ChoiceGroup";
 import { QuestionDescription } from "./QuestionDescription";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { OnboardingAnswers } from "@/types/onboarding";
+import { Progress } from "@/components/ui/progress";
 
 interface QuestionFormProps {
   currentStep: number;
@@ -31,11 +32,18 @@ export const QuestionForm = ({
   const currentQuestion = ONBOARDING_QUESTIONS[currentStep - 1];
   const questionText = currentQuestion.question.replace('{firstName}', firstName);
   const isMobile = useIsMobile();
+  const progress = (currentStep / ONBOARDING_QUESTIONS.length) * 100;
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Questionnaire ({currentStep}/{ONBOARDING_QUESTIONS.length})</CardTitle>
+        <div className="flex items-center justify-between mb-4">
+          <CardTitle>Questionnaire</CardTitle>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">{currentStep}/{ONBOARDING_QUESTIONS.length}</span>
+            <Progress value={progress} className="w-24" />
+          </div>
+        </div>
         <CardDescription>
           Répondez à quelques questions pour personnaliser votre expérience
         </CardDescription>
@@ -57,7 +65,7 @@ export const QuestionForm = ({
               <Input
                 value={answers[currentQuestion.id] as string || ''}
                 onChange={(e) => onAnswerChange(e.target.value)}
-                placeholder="Votre réponse..."
+                placeholder={currentQuestion.id === 'birth_date' ? "Ex: 19 février 1987" : "Votre réponse..."}
                 maxLength={currentQuestion.maxLength}
                 className="w-full"
               />
@@ -68,18 +76,11 @@ export const QuestionForm = ({
                 value={answers[currentQuestion.id] as string || ''}
                 onChange={(e) => onAnswerChange(e.target.value)}
                 placeholder="Votre réponse..."
-                className="min-h-[120px] w-full resize-y"
+                className={cn(
+                  "min-h-[120px] w-full resize-y",
+                  (currentQuestion.id === 'favorite_books' || currentQuestion.id === 'personal_story') && "min-h-[180px]"
+                )}
                 maxLength={currentQuestion.maxLength}
-              />
-            )}
-
-            {currentQuestion.type === 'date' && (
-              <Input
-                type="text"
-                value={answers[currentQuestion.id] as string || ''}
-                onChange={(e) => onAnswerChange(e.target.value)}
-                placeholder="19 février 1987"
-                className="w-full"
               />
             )}
 
