@@ -7,8 +7,11 @@ import { PersonalitySection } from "@/components/profile/PersonalitySection";
 import { PersonStanding } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useSearchParams } from "react-router-dom";
 
 const Profile = () => {
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get('tab') || 'profile';
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -52,7 +55,7 @@ const Profile = () => {
         Mon Profil
       </h1>
       
-      <Tabs defaultValue="profile" className="space-y-8">
+      <Tabs defaultValue={defaultTab} className="space-y-8">
         <TabsList className="grid w-full grid-cols-3 mb-8">
           <TabsTrigger value="profile" className="text-lg">
             Informations

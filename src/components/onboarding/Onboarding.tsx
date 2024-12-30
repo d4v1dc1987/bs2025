@@ -8,12 +8,14 @@ import { QuestionForm } from "./QuestionForm";
 import { AIProfileReview } from "./AIProfileReview";
 import { isCustomAnswer } from "@/types/customAnswer";
 import { useOnboardingData } from "@/hooks/useOnboardingData";
+import { useNavigate } from "react-router-dom";
 
 interface OnboardingProps {
   onComplete?: () => void;
 }
 
 export const Onboarding = ({ onComplete }: OnboardingProps) => {
+  const navigate = useNavigate();
   const {
     isLoading,
     currentStep,
@@ -49,16 +51,17 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     setGenerationProgress(0);
     
     try {
-      // Start progress animation immediately
+      // Start progress animation immediately with slower progression
       const progressInterval = setInterval(() => {
         setGenerationProgress(prev => {
           if (prev >= 90) {
             clearInterval(progressInterval);
             return 90;
           }
-          return prev + 1;
+          // Slower progression to ensure visibility
+          return prev + 0.5;
         });
-      }, 100);
+      }, 50); // Update every 50ms for smoother animation
 
       const formattedAnswers = Object.entries(answers)
         .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
@@ -93,20 +96,28 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { error } = await supabase
-      .from('onboarding')
-      .update({ 
-        ai_summary: profile,
-        status: 'completed'
-      })
-      .eq('id', user.id);
+    try {
+      const { error } = await supabase
+        .from('onboarding')
+        .update({ 
+          ai_summary: profile,
+          status: 'completed'
+        })
+        .eq('id', user.id);
 
-    if (error) {
-      throw error;
+      if (error) {
+        throw error;
+      }
+
+      closeOnboarding();
+      onComplete?.();
+      // Navigate to profile page with personality tab selected
+      navigate('/profile?tab=personality');
+      toast.success("Votre profil a été enregistré avec succès!");
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast.error("Erreur lors de l'enregistrement du profil");
     }
-
-    closeOnboarding();
-    onComplete?.();
   };
 
   const handleNext = async () => {
