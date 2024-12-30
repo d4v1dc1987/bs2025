@@ -9,6 +9,7 @@ import { AIProfileReview } from "./AIProfileReview";
 import { isCustomAnswer } from "@/types/customAnswer";
 import { useOnboardingData } from "@/hooks/useOnboardingData";
 import { useNavigate } from "react-router-dom";
+import { useAIProfileGeneration } from "@/hooks/useAIProfileGeneration";
 
 interface OnboardingProps {
   onComplete?: () => void;
@@ -25,10 +26,15 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     firstName
   } = useOnboardingData();
 
+  const {
+    isGeneratingProfile,
+    generationProgress,
+    generatedProfile,
+    generateAIProfile,
+    setGeneratedProfile
+  } = useAIProfileGeneration();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [generationProgress, setGenerationProgress] = useState(0);
-  const [generatedProfile, setGeneratedProfile] = useState<string | null>(null);
-  const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
   const { closeOnboarding } = useOnboarding();
 
   const formatAnswerValue = (value: unknown): string => {
@@ -44,59 +50,6 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
         .join(', ');
     }
     return String(value);
-  };
-
-  const generateAIProfile = async () => {
-    // Always show the progress bar immediately
-    setIsGeneratingProfile(true);
-    setGenerationProgress(0);
-    
-    // Start progress animation immediately
-    const progressInterval = setInterval(() => {
-      setGenerationProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return prev + 0.5;
-      });
-    }, 50);
-
-    try {
-      const formattedAnswers = Object.entries(answers)
-        .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
-        .join('\n');
-
-      const prompt = AI_PROFILE_PROMPT
-        .replace('{firstName}', firstName)
-        .replace('{answers}', formattedAnswers);
-
-      // Generate profile with minimum 7 seconds delay
-      const [aiResponse] = await Promise.all([
-        supabase.functions.invoke('generate-with-ai', {
-          body: { prompt }
-        }),
-        new Promise(resolve => setTimeout(resolve, 7000)) // Ensure minimum 7 seconds visibility
-      ]);
-
-      if (aiResponse.error) throw aiResponse.error;
-
-      // After 7 seconds, complete the progress bar
-      clearInterval(progressInterval);
-      setGenerationProgress(100);
-      
-      // Wait a moment before showing the generated profile
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setGeneratedProfile(aiResponse.data.generatedText);
-    } catch (error: any) {
-      console.error('Error generating AI summary:', error);
-      toast.error("Erreur lors de la génération du profil");
-    } finally {
-      // Keep progress bar visible for a smooth transition
-      setTimeout(() => {
-        setIsGeneratingProfile(false);
-      }, 500);
-    }
   };
 
   const handleProfileConfirm = async (profile: string) => {
@@ -118,7 +71,6 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
 
       closeOnboarding();
       onComplete?.();
-      // Navigate to profile page with personality tab selected
       navigate('/profile?tab=personality');
       toast.success("Votre profil a été enregistré avec succès!");
     } catch (error) {
@@ -166,7 +118,15 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
       }
 
       if (nextStep > ONBOARDING_QUESTIONS.length) {
-        await generateAIProfile();
+        const formattedAnswers = Object.entries(answers)
+          .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
+          .join('\n');
+
+        const prompt = AI_PROFILE_PROMPT
+          .replace('{firstName}', firstName)
+          .replace('{answers}', formattedAnswers);
+
+        await generateAIProfile(prompt);
       }
 
       setCurrentStep(nextStep);
