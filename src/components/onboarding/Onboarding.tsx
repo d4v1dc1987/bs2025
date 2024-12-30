@@ -118,6 +118,23 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
       }
 
       if (nextStep > ONBOARDING_QUESTIONS.length) {
+        setIsSubmitting(true);
+        
+        // Start the progress animation immediately
+        const startTime = Date.now();
+        const animationDuration = 7000; // 7 seconds
+        
+        const progressInterval = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min((elapsed / animationDuration) * 100, 90);
+          setGenerationProgress(progress);
+        }, 50);
+
+        // Wait for 7 seconds before making the API call
+        await new Promise(resolve => setTimeout(resolve, animationDuration));
+        
+        clearInterval(progressInterval);
+
         const formattedAnswers = Object.entries(answers)
           .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
           .join('\n');
@@ -133,6 +150,8 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     } catch (error) {
       console.error('Error in handleNext:', error);
       toast.error("Une erreur est survenue");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
