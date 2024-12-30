@@ -56,7 +56,7 @@ export const ProfileForm = ({
         <Input
           id="email"
           type="email"
-          value={formData.email}
+          value={formData.email || ""}
           disabled
           className="bg-muted border-foreground/20"
         />
