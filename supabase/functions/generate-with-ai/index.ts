@@ -10,12 +10,15 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { prompt } = await req.json();
+
+    console.log('Received prompt:', prompt); // Add logging
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -24,7 +27,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini', // Fixed model name
         messages: [
           {
             role: 'system',
@@ -44,11 +47,18 @@ serve(async (req) => {
     }
 
     const data = await response.json();
+    console.log('OpenAI response received'); // Add logging
+
     const generatedText = data.choices[0].message.content;
 
     return new Response(
       JSON.stringify({ generatedText }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json'
+        } 
+      }
     );
   } catch (error) {
     console.error('Error in generate-with-ai function:', error);
@@ -56,7 +66,10 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json'
+        }
       }
     );
   }
