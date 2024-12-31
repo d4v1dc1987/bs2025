@@ -42,8 +42,14 @@ export const AIProfileGenerator = ({
         .replace('{answers}', formattedAnswers);
 
       try {
-        await generateAIProfile(prompt);
-        await new Promise(resolve => setTimeout(resolve, 500)); // Small delay to ensure smooth transition
+        const profilePromise = generateAIProfile(prompt);
+        
+        // Ensure the animation runs for at least 3 seconds for a smooth experience
+        await Promise.all([
+          profilePromise,
+          new Promise(resolve => setTimeout(resolve, 3000))
+        ]);
+        
         stopAnimation();
         setIsSubmitting(false);
       } catch (error) {

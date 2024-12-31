@@ -33,8 +33,8 @@ export const MultipleChoice = ({
         className={cn(
           "flex items-center space-x-2 px-4 py-3 rounded-lg cursor-pointer transition-all border",
           isChecked 
-            ? "bg-primary/20 border-primary" 
-            : "bg-primary/10 hover:bg-primary/20 border-primary/20"
+            ? "bg-white/10 border-primary" 
+            : "bg-white/5 hover:bg-white/10 border-white/10"
         )}
       >
         <div className={cn(
