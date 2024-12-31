@@ -2,37 +2,43 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { MainLayout } from "./components/layout/MainLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Generator from "./pages/Generator";
 import Dashboard from "./pages/Dashboard";
-import Calendar from "./pages/Calendar";
+import Generator from "./pages/Generator";
 import Comment from "./pages/Comment";
 import Reply from "./pages/Reply";
+import Calendar from "./pages/Calendar";
 import Close from "./pages/Close";
 import Profile from "./pages/Profile";
 import ResetPassword from "./pages/ResetPassword";
 import UpdatePassword from "./pages/UpdatePassword";
-import PromptViewer from "./pages/PromptViewer";
+import { OnboardingProvider } from "./components/onboarding/OnboardingContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route index element={<Index />} />
-          <Route path="auth" element={<Auth />} />
-          <Route path="generator" element={<Generator />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="calendar" element={<Calendar />} />
-          <Route path="comment" element={<Comment />} />
-          <Route path="reply" element={<Reply />} />
-          <Route path="close" element={<Close />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="reset-password" element={<ResetPassword />} />
-          <Route path="update-password" element={<UpdatePassword />} />
-          <Route path="prompt-viewer" element={<PromptViewer />} />
-        </Route>
-      </Routes>
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <OnboardingProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
+            <Route element={<MainLayout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/generator" element={<Generator />} />
+              <Route path="/comment" element={<Comment />} />
+              <Route path="/reply" element={<Reply />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/close" element={<Close />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
+          </Routes>
+        </Router>
+      </OnboardingProvider>
+    </QueryClientProvider>
   );
 }
 
