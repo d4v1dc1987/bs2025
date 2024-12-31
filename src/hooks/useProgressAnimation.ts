@@ -2,12 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 
 export const useProgressAnimation = (duration: number = 7000) => {
   const [progress, setProgress] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const startTimeRef = useRef<number>(0);
   const animationFrameRef = useRef<number>();
+  const startTimeRef = useRef<number>(0);
 
   const startAnimation = () => {
-    setIsAnimating(true);
     setProgress(0);
     startTimeRef.current = Date.now();
 
@@ -17,12 +15,13 @@ export const useProgressAnimation = (duration: number = 7000) => {
       
       setProgress(newProgress);
 
-      if (elapsed < duration && isAnimating) {
+      if (elapsed < duration) {
         animationFrameRef.current = requestAnimationFrame(animate);
       }
     };
 
-    animate(); // Start the animation immediately
+    cancelAnimationFrame(animationFrameRef.current!);
+    animationFrameRef.current = requestAnimationFrame(animate);
   };
 
   const stopAnimation = () => {
@@ -30,10 +29,8 @@ export const useProgressAnimation = (duration: number = 7000) => {
       cancelAnimationFrame(animationFrameRef.current);
     }
     setProgress(100);
-    setIsAnimating(false);
   };
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (animationFrameRef.current) {
@@ -44,7 +41,6 @@ export const useProgressAnimation = (duration: number = 7000) => {
 
   return {
     progress,
-    isAnimating,
     startAnimation,
     stopAnimation
   };

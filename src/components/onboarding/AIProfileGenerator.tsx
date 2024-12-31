@@ -19,7 +19,7 @@ export const AIProfileGenerator = ({
   onComplete 
 }: AIProfileGeneratorProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { progress, isAnimating, startAnimation, stopAnimation } = useProgressAnimation(7000);
+  const { progress, startAnimation, stopAnimation } = useProgressAnimation(7000);
   const {
     isGeneratingProfile,
     generatedProfile,
@@ -31,25 +31,22 @@ export const AIProfileGenerator = ({
     const handleGeneration = async () => {
       if (!isSubmitting) return;
 
-      startAnimation();
-      
-      const formattedAnswers = Object.entries(answers)
-        .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
-        .join('\n');
-
-      const prompt = AI_PROFILE_PROMPT
-        .replace('{firstName}', firstName)
-        .replace('{answers}', formattedAnswers);
-
       try {
-        const profilePromise = generateAIProfile(prompt);
-        const animationPromise = new Promise(resolve => setTimeout(resolve, 7000));
+        startAnimation();
+        
+        const formattedAnswers = Object.entries(answers)
+          .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
+          .join('\n');
 
-        const [profile] = await Promise.all([
-          profilePromise,
-          animationPromise
-        ]);
+        const prompt = AI_PROFILE_PROMPT
+          .replace('{firstName}', firstName)
+          .replace('{answers}', formattedAnswers);
 
+        const profile = await generateAIProfile(prompt);
+        
+        // Ensure we wait at least 7 seconds for the animation
+        await new Promise(resolve => setTimeout(resolve, 7000));
+        
         stopAnimation();
         setIsSubmitting(false);
       } catch (error) {
@@ -68,7 +65,7 @@ export const AIProfileGenerator = ({
 
   return (
     <AIProfileReview
-      isGenerating={isSubmitting && !generatedProfile}
+      isGenerating={isSubmitting}
       progress={progress}
       generatedProfile={generatedProfile}
       onEdit={onEdit}
