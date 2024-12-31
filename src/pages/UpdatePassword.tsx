@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { UpdatePasswordForm } from "@/components/auth/UpdatePasswordForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,56 +8,39 @@ import { toast } from "sonner";
 
 const UpdatePassword = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (!hash) {
-      console.error("No hash found in URL");
-      toast.error("Lien invalide. Veuillez réessayer.");
-      navigate("/auth?mode=reset");
-      return;
-    }
-
-    const token = hash.split("=")[1];
-    if (!token) {
-      console.error("No token found in hash");
-      toast.error("Lien invalide. Veuillez réessayer.");
-      navigate("/auth?mode=reset");
-      return;
-    }
-
-    // Vérifier la validité du token
-    const verifyToken = async () => {
-      try {
-        const { data, error } = await supabase.auth.verifyOtp({
-          token_hash: token,
-          type: 'recovery',
-        });
-
-        if (error) {
-          console.error("Error verifying token:", error);
-          toast.error("Le lien a expiré. Veuillez réessayer.");
-          navigate("/auth?mode=reset");
-          return;
-        }
-
-        console.log("Token verified successfully:", data);
-      } catch (error) {
-        console.error("Error in token verification:", error);
-        toast.error("Une erreur est survenue. Veuillez réessayer.");
-        navigate("/auth?mode=reset");
-      }
-    };
-
-    verifyToken();
-  }, [navigate]);
 
   const handlePasswordUpdate = async (values: { password: string }) => {
     try {
       setIsLoading(true);
       console.log("Attempting to update password...");
 
+      // Get the access_token from the URL
+      const hashParams = new URLSearchParams(location.hash.substring(1));
+      const accessToken = hashParams.get("access_token");
+
+      if (!accessToken) {
+        console.error("No access token found in URL");
+        toast.error("Lien invalide. Veuillez réessayer.");
+        navigate("/auth?mode=reset");
+        return;
+      }
+
+      // Set the session with the access token
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: "",
+      });
+
+      if (sessionError) {
+        console.error("Error setting session:", sessionError);
+        toast.error("Le lien a expiré. Veuillez réessayer.");
+        navigate("/auth?mode=reset");
+        return;
+      }
+
+      // Update the password
       const { error } = await supabase.auth.updateUser({
         password: values.password,
       });
