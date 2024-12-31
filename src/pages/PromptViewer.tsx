@@ -12,11 +12,8 @@ const PromptViewer = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Wait for auth to be initialized
-    if (loading) return;
-    
-    // Redirect if not authenticated
-    if (!user && !loading) {
+    // Redirect to auth only if not authenticated and not loading
+    if (!loading && !user) {
       navigate('/auth');
       return;
     }
@@ -28,7 +25,7 @@ const PromptViewer = () => {
         try {
           const parsedPrompts = JSON.parse(storedPrompts);
           setPrompts(parsedPrompts);
-          console.log('Loaded prompts:', parsedPrompts.length); // Debug log
+          console.log('Loaded prompts:', parsedPrompts.length);
         } catch (error) {
           console.error('Error parsing prompts:', error);
         }
@@ -58,22 +55,6 @@ const PromptViewer = () => {
         <Card>
           <CardHeader>
             <CardTitle>Chargement...</CardTitle>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
-
-  // Show auth required message if not authenticated
-  if (!user) {
-    return (
-      <div className="container mx-auto py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Authentification requise</CardTitle>
-            <CardDescription>
-              Veuillez vous connecter pour voir l'historique des prompts.
-            </CardDescription>
           </CardHeader>
         </Card>
       </div>
