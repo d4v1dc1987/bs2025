@@ -74,12 +74,11 @@ export const ProfileSection = ({
         .from('avatars')
         .getPublicUrl(filePath);
 
-      // Mettre à jour l'avatar dans auth.users sans recharger la session
+      // Mettre à jour l'avatar dans auth.users
       const { error: updateAuthError } = await supabase.auth.updateUser({
-        data: { avatar_url: publicUrl }
-      }, {
-        options: {
-          refreshSession: false // Empêcher le rechargement automatique de la session
+        data: { 
+          avatar_url: publicUrl,
+          updated_at: new Date().toISOString()
         }
       });
 
@@ -109,20 +108,17 @@ export const ProfileSection = ({
   };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault(); // Empêcher le comportement par défaut du formulaire
+    e.preventDefault();
     
     try {
       setIsLoading(true);
 
-      // Mettre à jour les données utilisateur sans recharger la session
+      // Mettre à jour les données utilisateur
       const { error: updateAuthError } = await supabase.auth.updateUser({
         data: {
           first_name: formData.first_name,
           last_name: formData.last_name,
-        }
-      }, {
-        options: {
-          refreshSession: false // Empêcher le rechargement automatique de la session
+          updated_at: new Date().toISOString()
         }
       });
 
