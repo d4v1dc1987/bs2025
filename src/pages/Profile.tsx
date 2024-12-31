@@ -5,7 +5,7 @@ import { ProfileSection } from "@/components/profile/ProfileSection";
 import { SecuritySection } from "@/components/profile/SecuritySection";
 import { PersonalitySection } from "@/components/profile/PersonalitySection";
 import { BusinessSection } from "@/components/profile/BusinessSection";
-import { PersonStanding, User, Shield, Building } from "lucide-react";
+import { User, Shield, UserRound, Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
@@ -72,14 +72,14 @@ const Profile = () => {
                 value="personality" 
                 className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none whitespace-nowrap"
               >
-                <PersonStanding className="mr-2 h-4 w-4" />
+                <UserRound className="mr-2 h-4 w-4" />
                 Personnalité
               </TabsTrigger>
               <TabsTrigger 
                 value="business" 
                 className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none whitespace-nowrap"
               >
-                <Building className="mr-2 h-4 w-4" />
+                <Building2 className="mr-2 h-4 w-4" />
                 Ma Business
               </TabsTrigger>
               <TabsTrigger 
