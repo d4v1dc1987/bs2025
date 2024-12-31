@@ -47,7 +47,10 @@ export const BusinessSection = () => {
       if (error) throw error;
 
       if (data) {
-        setFormData(data);
+        setFormData({
+          ...data,
+          business_ownership: data.business_ownership || null,
+        });
       }
     } catch (error) {
       console.error("Error fetching business profile:", error);

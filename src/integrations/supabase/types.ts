@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           ai_summary: string | null
           business_name: string | null
+          business_ownership: string | null
           business_type: Database["public"]["Enums"]["business_type"] | null
           challenges: string | null
           client_results: string | null
@@ -33,6 +34,7 @@ export type Database = {
         Insert: {
           ai_summary?: string | null
           business_name?: string | null
+          business_ownership?: string | null
           business_type?: Database["public"]["Enums"]["business_type"] | null
           challenges?: string | null
           client_results?: string | null
@@ -53,6 +55,7 @@ export type Database = {
         Update: {
           ai_summary?: string | null
           business_name?: string | null
+          business_ownership?: string | null
           business_type?: Database["public"]["Enums"]["business_type"] | null
           challenges?: string | null
           client_results?: string | null
