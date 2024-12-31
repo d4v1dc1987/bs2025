@@ -82,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Bobby Social <noreply@bobbysocial.com>",
+        from: "onboarding@resend.dev", // Utilisation de l'adresse de test Resend
         to: [email],
         subject: "Réinitialisation de votre mot de passe - Bobby Social",
         html: emailHtml,
@@ -91,6 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (!res.ok) {
       const error = await res.text();
+      console.error("Resend API error:", error);
       throw new Error(`Resend API error: ${error}`);
     }
 
