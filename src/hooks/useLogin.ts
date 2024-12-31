@@ -22,7 +22,6 @@ export const useLogin = () => {
     try {
       setIsLoading(true);
       
-      // Nettoyage et validation des entrées
       const cleanEmail = email.trim().toLowerCase();
       const cleanPassword = password.trim();
       
@@ -36,19 +35,13 @@ export const useLogin = () => {
         };
       }
 
-      console.log("Tentative de connexion avec:", cleanEmail);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
         password: cleanPassword
       });
 
       if (error) {
-        console.error("Erreur d'authentification:", {
-          name: error.name,
-          message: error.message,
-          status: error.status
-        });
+        console.error("Erreur d'authentification:", error);
 
         if (error.message.includes("Invalid login credentials")) {
           return {
@@ -56,16 +49,6 @@ export const useLogin = () => {
             error: {
               code: "invalid_credentials",
               message: "Email ou mot de passe incorrect"
-            }
-          };
-        }
-
-        if (error.message.includes("Email not confirmed")) {
-          return {
-            success: false,
-            error: {
-              code: "email_not_confirmed",
-              message: "Veuillez confirmer votre email avant de vous connecter"
             }
           };
         }
@@ -80,7 +63,6 @@ export const useLogin = () => {
       }
 
       if (!data.session) {
-        console.error("Session manquante après connexion réussie");
         return {
           success: false,
           error: {
@@ -90,7 +72,6 @@ export const useLogin = () => {
         };
       }
 
-      console.log("Connexion réussie pour:", cleanEmail);
       return { success: true };
       
     } catch (error) {

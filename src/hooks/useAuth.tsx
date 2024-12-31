@@ -10,7 +10,6 @@ export const useAuth = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Function to force clear all Supabase auth data
   const forceClearAuth = () => {
     localStorage.removeItem("sb-jxqeoenhiqdtzzqbjwqz-auth-token");
     sessionStorage.removeItem("sb-jxqeoenhiqdtzzqbjwqz-auth-token");
@@ -19,27 +18,23 @@ export const useAuth = () => {
   };
 
   useEffect(() => {
-    // Get initial session
     const initializeAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
+        
         if (error) {
           console.error("Session error:", error);
           forceClearAuth();
           return;
         }
-        
+
         if (session?.user) {
           setUser(session.user);
-          // Only redirect to dashboard if not on auth-related pages and not handling password reset
-          if (!location.pathname.includes('/auth') && 
-              !location.pathname.includes('/reset-password') && 
-              !location.pathname.includes('/update-password')) {
+          if (location.pathname === "/" || location.pathname === "/auth") {
             navigate("/dashboard");
           }
         } else {
           setUser(null);
-          // If not on auth page and no session, redirect to login
           if (!location.pathname.includes('/auth') && 
               !location.pathname.includes('/reset-password') && 
               !location.pathname.includes('/update-password')) {
@@ -56,24 +51,16 @@ export const useAuth = () => {
 
     initializeAuth();
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
       
-      if (event === "SIGNED_OUT" || (event === "TOKEN_REFRESHED" && !session)) {
+      if (event === "SIGNED_OUT") {
         forceClearAuth();
-      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+      } else if (event === "SIGNED_IN") {
         if (session?.user) {
           setUser(session.user);
-          // Only redirect to dashboard if not on auth-related pages and not handling password reset
-          if (!location.pathname.includes('/auth') && 
-              !location.pathname.includes('/reset-password') && 
-              !location.pathname.includes('/update-password')) {
-            if (event === "SIGNED_IN") {
-              navigate("/dashboard");
-            }
+          if (location.pathname === "/" || location.pathname === "/auth") {
+            navigate("/dashboard");
           }
         } else {
           setUser(null);
@@ -90,16 +77,8 @@ export const useAuth = () => {
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
-      if (error) {
-        if (error.status === 403 || error.message.includes("user_not_found")) {
-          console.log("Forcing auth clear due to deleted user");
-          forceClearAuth();
-          toast.success("Session terminée");
-          return;
-        }
-        throw error;
-      }
-      
+      if (error) throw error;
+      forceClearAuth();
       toast.success("Déconnexion réussie");
     } catch (error: any) {
       console.error("Logout error:", error);
