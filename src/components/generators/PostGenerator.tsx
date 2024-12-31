@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Send, Copy, CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PostTypeSelect, getPostTypeById } from "./PostTypeSelect";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { createPromptWithUserContext } from "./types/postTypes";
 
 export const PostGenerator = () => {
   const [selectedType, setSelectedType] = useState<string>();
@@ -14,15 +15,38 @@ export const PostGenerator = () => {
   const [generatedContent, setGeneratedContent] = useState<string>();
   const [hasHistory, setHasHistory] = useState(false);
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
+  const [aiPersonalitySummary, setAiPersonalitySummary] = useState<string | null>(null);
+  const [aiBusinessSummary, setAiBusinessSummary] = useState<string | null>(null);
 
   const selectedPostType = selectedType ? getPostTypeById(selectedType) : undefined;
+
+  useEffect(() => {
+    const fetchUserSummaries = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const [{ data: onboardingData }, { data: businessData }] = await Promise.all([
+          supabase.from('onboarding').select('ai_summary').eq('id', user.id).single(),
+          supabase.from('business_profiles').select('ai_summary').eq('id', user.id).single()
+        ]);
+
+        setAiPersonalitySummary(onboardingData?.ai_summary || null);
+        setAiBusinessSummary(businessData?.ai_summary || null);
+      } catch (error) {
+        console.error("Error fetching user summaries:", error);
+      }
+    };
+
+    fetchUserSummaries();
+  }, []);
 
   const handleGenerate = async () => {
     if (!selectedType || !selectedPostType) return;
     
     setIsGenerating(true);
     try {
-      let prompt = selectedPostType.prompt;
+      let basePrompt = selectedPostType.prompt;
       
       // Add custom field values to the prompt if they exist
       if (selectedPostType.customFields) {
@@ -31,9 +55,15 @@ export const PostGenerator = () => {
           .filter(Boolean);
         
         if (fieldValues.length > 0) {
-          prompt += " " + fieldValues.join(" ");
+          basePrompt += " " + fieldValues.join(" ");
         }
       }
+
+      const prompt = createPromptWithUserContext(
+        basePrompt,
+        aiPersonalitySummary,
+        aiBusinessSummary
+      );
 
       const { data, error } = await supabase.functions.invoke("generate-with-ai", {
         body: { prompt }
