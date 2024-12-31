@@ -1,6 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,18 +14,34 @@ const corsHeaders = {
 interface EmailRequest {
   email: string;
   resetLink: string;
+  resetToken: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { email, resetLink }: EmailRequest = await req.json();
-    console.log("Sending reset email to:", email);
-    console.log("Reset link:", resetLink);
+    const { email, resetLink, resetToken }: EmailRequest = await req.json();
+    console.log("Processing reset request for:", email);
+
+    // Créer un client Supabase avec le rôle de service pour générer un OTP
+    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+    
+    // Générer un OTP pour la réinitialisation
+    const { error: otpError } = await supabase.auth.admin.generateLink({
+      type: 'recovery',
+      email: email,
+      options: {
+        redirectTo: resetLink,
+      }
+    });
+
+    if (otpError) {
+      console.error("Error generating OTP:", otpError);
+      throw otpError;
+    }
 
     const emailHtml = `
       <!DOCTYPE html>

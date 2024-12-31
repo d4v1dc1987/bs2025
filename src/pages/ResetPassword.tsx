@@ -38,13 +38,18 @@ const ResetPassword = () => {
   const onSubmit = async (values: ResetFormValues) => {
     try {
       setIsLoading(true);
+      console.log("Starting password reset process for:", values.email);
 
+      // Important: On désactive complètement l'email automatique de Supabase
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
         redirectTo: null,
+        options: {
+          // Cette option est cruciale pour désactiver l'email automatique
+          emailRedirectTo: null,
+        }
       });
 
       if (error) {
-        // Gestion spécifique de l'erreur de rate limit
         if (error.message.includes("rate_limit") || error.status === 429) {
           toast.error("Veuillez patienter quelques secondes avant de réessayer");
           return;
@@ -52,10 +57,18 @@ const ResetPassword = () => {
         throw error;
       }
 
-      // Appel à notre fonction Edge pour envoyer l'email personnalisé
-      const resetLink = `${window.location.origin}/update-password#access_token=${values.email}`;
+      // On génère un token unique pour la réinitialisation
+      const resetToken = crypto.randomUUID();
+      const resetLink = `${window.location.origin}/update-password#token=${resetToken}`;
+      
+      console.log("Sending custom reset email with link:", resetLink);
+      
       const response = await supabase.functions.invoke('send-reset-email', {
-        body: { email: values.email, resetLink },
+        body: { 
+          email: values.email, 
+          resetLink,
+          resetToken
+        },
       });
 
       if (response.error) throw response.error;

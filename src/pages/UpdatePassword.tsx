@@ -53,30 +53,38 @@ const UpdatePassword = () => {
       return;
     }
 
-    const accessToken = hash.split("=")[1];
-    if (!accessToken) {
-      console.error("No access token found in hash");
+    const token = hash.split("=")[1];
+    if (!token) {
+      console.error("No token found in hash");
       toast.error("Lien invalide. Veuillez réessayer.");
       navigate("/auth?mode=reset");
       return;
     }
 
-    // Récupérer la session avec le token
-    const getSession = async () => {
-      const { data, error } = await supabase.auth.verifyOtp({
-        email: accessToken,
-        type: 'recovery',
-        token: accessToken,
-      });
+    // Vérifier la validité du token
+    const verifyToken = async () => {
+      try {
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: 'recovery',
+        });
 
-      if (error) {
-        console.error("Error verifying OTP:", error);
-        toast.error("Le lien a expiré. Veuillez réessayer.");
+        if (error) {
+          console.error("Error verifying token:", error);
+          toast.error("Le lien a expiré. Veuillez réessayer.");
+          navigate("/auth?mode=reset");
+          return;
+        }
+
+        console.log("Token verified successfully:", data);
+      } catch (error) {
+        console.error("Error in token verification:", error);
+        toast.error("Une erreur est survenue. Veuillez réessayer.");
         navigate("/auth?mode=reset");
       }
     };
 
-    getSession();
+    verifyToken();
   }, [navigate]);
 
   const form = useForm<UpdateFormValues>({
