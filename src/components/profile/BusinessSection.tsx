@@ -17,6 +17,7 @@ export const BusinessSection = () => {
   const [formData, setFormData] = useState<BusinessProfile>({
     business_name: "",
     business_type: null,
+    business_ownership: null,
     industry: "",
     main_product: "",
     target_audience: "",
@@ -71,10 +72,11 @@ export const BusinessSection = () => {
       setIsGenerating(true);
       const { data, error } = await supabase.functions.invoke("generate-with-ai", {
         body: {
-          prompt: `En tant qu'expert en marketing digital, crée un résumé professionnel détaillé (4-6 phrases) de cette entreprise en ligne, en utilisant "Je" ou "Mon" comme si c'était l'entrepreneur qui parlait. Mets l'accent sur la valeur unique et les résultats concrets. Utilise ces informations:
+          prompt: `En tant qu'expert en marketing digital, crée un résumé professionnel détaillé et complet (6-8 phrases) de cette entreprise en ligne, en utilisant "Je" ou "Mon" comme si c'était l'entrepreneur qui parlait. Mets l'accent sur la valeur unique, les résultats concrets et l'histoire de l'entreprise. N'oublie aucun détail important. Utilise ces informations:
           
           Nom de l'entreprise: ${formData.business_name}
           Type d'entreprise: ${formData.business_type}
+          Relation avec l'entreprise: ${formData.business_ownership === 'own_business' ? 'Propriétaire' : 'Affilié/Représentant'}
           Industrie: ${formData.industry}
           Produit principal: ${formData.main_product}
           Public cible: ${formData.target_audience}
@@ -120,6 +122,7 @@ export const BusinessSection = () => {
         .update({
           business_name: formData.business_name,
           business_type: formData.business_type,
+          business_ownership: formData.business_ownership,
           industry: formData.industry,
           main_product: formData.main_product,
           target_audience: formData.target_audience,

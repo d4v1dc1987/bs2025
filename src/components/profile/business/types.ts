@@ -4,6 +4,7 @@ export type BusinessProfile = {
   id?: string;
   business_name: string | null;
   business_type: BusinessType | null;
+  business_ownership: string | null;
   industry: string | null;
   main_product: string | null;
   target_audience: string | null;

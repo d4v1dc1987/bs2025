@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { BusinessOwnership } from "./form/BusinessOwnership";
 import type { BusinessProfile } from "./types";
 import type { BusinessType } from "./types";
 
@@ -19,7 +20,7 @@ interface BusinessFormProps {
 export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps) => {
   return (
     <div className="space-y-6">
-      <div className="space-y-6">
+      <div className="space-y-6 flex flex-col">
         <div className="space-y-2">
           <Label htmlFor="business_name" className="text-[#c299ff]">
             Quel est le nom de ton entreprise ou de la compagnie que tu représentes?
@@ -37,9 +38,14 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           </p>
         </div>
 
+        <BusinessOwnership
+          value={formData.business_ownership}
+          onChange={(value) => handleInputChange("business_ownership", value)}
+        />
+
         <div className="space-y-2">
           <Label htmlFor="business_type" className="text-[#c299ff]">
-            Dans quel domaine ou industrie ton entreprise évolue-t-elle?
+            Quel est ton type d'activité?
           </Label>
           <Select
             value={formData.business_type || ""}
