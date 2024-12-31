@@ -3,6 +3,7 @@ import { Menu, LogOut, User, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSidebar } from "@/components/layout/sidebar/SidebarContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUserAvatar } from "@/hooks/useUserAvatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,7 @@ import { Link } from "react-router-dom";
 export const Header = () => {
   const { user, signOut } = useAuth();
   const { toggle } = useSidebar();
+  const { avatarUrl } = useUserAvatar(user?.id);
   
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -59,12 +61,12 @@ export const Header = () => {
               >
                 <Avatar className="h-8 w-8">
                   <AvatarImage 
-                    src={user?.user_metadata?.avatar_url || undefined} 
+                    src={avatarUrl || undefined} 
                     alt="Photo de profil"
                     className="object-cover" 
                   />
                   <AvatarFallback className="bg-primary/10 text-primary">
-                    {user?.user_metadata?.avatar_url ? getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name) : <User className="h-4 w-4" />}
+                    {avatarUrl ? getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name) : <User className="h-4 w-4" />}
                   </AvatarFallback>
                 </Avatar>
                 <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />

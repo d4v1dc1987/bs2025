@@ -4,6 +4,7 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserAvatar } from "@/hooks/useUserAvatar";
 
 interface ProfileSectionProps {
   formData: {
@@ -24,6 +25,7 @@ export const ProfileSection = ({
   setFormData 
 }: ProfileSectionProps) => {
   const { user } = useAuth();
+  const { updateAvatarCache } = useUserAvatar(user?.id);
 
   const handleFormChange = (field: string, value: string) => {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
@@ -84,6 +86,9 @@ export const ProfileSection = ({
         .eq('id', user?.id);
 
       if (updateProfileError) throw updateProfileError;
+
+      // Mettre à jour le cache React Query
+      updateAvatarCache(publicUrl);
 
       // Clean up old avatars after successful update
       await cleanupOldAvatars(user?.id || '', publicUrl);
