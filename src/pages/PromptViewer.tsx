@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+const PROMPT_ADDED_EVENT = 'PROMPT_ADDED';
+
 const PromptViewer = () => {
   const [prompts, setPrompts] = useState<{ prompt: string; timestamp: string }[]>([]);
 
@@ -23,21 +25,16 @@ const PromptViewer = () => {
     // Load initial prompts
     loadPrompts();
 
-    // Listen for storage events
-    const handleStorageChange = (event: StorageEvent | Event) => {
-      if ((event as StorageEvent).key === null || (event as StorageEvent).key === 'aiPrompts') {
-        loadPrompts();
-      }
+    // Listen for our custom event
+    const handlePromptAdded = () => {
+      console.log('Prompt added event received');
+      loadPrompts();
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Also listen for local storage changes in the same window
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener(PROMPT_ADDED_EVENT, handlePromptAdded);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener(PROMPT_ADDED_EVENT, handlePromptAdded);
     };
   }, []);
 

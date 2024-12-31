@@ -9,6 +9,10 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { createPromptWithUserContext } from "./types/postTypes";
 
+// Créer un événement personnalisé
+const PROMPT_ADDED_EVENT = 'PROMPT_ADDED';
+const promptEvent = new Event(PROMPT_ADDED_EVENT);
+
 export const PostGenerator = () => {
   const [selectedType, setSelectedType] = useState<string>();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -64,7 +68,7 @@ export const PostGenerator = () => {
         aiBusinessSummary
       );
 
-      // Store the prompt in localStorage and trigger storage event
+      // Store the prompt in localStorage and trigger custom event
       const promptEntry = {
         prompt,
         timestamp: new Date().toISOString()
@@ -74,8 +78,9 @@ export const PostGenerator = () => {
       prompts.unshift(promptEntry);
       localStorage.setItem('aiPrompts', JSON.stringify(prompts.slice(0, 100)));
       
-      // Dispatch storage event manually for same window
-      window.dispatchEvent(new Event('storage'));
+      // Dispatch custom event
+      window.dispatchEvent(promptEvent);
+      console.log('Prompt event dispatched:', PROMPT_ADDED_EVENT);
 
       const { data, error } = await supabase.functions.invoke("generate-with-ai", {
         body: { prompt }
