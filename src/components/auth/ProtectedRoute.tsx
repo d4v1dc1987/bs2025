@@ -8,13 +8,10 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   useEffect(() => {
-    // Liste des routes publiques
-    const publicRoutes = ['/auth', '/reset-password', '/update-password'];
-    const isPublicRoute = publicRoutes.some(route => location.pathname.startsWith(route));
-
-    // Rediriger vers la page de connexion si nécessaire
-    if (!loading && !user && !isPublicRoute) {
-      navigate("/auth?mode=login");
+    if (!loading && !user) {
+      // Stocker l'URL actuelle pour rediriger après la connexion
+      const returnUrl = encodeURIComponent(location.pathname + location.search);
+      navigate(`/auth?mode=login&returnUrl=${returnUrl}`);
     }
   }, [user, loading, navigate, location]);
 

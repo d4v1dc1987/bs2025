@@ -4,6 +4,7 @@ export const initiatePasswordReset = async (email: string) => {
   try {
     console.log("Starting password reset process for:", email);
     
+    // Utiliser une URL absolue pour la redirection
     const redirectUrl = `${window.location.origin}/update-password`;
     console.log("Redirect URL:", redirectUrl);
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { UpdatePasswordForm } from "@/components/auth/UpdatePasswordForm";
@@ -11,12 +11,45 @@ const UpdatePassword = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isValidSession, setIsValidSession] = useState(false);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Session check error:", error);
+          toast.error("Session invalide. Veuillez réessayer.");
+          navigate("/auth?mode=login");
+          return;
+        }
+
+        if (!session) {
+          const params = new URLSearchParams(window.location.search);
+          if (!params.get("token") || params.get("type") !== "recovery") {
+            console.error("No valid recovery token found");
+            toast.error("Lien invalide. Veuillez réessayer.");
+            navigate("/auth?mode=login");
+            return;
+          }
+        }
+
+        setIsValidSession(true);
+      } catch (error) {
+        console.error("Session validation error:", error);
+        toast.error("Une erreur est survenue. Veuillez réessayer.");
+        navigate("/auth?mode=login");
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
 
   const handlePasswordUpdate = async (values: { password: string }) => {
     try {
       setIsLoading(true);
       
-      // Mettre à jour le mot de passe directement
       const { error: updateError } = await supabase.auth.updateUser({
         password: values.password
       });
@@ -40,6 +73,10 @@ const UpdatePassword = () => {
       setIsLoading(false);
     }
   };
+
+  if (!isValidSession) {
+    return null;
+  }
 
   if (isSuccess) {
     return (
