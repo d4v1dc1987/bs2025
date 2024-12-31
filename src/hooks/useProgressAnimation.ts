@@ -19,8 +19,6 @@ export const useProgressAnimation = (duration: number = 7000) => {
 
       if (elapsed < duration && isAnimating) {
         animationFrameRef.current = requestAnimationFrame(animate);
-      } else {
-        setIsAnimating(false);
       }
     };
 
