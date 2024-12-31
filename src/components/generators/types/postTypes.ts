@@ -19,12 +19,14 @@ export type PostType = {
 export const createPromptWithUserContext = (basePrompt: string, aiPersonalitySummary: string | null, aiBusinessSummary: string | null) => {
   let fullPrompt = basePrompt;
 
-  if (aiPersonalitySummary) {
-    fullPrompt = `Voici ma personnalité: ${aiPersonalitySummary}\n\n${fullPrompt}`;
-  }
-
-  if (aiBusinessSummary) {
-    fullPrompt = `Voici ma business: ${aiBusinessSummary}\n\n${fullPrompt}`;
+  if (selectedPostType?.customFields) {
+    const fieldValues = selectedPostType.customFields
+      .map(field => customFieldValues[field.name])
+      .filter(Boolean);
+    
+    if (fieldValues.length > 0) {
+      fullPrompt += " " + fieldValues.join(" ");
+    }
   }
 
   return fullPrompt;

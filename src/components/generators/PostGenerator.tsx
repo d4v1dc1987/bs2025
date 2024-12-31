@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Send, Copy, CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PostTypeSelect, getPostTypeById } from "./PostTypeSelect";
@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { createPromptWithUserContext } from "./types/postTypes";
 
 // Créer un événement personnalisé
 const PROMPT_ADDED_EVENT = 'PROMPT_ADDED';
@@ -19,38 +18,15 @@ export const PostGenerator = () => {
   const [generatedContent, setGeneratedContent] = useState<string>();
   const [hasHistory, setHasHistory] = useState(false);
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
-  const [aiPersonalitySummary, setAiPersonalitySummary] = useState<string | null>(null);
-  const [aiBusinessSummary, setAiBusinessSummary] = useState<string | null>(null);
 
   const selectedPostType = selectedType ? getPostTypeById(selectedType) : undefined;
-
-  useEffect(() => {
-    const fetchUserSummaries = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const [{ data: onboardingData }, { data: businessData }] = await Promise.all([
-          supabase.from('onboarding').select('ai_summary').eq('id', user.id).single(),
-          supabase.from('business_profiles').select('ai_summary').eq('id', user.id).single()
-        ]);
-
-        setAiPersonalitySummary(onboardingData?.ai_summary || null);
-        setAiBusinessSummary(businessData?.ai_summary || null);
-      } catch (error) {
-        console.error("Error fetching user summaries:", error);
-      }
-    };
-
-    fetchUserSummaries();
-  }, []);
 
   const handleGenerate = async () => {
     if (!selectedType || !selectedPostType) return;
     
     setIsGenerating(true);
     try {
-      let basePrompt = selectedPostType.prompt;
+      let prompt = selectedPostType.prompt;
       
       if (selectedPostType.customFields) {
         const fieldValues = selectedPostType.customFields
@@ -58,19 +34,13 @@ export const PostGenerator = () => {
           .filter(Boolean);
         
         if (fieldValues.length > 0) {
-          basePrompt += " " + fieldValues.join(" ");
+          prompt += " " + fieldValues.join(" ");
         }
       }
 
-      const prompt = createPromptWithUserContext(
-        basePrompt,
-        aiPersonalitySummary,
-        aiBusinessSummary
-      );
-
       // Ajout des logs pour voir le prompt exact
       console.log('Type de post sélectionné:', selectedPostType.label);
-      console.log('Prompt de base:', basePrompt);
+      console.log('Prompt de base:', selectedPostType.prompt);
       console.log('Valeurs des champs personnalisés:', customFieldValues);
       console.log('Prompt final envoyé à OpenAI:', prompt);
 

@@ -17,6 +17,13 @@ export const postTypes: PostType[] = [
     prompt: "Donne-moi 1 idée de citations motivantes pour mon audience. La citation doit être propre, professionnelle, et contenir entre 10 et 20 mots. Utilise un ton amical, familier, conversationnel et authentique. Toujours utiliser le tutoiement. Évite les jurons. Enrichis d'un ou deux émojis pertinents. Ne mets pas de hashtags.",
   },
   {
+    id: "inspirational-quotes",
+    label: "Citation inspirante",
+    description: "Inspire ton audience avec des citations profondes et réfléchies. Des mots qui touchent l'âme et poussent à la réflexion.",
+    icon: <Quote className="text-purple-500" />,
+    prompt: "Donne-moi 1 idée de citations motivantes pour mon audience. La citation doit être propre, professionnelle. Enrichis d'un ou deux émojis pertinents. Ne mets pas de hashtags. Mets un `<br><br>` entre la citation et l'auteur. Mets les guillemets en Français.",
+  },
+  {
     id: "funny-quotes",
     label: "Citations humoristiques",
     description: "Illumine la journée de ton audience avec de l'humour piquant. Des citations amusantes qui détendent et créent un lien de complicité.",
@@ -31,8 +38,8 @@ export const postTypes: PostType[] = [
     prompt: "Donne-moi 1 idée de question d'interaction pour mon audience. La question doit être propre, professionnelle, un brin d'humour, et doit amener l'interaction. Utilise un ton amical, familier, conversationnel et authentique. Toujours utiliser le tutoiement. Enrichis d'un ou deux émojis pertinents. Ne mets pas de hashtags.",
   },
   {
-    id: "behind-scenes",
-    label: "Behind the scenes",
+    id: "role-model",
+    label: "Role Model",
     description: "Partage tes 'Behind the Scenes' pour inspirer et montrer le vrai toi. Laisse ton audience découvrir le leader en toi, dans chaque moment authentique.",
     icon: <Video className="text-green-500" />,
     prompt: "Donne-moi 1 idée de publication Facebook. L'idée est que je dévoile ma vraie nature d'entrepreneur par des instants authentiques. Du travail à la détente, c'est comme mon 'Behind the Scenes' en photos ou vidéos. Voici de quoi je veux parler dans le post :",
@@ -52,8 +59,8 @@ export const postTypes: PostType[] = [
     ]
   },
   {
-    id: "accomplishment",
-    label: "Accomplissement",
+    id: "milestone",
+    label: "Milestone",
     description: "Célèbre et inspire avec tes réussites personnelles. Montre comment chaque succès est un pas vers le grand rêve, motivant chacun à agir.",
     icon: <Video className="text-pink-500" />,
     prompt: "Donne-moi 1 idée de publication Facebook. L'idée est que je dévoile ma vraie nature d'entrepreneur par des instants authentiques. Je veux célébrer et partager une réalisation personnelle et professionnelle pour inspirer d'autres. Voici de quoi je veux parler dans le post :",
@@ -146,7 +153,7 @@ export const postTypes: PostType[] = [
   },
   {
     id: "giveaway",
-    label: "GiveAway (freebie)",
+    label: "GiveAway",
     description: "Excite ton public avec des giveaways attractifs. Utilise des offres pour engager et agrandir ta base, créant un buzz autour de ta marque.",
     icon: <Gift className="text-red-500" />,
     prompt: "Donne-moi 1 idée de post Facebook pour mon audience. Ce post est de type 'GiveAway'. Voici ce que tu veux offrir gratuitement à mes followers :",
