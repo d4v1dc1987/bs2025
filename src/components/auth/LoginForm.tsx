@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -28,6 +28,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   
   const form = useForm<LoginFormValues>({
@@ -42,7 +43,6 @@ export const LoginForm = () => {
   // Cleanup function for ResizeObserver
   useEffect(() => {
     return () => {
-      // Force cleanup of any pending ResizeObserver operations
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
           // This empty callback will help flush any pending observations
@@ -58,11 +58,33 @@ export const LoginForm = () => {
         password: values.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Gérer spécifiquement les différents types d'erreurs
+        if (error.message === "Invalid login credentials") {
+          toast.error("Email ou mot de passe incorrect");
+          return;
+        }
+        if (error.message.includes("Email not confirmed")) {
+          toast.error("Veuillez confirmer votre email avant de vous connecter");
+          return;
+        }
+        // Pour toute autre erreur
+        toast.error("Une erreur est survenue lors de la connexion");
+        console.error("Erreur de connexion:", error);
+        return;
+      }
 
-      navigate("/dashboard");
+      // Si la connexion réussit
+      const returnUrl = searchParams.get("returnUrl");
+      if (returnUrl) {
+        navigate(decodeURIComponent(returnUrl));
+      } else {
+        navigate("/dashboard");
+      }
+      
     } catch (error: any) {
-      toast.error("Email ou mot de passe incorrect");
+      console.error("Erreur inattendue:", error);
+      toast.error("Une erreur inattendue est survenue");
     }
   };
 
