@@ -11,12 +11,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { useLogin } from "@/hooks/useLogin";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
@@ -30,7 +29,7 @@ export const LoginForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, isLoading } = useLogin();
   
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -42,41 +41,14 @@ export const LoginForm = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    try {
-      setIsLoading(true);
-      
-      const { error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      });
+    const { success } = await login({
+      email: values.email,
+      password: values.password,
+    });
 
-      if (error) {
-        if (error.message === "Invalid login credentials") {
-          toast.error("Email ou mot de passe incorrect");
-          return;
-        }
-        if (error.message.includes("Email not confirmed")) {
-          toast.error("Veuillez confirmer votre email avant de vous connecter");
-          return;
-        }
-        
-        console.error("Erreur de connexion:", error);
-        toast.error("Une erreur est survenue lors de la connexion");
-        return;
-      }
-
+    if (success) {
       const returnUrl = searchParams.get("returnUrl");
-      if (returnUrl) {
-        navigate(decodeURIComponent(returnUrl));
-      } else {
-        navigate("/dashboard");
-      }
-      
-    } catch (error: any) {
-      console.error("Erreur inattendue:", error);
-      toast.error("Une erreur inattendue est survenue");
-    } finally {
-      setIsLoading(false);
+      navigate(returnUrl ? decodeURIComponent(returnUrl) : "/dashboard");
     }
   };
 
