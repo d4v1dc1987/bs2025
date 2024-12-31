@@ -15,7 +15,7 @@ const PromptViewer = () => {
         try {
           const parsedPrompts = JSON.parse(storedPrompts);
           setPrompts(parsedPrompts);
-          console.log('Loaded prompts:', parsedPrompts); // Debug log
+          console.log('Loaded prompts:', parsedPrompts.length); // Debug log
         } catch (error) {
           console.error('Error parsing prompts:', error);
         }
