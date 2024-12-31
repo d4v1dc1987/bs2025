@@ -13,4 +13,6 @@ export type BusinessProfile = {
   company_story: string | null;
   company_values: string | null;
   ai_summary: string | null;
+  created_at?: string;
+  updated_at?: string;
 };
