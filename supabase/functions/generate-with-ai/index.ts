@@ -6,22 +6,27 @@ const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
     if (!openAIApiKey) {
-      console.error('OpenAI API key is not configured');
       throw new Error('OpenAI API key is not configured');
     }
 
     const { prompt } = await req.json();
-    console.log('Received prompt:', prompt);
+    
+    if (!prompt) {
+      throw new Error('No prompt provided');
+    }
+
+    console.log('Sending request to OpenAI with prompt:', prompt);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -34,7 +39,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: "Tu es un expert en marketing digital spécialisé dans l'analyse de profils entrepreneuriaux. Tu dois fournir des analyses concises et pertinentes."
+            content: 'You are a helpful assistant that generates professional social media profiles based on user information. Keep the tone professional but friendly.'
           },
           { role: 'user', content: prompt }
         ],
@@ -50,25 +55,34 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('OpenAI response received');
+    const generatedText = data.choices[0].message.content;
+
+    console.log('Successfully generated text');
 
     return new Response(
-      JSON.stringify({ generatedText: data.choices[0].message.content }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      JSON.stringify({ generatedText }),
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
     );
+
   } catch (error) {
     console.error('Error in generate-with-ai function:', error);
     
     return new Response(
-      JSON.stringify({ 
-        error: error.message || 'An unexpected error occurred',
-        details: error.toString()
+      JSON.stringify({
+        error: error.message,
+        details: error.stack
       }),
-      {
+      { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
     );
   }
