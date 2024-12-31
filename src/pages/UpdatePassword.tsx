@@ -16,25 +16,25 @@ const UpdatePassword = () => {
       setIsLoading(true);
       console.log("Attempting to update password...");
 
-      // Get the access_token from the URL
-      const hashParams = new URLSearchParams(location.hash.substring(1));
-      const accessToken = hashParams.get("access_token");
+      // Get the token from the URL
+      const searchParams = new URLSearchParams(location.search);
+      const token = searchParams.get("token");
 
-      if (!accessToken) {
-        console.error("No access token found in URL");
+      if (!token) {
+        console.error("No token found in URL");
         toast.error("Lien invalide. Veuillez réessayer.");
         navigate("/auth?mode=reset");
         return;
       }
 
-      // Set the session with the access token
-      const { error: sessionError } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: "",
+      // Verify the token
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        token,
+        type: 'recovery'
       });
 
-      if (sessionError) {
-        console.error("Error setting session:", sessionError);
+      if (verifyError) {
+        console.error("Error verifying token:", verifyError);
         toast.error("Le lien a expiré. Veuillez réessayer.");
         navigate("/auth?mode=reset");
         return;
