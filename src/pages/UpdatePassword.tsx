@@ -17,10 +17,20 @@ const UpdatePassword = () => {
   useEffect(() => {
     const validateToken = async () => {
       try {
-        // Récupérer le token depuis l'URL
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const type = new URLSearchParams(window.location.search).get("type");
-        
+        const hashFragment = window.location.hash.substring(1);
+        const searchParams = new URLSearchParams(window.location.search);
+        const type = searchParams.get("type");
+
+        // Vérifier si nous avons un hash fragment
+        if (!hashFragment) {
+          console.error("No hash fragment found in URL");
+          toast.error("Lien de réinitialisation invalide");
+          navigate("/auth?mode=login");
+          return;
+        }
+
+        // Parser le hash fragment
+        const hashParams = new URLSearchParams(hashFragment);
         const accessToken = hashParams.get("access_token");
         const refreshToken = hashParams.get("refresh_token");
 
@@ -34,12 +44,12 @@ const UpdatePassword = () => {
         }
 
         // Définir la session avec le token de réinitialisation
-        const { data, error: sessionError } = await supabase.auth.setSession({
+        const { data: { session }, error: sessionError } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken || "",
         });
 
-        if (sessionError || !data.session) {
+        if (sessionError || !session) {
           console.error("Session error:", sessionError);
           toast.error("Session invalide");
           navigate("/auth?mode=login");
@@ -55,7 +65,7 @@ const UpdatePassword = () => {
     };
 
     validateToken();
-  }, [navigate, location]);
+  }, [navigate]);
 
   const handlePasswordUpdate = async (values: { password: string }) => {
     try {
