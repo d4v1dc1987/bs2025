@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useProgressAnimation } from '@/hooks/useProgressAnimation';
 import { useAIProfileGeneration } from '@/hooks/useAIProfileGeneration';
 import { AIProfileReview } from './AIProfileReview';
@@ -28,19 +28,17 @@ export const AIProfileGenerator = ({
     setGeneratedProfile,
     error
   } = useAIProfileGeneration();
-  
-  const generationPromise = useRef<Promise<string> | null>(null);
-  const isGenerating = useRef(false);
 
   useEffect(() => {
-    const handleGeneration = async () => {
-      if (!isSubmitting || isGenerating.current) {
-        console.log('Skipping generation: already in progress or not submitting');
+    let isMounted = true;
+
+    const generateProfile = async () => {
+      if (!isSubmitting || isGeneratingProfile) {
+        console.log('Skipping generation: not submitting or already in progress');
         return;
       }
 
       try {
-        isGenerating.current = true;
         console.log('Starting profile generation...');
         startAnimation();
         
@@ -52,44 +50,31 @@ export const AIProfileGenerator = ({
           .replace('{firstName}', firstName)
           .replace('{answers}', formattedAnswers);
 
-        if (!generationPromise.current) {
-          console.log('Initiating new generation promise');
-          generationPromise.current = generateAIProfile(prompt);
-        } else {
-          console.log('Using existing generation promise');
+        const generatedText = await generateAIProfile(prompt);
+        
+        // Only update state if component is still mounted
+        if (isMounted) {
+          console.log('Generation complete, updating profile');
+          setGeneratedProfile(generatedText);
+          stopAnimation();
+          setIsSubmitting(false);
         }
-
-        const [generatedText] = await Promise.all([
-          generationPromise.current,
-          new Promise(resolve => setTimeout(resolve, 7000))
-        ]);
-        
-        console.log('Generation complete, updating profile');
-        setGeneratedProfile(generatedText);
-        
-        stopAnimation();
-        setIsSubmitting(false);
-        generationPromise.current = null;
       } catch (error) {
-        console.error('Error generating profile:', error);
-        toast.error("Une erreur est survenue lors de la génération du profil");
-        stopAnimation();
-        setIsSubmitting(false);
-        generationPromise.current = null;
-      } finally {
-        isGenerating.current = false;
-        console.log('Generation process completed');
+        if (isMounted) {
+          console.error('Error generating profile:', error);
+          stopAnimation();
+          setIsSubmitting(false);
+        }
       }
     };
 
-    handleGeneration();
+    generateProfile();
 
     return () => {
+      isMounted = false;
       console.log('Cleaning up generation process');
-      generationPromise.current = null;
-      isGenerating.current = false;
     };
-  }, [isSubmitting, firstName, answers, generateAIProfile, startAnimation, stopAnimation, setGeneratedProfile]);
+  }, [isSubmitting, firstName, answers, generateAIProfile, startAnimation, stopAnimation, setGeneratedProfile, isGeneratingProfile]);
 
   useEffect(() => {
     setIsSubmitting(true);

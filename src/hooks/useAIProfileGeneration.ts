@@ -8,16 +8,15 @@ export const useAIProfileGeneration = () => {
   const [error, setError] = useState<string | null>(null);
 
   const generateAIProfile = async (prompt: string): Promise<string> => {
-    try {
-      if (isGeneratingProfile) {
-        console.log('Generation already in progress, skipping...');
-        throw new Error('Une génération est déjà en cours');
-      }
+    if (isGeneratingProfile) {
+      console.log('Generation already in progress, skipping...');
+      throw new Error('Une génération est déjà en cours');
+    }
 
+    try {
+      console.log('Starting AI profile generation...');
       setIsGeneratingProfile(true);
       setError(null);
-
-      console.log('Generating AI profile with prompt length:', prompt.length);
 
       const aiResponse = await supabase.functions.invoke('generate-with-ai', {
         body: { prompt }
@@ -35,9 +34,6 @@ export const useAIProfileGeneration = () => {
       }
 
       console.log('Successfully generated profile of length:', generatedText.length);
-      
-      // Set the generated profile only once when generation is complete
-      setGeneratedProfile(generatedText);
       return generatedText;
     } catch (error: any) {
       console.error('Error generating AI summary:', error);
