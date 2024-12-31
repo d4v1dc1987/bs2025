@@ -40,7 +40,7 @@ const ResetPassword = () => {
       setIsLoading(true);
 
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
+        redirectTo: `${window.location.origin}/update-password`,
       });
 
       if (error) {
@@ -53,7 +53,7 @@ const ResetPassword = () => {
       }
 
       // Appel à notre fonction Edge pour envoyer l'email personnalisé
-      const resetLink = `${window.location.origin}/auth/update-password`;
+      const resetLink = `${window.location.origin}/update-password`;
       const response = await supabase.functions.invoke('send-reset-email', {
         body: { email: values.email, resetLink },
       });
