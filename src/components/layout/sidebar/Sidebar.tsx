@@ -2,11 +2,10 @@ import { cn } from "@/lib/utils";
 import { useSidebar } from "./SidebarContext";
 import { SidebarNav } from "./SidebarNav";
 import { SidebarLogo } from "./SidebarLogo";
-import { X, User, LogOut, LayoutDashboard } from "lucide-react";
+import { X, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 
 export const Sidebar = () => {
@@ -105,31 +104,6 @@ export const Sidebar = () => {
                 {user?.email}
               </span>
             </div>
-          </div>
-
-          <Separator className="my-2 bg-white/10" />
-          
-          <div className="space-y-1">
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-2"
-              asChild
-            >
-              <Link to="/dashboard">
-                <LayoutDashboard className="h-4 w-4" />
-                <span>Tableau de bord</span>
-              </Link>
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-2"
-              asChild
-            >
-              <Link to="/profile">
-                <User className="h-4 w-4" />
-                <span>Mon Profil</span>
-              </Link>
-            </Button>
           </div>
 
           <Separator className="my-2 bg-white/10" />
