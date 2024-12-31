@@ -4,7 +4,7 @@ export const initiatePasswordReset = async (email: string) => {
   try {
     console.log("Starting password reset process for:", email);
 
-    // 1. Call Supabase's reset password function
+    // 1. Call Supabase's reset password function with the correct redirect URL
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(
       email,
       {
