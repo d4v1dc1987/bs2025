@@ -8,10 +8,11 @@ import { BusinessSection } from "@/components/profile/BusinessSection";
 import { User, Shield, UserRound, Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const defaultTab = searchParams.get('tab') || 'profile';
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -50,6 +51,10 @@ const Profile = () => {
     fetchProfileData();
   }, [user]);
 
+  const handleTabChange = (value: string) => {
+    navigate(`/profile?tab=${value}`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -57,7 +62,7 @@ const Profile = () => {
         <h1 className="text-3xl font-bold">Mon Profil</h1>
       </div>
 
-      <Tabs defaultValue={defaultTab} className="w-full space-y-8">
+      <Tabs value={defaultTab} onValueChange={handleTabChange} className="w-full space-y-8">
         <div className="sticky top-[3.5rem] z-30 -mx-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40">
           <div className="px-4 overflow-x-auto scrollbar-none">
             <TabsList className="h-12 w-full md:w-auto justify-start gap-4 rounded-none border-b border-border/40 bg-transparent p-0 flex-nowrap">
