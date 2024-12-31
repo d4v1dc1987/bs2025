@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut, User, LayoutDashboard } from "lucide-react";
+import { Menu, LogOut, User, LayoutDashboard, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSidebar } from "@/components/layout/sidebar/SidebarContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -51,21 +51,22 @@ export const Header = () => {
         <div className="flex flex-1 items-center justify-end space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <Avatar className="h-10 w-10">
+              <Button variant="ghost" className="relative h-10 px-3 flex items-center gap-2 hover:bg-primary/10">
+                <Avatar className="h-8 w-8">
                   <AvatarImage 
                     src={user?.user_metadata?.avatar_url || undefined} 
                     alt="Photo de profil"
                     className="object-cover w-full h-full" 
                   />
                   <AvatarFallback className="bg-primary/10 text-primary">
-                    {user?.user_metadata?.avatar_url ? getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name) : <User className="h-5 w-5" />}
+                    {user?.user_metadata?.avatar_url ? getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name) : <User className="h-4 w-4" />}
                   </AvatarFallback>
                 </Avatar>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
+              <DropdownMenuLabel className="font-normal py-3">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">
                     {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
@@ -76,20 +77,20 @@ export const Header = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
+              <DropdownMenuItem asChild className="py-2">
                 <Link to="/dashboard" className="flex items-center cursor-pointer">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   <span>Tableau de bord</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
+              <DropdownMenuItem asChild className="py-2">
                 <Link to="/profile" className="flex items-center cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
                   <span>Mon Profil</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={signOut} className="text-red-600">
+              <DropdownMenuItem onClick={signOut} className="text-red-600 py-2">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Déconnexion</span>
               </DropdownMenuItem>
