@@ -8,7 +8,7 @@ interface SingleChoiceProps {
 
 export const SingleChoice = ({ option }: SingleChoiceProps) => {
   return (
-    <div className="flex items-center space-x-2 bg-background/5 px-4 py-2 rounded-lg hover:bg-background/10 transition-colors">
+    <div className="flex items-center space-x-2 bg-background/10 hover:bg-background/20 px-4 py-3 rounded-lg transition-all">
       <RadioGroupItem value={option.value} id={option.value} className="border-2" />
       <Label htmlFor={option.value} className="cursor-pointer">
         <span className="mr-2">{option.emoji}</span>

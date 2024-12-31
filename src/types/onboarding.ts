@@ -217,18 +217,6 @@ export const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
     ]
   },
   {
-    id: 'favorite_movies',
-    question: "OK, on va entrer un peu plus dans les détails!\n\nDisons que tu avais à citer tes 3 films préférés, ce serait quoi? 😜",
-    type: 'text',
-    maxLength: TEXT_LIMITS.short
-  },
-  {
-    id: 'favorite_books',
-    question: "Disons que tu avais à citer 3 de tes livres préférés qui ont changé ta vie, ta manière de penser, d'agir, ce serait quoi? 🙂\n\nExemple: 📘 Père riche, père pauvre (Robert Kiyosaki), 📗 I Dare You (Frazer Brookes), 📕 Le Secret (Rhonda Byrne), 📙 L'Alchimiste (Paulo Coelho), 📓 Think and Grow Rich (Napoleon Hill), etc.",
-    type: 'text',
-    maxLength: TEXT_LIMITS.medium
-  },
-  {
     id: 'personal_story',
     question: "OK dernière question {firstName}, après j'arrête promis haha.\n\nRaconte-moi brièvement quelque chose de toi, dans tes propres mots. Ajoute tout ce que tu penses qui pourrait m'aider à mieux te comprendre et cerner qui tu es vraiment.\n\nÇa peut être un élément de ton histoire personnelle, une expérience marquante, ou quelque chose qui te caractérise.\n\nQu'est-ce qui te rend unique et qu'aimerais-tu que je sache de plus pour que je puisse vraiment m'adapter à toi? 👇",
     type: 'textarea',

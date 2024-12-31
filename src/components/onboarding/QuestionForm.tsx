@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,21 +35,23 @@ export const QuestionForm = ({
   const questionText = currentQuestion.question.replace('{firstName}', firstName);
   const isMobile = useIsMobile();
   const progress = (currentStep / ONBOARDING_QUESTIONS.length) * 100;
+  const formRef = useRef<HTMLDivElement>(null);
 
-  // Determine if the question should use a multi-line input
-  const isMultilineQuestion = currentQuestion.id === 'favorite_books' || 
-                            currentQuestion.id === 'personal_story';
-
-  // Determine textarea rows based on question
-  const getTextareaRows = () => {
-    if (currentQuestion.id === 'favorite_books' || currentQuestion.id === 'personal_story') {
-      return 5;
+  useEffect(() => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    return 3;
+  }, [currentStep]);
+
+  const isAnswerValid = () => {
+    const answer = answers[currentQuestion.id];
+    if (!answer) return false;
+    if (Array.isArray(answer)) return answer.length > 0;
+    return answer.trim() !== '';
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full max-w-2xl mx-auto" ref={formRef}>
       <CardHeader>
         <div className="flex flex-col gap-4">
           <CardTitle>Questionnaire</CardTitle>
@@ -106,11 +109,8 @@ export const QuestionForm = ({
                 value={answers[currentQuestion.id] as string || ''}
                 onChange={(e) => onAnswerChange(e.target.value)}
                 placeholder="Votre réponse..."
-                className={cn(
-                  "resize-y w-full",
-                  isMultilineQuestion ? "min-h-[120px]" : "min-h-[80px]"
-                )}
-                rows={getTextareaRows()}
+                className="w-full min-h-[120px]"
+                rows={5}
                 maxLength={currentQuestion.maxLength}
               />
             )}
@@ -130,7 +130,7 @@ export const QuestionForm = ({
             </Button>
             <Button
               onClick={onNext}
-              disabled={!answers[currentQuestion.id] || isSubmitting}
+              disabled={!isAnswerValid() || isSubmitting}
               className="w-full md:w-auto"
             >
               {currentStep === ONBOARDING_QUESTIONS.length ? (
