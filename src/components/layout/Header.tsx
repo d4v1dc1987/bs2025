@@ -75,14 +75,14 @@ export const Header = () => {
               align="end" 
               forceMount
               onPointerEnter={(e) => {
-                const trigger = document.querySelector('[data-radix-dropdown-menu-trigger]');
+                const trigger = document.querySelector('[data-radix-dropdown-menu-trigger]') as HTMLElement;
                 if (trigger) {
                   trigger.click();
                   trigger.setAttribute('data-state', 'open');
                 }
               }}
               onPointerLeave={(e) => {
-                const trigger = document.querySelector('[data-radix-dropdown-menu-trigger]');
+                const trigger = document.querySelector('[data-radix-dropdown-menu-trigger]') as HTMLElement;
                 if (trigger) {
                   trigger.setAttribute('data-state', 'closed');
                   const closeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
