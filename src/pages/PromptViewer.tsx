@@ -1,13 +1,23 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const PROMPT_ADDED_EVENT = 'PROMPT_ADDED';
 
 const PromptViewer = () => {
   const [prompts, setPrompts] = useState<{ prompt: string; timestamp: string }[]>([]);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Redirect if not authenticated
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
     // Function to load prompts from localStorage
     const loadPrompts = () => {
       const storedPrompts = localStorage.getItem('aiPrompts');
@@ -36,7 +46,7 @@ const PromptViewer = () => {
     return () => {
       window.removeEventListener(PROMPT_ADDED_EVENT, handlePromptAdded);
     };
-  }, []);
+  }, [user, navigate]);
 
   return (
     <div className="container mx-auto py-8">
