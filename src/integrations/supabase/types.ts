@@ -15,15 +15,19 @@ export type Database = {
           business_name: string | null
           business_type: Database["public"]["Enums"]["business_type"] | null
           challenges: string | null
+          client_results: string | null
+          company_age: string | null
+          company_story: string | null
+          company_values: string | null
           created_at: string
           goals: string | null
           id: string
+          industry: string | null
           main_product: string | null
-          price_range: string | null
-          product_description: string | null
+          main_solution: string | null
+          problem_solved: string | null
           social_links: Json | null
           target_audience: string | null
-          unique_value: string | null
           updated_at: string
         }
         Insert: {
@@ -31,15 +35,19 @@ export type Database = {
           business_name?: string | null
           business_type?: Database["public"]["Enums"]["business_type"] | null
           challenges?: string | null
+          client_results?: string | null
+          company_age?: string | null
+          company_story?: string | null
+          company_values?: string | null
           created_at?: string
           goals?: string | null
           id: string
+          industry?: string | null
           main_product?: string | null
-          price_range?: string | null
-          product_description?: string | null
+          main_solution?: string | null
+          problem_solved?: string | null
           social_links?: Json | null
           target_audience?: string | null
-          unique_value?: string | null
           updated_at?: string
         }
         Update: {
@@ -47,15 +55,19 @@ export type Database = {
           business_name?: string | null
           business_type?: Database["public"]["Enums"]["business_type"] | null
           challenges?: string | null
+          client_results?: string | null
+          company_age?: string | null
+          company_story?: string | null
+          company_values?: string | null
           created_at?: string
           goals?: string | null
           id?: string
+          industry?: string | null
           main_product?: string | null
-          price_range?: string | null
-          product_description?: string | null
+          main_solution?: string | null
+          problem_solved?: string | null
           social_links?: Json | null
           target_audience?: string | null
-          unique_value?: string | null
           updated_at?: string
         }
         Relationships: []
