@@ -52,7 +52,6 @@ export const AIProfileGenerator = ({
 
         const generatedText = await generateAIProfile(prompt);
         
-        // Only update state if component is still mounted
         if (isMounted) {
           console.log('Generation complete, updating profile');
           setGeneratedProfile(generatedText);
@@ -62,6 +61,7 @@ export const AIProfileGenerator = ({
       } catch (error) {
         if (isMounted) {
           console.error('Error generating profile:', error);
+          toast.error("Une erreur est survenue lors de la génération du profil");
           stopAnimation();
           setIsSubmitting(false);
         }
@@ -74,7 +74,7 @@ export const AIProfileGenerator = ({
       isMounted = false;
       console.log('Cleaning up generation process');
     };
-  }, [isSubmitting, firstName, answers, generateAIProfile, startAnimation, stopAnimation, setGeneratedProfile, isGeneratingProfile]);
+  }, [isSubmitting]);
 
   useEffect(() => {
     setIsSubmitting(true);
@@ -91,7 +91,7 @@ export const AIProfileGenerator = ({
 
   return (
     <AIProfileReview
-      isGenerating={isSubmitting}
+      isGenerating={isSubmitting && !error}
       progress={progress}
       generatedProfile={generatedProfile}
       onEdit={onEdit}

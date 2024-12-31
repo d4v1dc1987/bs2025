@@ -34,6 +34,7 @@ export const useAIProfileGeneration = () => {
       }
 
       console.log('Successfully generated profile of length:', generatedText.length);
+      setGeneratedProfile(generatedText);
       return generatedText;
     } catch (error: any) {
       console.error('Error generating AI summary:', error);
