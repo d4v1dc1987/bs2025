@@ -78,7 +78,7 @@ const Profile = () => {
                 className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none whitespace-nowrap"
               >
                 <UserRound className="mr-2 h-4 w-4" />
-                Personnalité
+                Ma Personnalité
               </TabsTrigger>
               <TabsTrigger 
                 value="business" 
