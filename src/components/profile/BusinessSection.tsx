@@ -29,16 +29,6 @@ export const BusinessSection = () => {
     setFormData(prev => ({ ...prev, ai_summary: summary }));
   });
 
-  const handleInputChange = (
-    field: keyof BusinessProfile,
-    value: string | null
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.id) return;
@@ -68,6 +58,9 @@ export const BusinessSection = () => {
 
       if (error) throw error;
 
+      // Générer automatiquement le résumé AI après la sauvegarde
+      await generateAISummary(formData);
+
       toast.success("Profil business mis à jour avec succès");
       // Recharger les données après la sauvegarde pour s'assurer que tout est à jour
       await fetchBusinessProfile();
@@ -91,25 +84,17 @@ export const BusinessSection = () => {
     <div className="space-y-8">
       <form onSubmit={handleSubmit} className="space-y-8">
         <Card className="p-8 bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30 border-primary/20">
-          <BusinessForm formData={formData} handleInputChange={handleInputChange} />
-          <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+          <BusinessForm formData={formData} handleInputChange={(field, value) => {
+            setFormData(prev => ({ ...prev, [field]: value }));
+          }} />
+          <div className="flex justify-center mt-8">
             <Button
               type="submit"
-              disabled={isSaving}
+              disabled={isSaving || isGenerating}
               className="bg-primary hover:bg-primary/90"
             >
-              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {(isSaving || isGenerating) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Sauvegarder les modifications
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => generateAISummary(formData)}
-              disabled={isGenerating}
-              className="border-primary/20 hover:bg-primary/10"
-            >
-              {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Générer un résumé AI
             </Button>
           </div>
         </Card>
