@@ -13,6 +13,9 @@ export const initiatePasswordReset = async (email: string) => {
 
     if (error) {
       console.error("Reset password error:", error);
+      if (error.message.includes("rate_limit") || error.status === 429) {
+        throw new Error("Veuillez patienter quelques secondes avant de réessayer");
+      }
       throw error;
     }
 

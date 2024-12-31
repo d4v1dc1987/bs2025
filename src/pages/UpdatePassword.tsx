@@ -17,13 +17,12 @@ const UpdatePassword = () => {
   useEffect(() => {
     const validateToken = async () => {
       try {
-        // Récupérer le token et le type depuis l'URL
-        const hashParams = new URLSearchParams(location.hash.substring(1));
-        const queryParams = new URLSearchParams(location.search);
+        // Récupérer le token depuis l'URL
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const type = new URLSearchParams(window.location.search).get("type");
         
         const accessToken = hashParams.get("access_token");
         const refreshToken = hashParams.get("refresh_token");
-        const type = queryParams.get("type");
 
         console.log("Token validation:", { accessToken, type });
 
@@ -35,12 +34,12 @@ const UpdatePassword = () => {
         }
 
         // Définir la session avec le token de réinitialisation
-        const { error: sessionError } = await supabase.auth.setSession({
+        const { data, error: sessionError } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken || "",
         });
 
-        if (sessionError) {
+        if (sessionError || !data.session) {
           console.error("Session error:", sessionError);
           toast.error("Session invalide");
           navigate("/auth?mode=login");
@@ -50,7 +49,7 @@ const UpdatePassword = () => {
         setIsValidToken(true);
       } catch (error) {
         console.error("Token validation error:", error);
-        toast.error("Une erreur est survenue");
+        toast.error("Une erreur est survenue lors de la validation du token");
         navigate("/auth?mode=login");
       }
     };
@@ -72,7 +71,7 @@ const UpdatePassword = () => {
         return;
       }
 
-      // Déconnecter l'utilisateur
+      // Déconnecter l'utilisateur après la mise à jour
       await supabase.auth.signOut();
       
       // Afficher la confirmation
