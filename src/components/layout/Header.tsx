@@ -31,7 +31,7 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-primary/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-[0_1px_3px_0_rgba(123,38,251,0.1)]">
-      <div className="container flex h-14 items-center justify-between px-4">
+      <div className="w-full h-14 px-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -68,7 +68,7 @@ export const Header = () => {
                   <AvatarImage 
                     src={user?.user_metadata?.avatar_url || undefined} 
                     alt="Photo de profil"
-                    className="object-cover w-full h-full" 
+                    className="object-cover" 
                   />
                   <AvatarFallback className="bg-primary/10 text-primary">
                     {user?.user_metadata?.avatar_url ? getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name) : <User className="h-4 w-4" />}
@@ -92,7 +92,6 @@ export const Header = () => {
                   const trigger = document.querySelector('[data-state="open"]');
                   if (trigger) {
                     trigger.setAttribute('data-state', 'closed');
-                    // Fermer le menu
                     const closeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
                     document.dispatchEvent(closeEvent);
                   }
