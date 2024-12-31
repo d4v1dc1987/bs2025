@@ -51,7 +51,11 @@ export const Header = () => {
         <div className="flex flex-1 items-center justify-end space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 px-3 flex items-center gap-2 hover:bg-primary/10">
+              <Button 
+                variant="ghost" 
+                className="relative h-10 px-3 flex items-center gap-2 hover:bg-primary/10 group"
+                data-state="closed"
+              >
                 <Avatar className="h-8 w-8">
                   <AvatarImage 
                     src={user?.user_metadata?.avatar_url || undefined} 
@@ -62,10 +66,26 @@ export const Header = () => {
                     {user?.user_metadata?.avatar_url ? getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name) : <User className="h-4 w-4" />}
                   </AvatarFallback>
                 </Avatar>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-hover:rotate-180" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuContent 
+              className="w-56" 
+              align="end" 
+              forceMount
+              onPointerEnter={(e) => {
+                if (window.innerWidth >= 768) {
+                  const trigger = document.querySelector('[data-state="closed"]');
+                  if (trigger) trigger.setAttribute('data-state', 'open');
+                }
+              }}
+              onPointerLeave={(e) => {
+                if (window.innerWidth >= 768) {
+                  const trigger = document.querySelector('[data-state="open"]');
+                  if (trigger) trigger.setAttribute('data-state', 'closed');
+                }
+              }}
+            >
               <DropdownMenuLabel className="font-normal py-3">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">
@@ -77,7 +97,7 @@ export const Header = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild className="py-2">
+              <DropdownMenuItem asChild className="py-2 hidden md:flex">
                 <Link to="/dashboard" className="flex items-center cursor-pointer">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   <span>Tableau de bord</span>
