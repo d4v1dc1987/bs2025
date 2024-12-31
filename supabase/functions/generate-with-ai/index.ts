@@ -10,27 +10,12 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  console.log('Function called with method:', req.method);
-  
   if (req.method === 'OPTIONS') {
-    console.log('Handling OPTIONS request');
-    return new Response('ok', { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    if (!openAIApiKey) {
-      console.error('OpenAI API key not found');
-      throw new Error('OpenAI API key is not configured');
-    }
-
     const { prompt } = await req.json();
-    
-    if (!prompt) {
-      console.error('No prompt provided in request');
-      throw new Error('No prompt provided');
-    }
-
-    console.log('Sending request to OpenAI with prompt length:', prompt.length);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -43,12 +28,12 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that generates professional business profiles based on user information. Keep the tone professional but friendly.'
+            content: 'Tu es un expert en marketing digital qui résume des profils business de manière concise et personnelle. Utilise toujours "Je" ou "Mon" dans tes résumés, comme si c\'était l\'entrepreneur qui parlait. Garde le résumé court et impactant, en 3-4 phrases maximum.'
           },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 500,
       }),
     });
 
@@ -60,8 +45,6 @@ serve(async (req) => {
 
     const data = await response.json();
     const generatedText = data.choices[0].message.content;
-
-    console.log('Successfully generated text of length:', generatedText.length);
 
     return new Response(
       JSON.stringify({ generatedText }),
@@ -75,12 +58,8 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in generate-with-ai function:', error);
-    
     return new Response(
-      JSON.stringify({
-        error: error.message,
-        details: error.stack
-      }),
+      JSON.stringify({ error: error.message }),
       { 
         status: 500,
         headers: {
