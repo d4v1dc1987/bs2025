@@ -35,7 +35,7 @@ export const useBusinessProfile = (userId: string | undefined) => {
         .from("business_profiles")
         .select("*")
         .eq("id", userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching business profile:", error);
@@ -45,12 +45,10 @@ export const useBusinessProfile = (userId: string | undefined) => {
       console.log('Fetched business profile:', data);
       
       // Merge the fetched data with default values to ensure all fields are defined
-      if (data) {
-        setFormData({
-          ...defaultBusinessProfile,
-          ...data,
-        });
-      }
+      setFormData({
+        ...defaultBusinessProfile,
+        ...data,
+      });
     } catch (error) {
       console.error("Error fetching business profile:", error);
       toast.error("Erreur lors du chargement du profil business");
