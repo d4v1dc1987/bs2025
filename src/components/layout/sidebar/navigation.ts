@@ -3,7 +3,7 @@ import { BookOpen, MessageSquare, MessageCircleReply, Calendar, CheckSquare, Lay
 export const dashboardLink = {
   to: "/dashboard",
   icon: LayoutDashboard,
-  label: "Dashboard",
+  label: "Tableau de bord",
 };
 
 export const navigationLinks = [
