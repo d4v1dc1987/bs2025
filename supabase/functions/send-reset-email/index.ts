@@ -17,6 +17,8 @@ interface EmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log("Received request:", req.method);
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -30,10 +32,10 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Email and resetLink are required");
     }
 
-    // Créer un client Supabase avec le rôle de service
+    // Create a Supabase client with the service role key
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
     
-    // Générer un lien de réinitialisation
+    // Generate a reset link
     const { data, error: linkError } = await supabase.auth.admin.generateLink({
       type: 'recovery',
       email: email,
@@ -128,8 +130,8 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error(`Resend API error: ${error}`);
     }
 
-    const data = await res.json();
-    console.log("Email sent successfully:", data);
+    const data2 = await res.json();
+    console.log("Email sent successfully:", data2);
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

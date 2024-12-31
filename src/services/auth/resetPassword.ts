@@ -19,7 +19,7 @@ export const initiatePasswordReset = async (email: string) => {
       throw resetError;
     }
 
-    // 2. Envoyer l'email via notre edge function
+    // 2. Send the email via our edge function
     const { data, error: functionError } = await supabase.functions.invoke('send-reset-email', {
       body: { 
         email,
