@@ -16,7 +16,6 @@ const UpdatePassword = () => {
       setIsLoading(true);
       console.log("Attempting to update password...");
 
-      // Get the token from the URL
       const searchParams = new URLSearchParams(location.search);
       const token = searchParams.get("token");
 
@@ -27,39 +26,25 @@ const UpdatePassword = () => {
         return;
       }
 
-      // Verify the token using token hash method
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        token_hash: token,
-        type: 'recovery'
-      });
-
-      if (verifyError) {
-        console.error("Error verifying token:", verifyError);
-        toast.error("Le lien a expiré. Veuillez réessayer.");
-        navigate("/auth?mode=reset");
-        return;
-      }
-
-      // Update the password
+      // Update the password directly
       const { error } = await supabase.auth.updateUser({
-        password: values.password,
+        password: values.password
       });
 
       if (error) {
         console.error("Error updating password:", error);
-        
-        if (error.message.includes("auth")) {
-          toast.error("Erreur d'authentification. Le lien a peut-être expiré, veuillez réessayer.");
-          navigate("/auth?mode=reset");
-          return;
-        }
-        
-        throw error;
+        toast.error("Le lien a expiré ou est invalide. Veuillez réessayer.");
+        navigate("/auth?mode=reset");
+        return;
       }
 
       console.log("Password updated successfully");
       toast.success("Votre mot de passe a été mis à jour");
+      
+      // Sign out the user to ensure a clean state
+      await supabase.auth.signOut();
       navigate("/auth?mode=login");
+      
     } catch (error: any) {
       console.error("Caught error:", error);
       toast.error(error.message || "Une erreur est survenue lors de la mise à jour du mot de passe");

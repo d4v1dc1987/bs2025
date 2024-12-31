@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Function to force clear all Supabase auth data
   const forceClearAuth = () => {
@@ -27,7 +28,14 @@ export const useAuth = () => {
           forceClearAuth();
           return;
         }
-        setUser(session?.user ?? null);
+        
+        // Only set user and redirect if we're not on the update-password page
+        if (session?.user && !location.pathname.includes('/update-password')) {
+          setUser(session.user);
+          navigate("/dashboard");
+        } else {
+          setUser(null);
+        }
       } catch (error) {
         console.error("Auth initialization error:", error);
         forceClearAuth();
@@ -47,9 +55,12 @@ export const useAuth = () => {
       if (event === "SIGNED_OUT" || (event === "TOKEN_REFRESHED" && !session)) {
         forceClearAuth();
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        setUser(session?.user ?? null);
-        if (event === "SIGNED_IN") {
-          navigate("/dashboard");
+        // Only set user and redirect if we're not on the update-password page
+        if (!location.pathname.includes('/update-password')) {
+          setUser(session?.user ?? null);
+          if (event === "SIGNED_IN") {
+            navigate("/dashboard");
+          }
         }
       }
     });
@@ -57,7 +68,7 @@ export const useAuth = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   const signOut = async () => {
     try {
