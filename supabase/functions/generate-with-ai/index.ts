@@ -28,18 +28,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `Tu es un expert en marketing digital qui résume des profils business de manière détaillée et personnelle. 
-            
-            Instructions spécifiques:
-            1. Utilise TOUJOURS "Je" ou "Mon" dans tes résumés, comme si c'était l'entrepreneur qui parlait
-            2. Crée un résumé détaillé et complet (8-10 phrases) en structurant le texte en 2-3 paragraphes
-            3. Mets l'accent sur:
-               - La valeur unique et la mission de l'entreprise
-               - Les résultats concrets obtenus avec les clients
-               - L'histoire et les valeurs de l'entreprise
-               - L'expertise et la passion de l'entrepreneur
-            4. Intègre TOUTES les informations fournies de manière naturelle et fluide
-            5. Garde un ton professionnel mais chaleureux et authentique`
+            content: 'Tu es un expert en marketing digital qui aide les entrepreneurs à créer du contenu engageant pour Facebook.'
           },
           { role: 'user', content: prompt }
         ],
@@ -59,24 +48,15 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ generatedText }),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        }
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-
   } catch (error) {
     console.error('Error in generate-with-ai function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
         status: 500,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
   }

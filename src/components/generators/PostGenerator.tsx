@@ -3,24 +3,45 @@ import { Send, Copy, CalendarDays, ChevronLeft, ChevronRight } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { PostTypeSelect, getPostTypeById } from "./PostTypeSelect";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const PostGenerator = () => {
   const [selectedType, setSelectedType] = useState<string>();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string>();
   const [hasHistory, setHasHistory] = useState(false);
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
 
   const selectedPostType = selectedType ? getPostTypeById(selectedType) : undefined;
 
   const handleGenerate = async () => {
-    if (!selectedType) return;
+    if (!selectedType || !selectedPostType) return;
     
     setIsGenerating(true);
     try {
-      // Temporairement, on simule la génération
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setGeneratedContent("Voici un exemple de contenu généré pour votre publication Facebook ! 🎉");
+      let prompt = selectedPostType.prompt;
+      
+      // Add custom field values to the prompt if they exist
+      if (selectedPostType.customFields) {
+        const fieldValues = selectedPostType.customFields
+          .map(field => customFieldValues[field.name])
+          .filter(Boolean);
+        
+        if (fieldValues.length > 0) {
+          prompt += " " + fieldValues.join(" ");
+        }
+      }
+
+      const { data, error } = await supabase.functions.invoke("generate-with-ai", {
+        body: { prompt }
+      });
+
+      if (error) throw error;
+
+      setGeneratedContent(data.generatedText);
       setHasHistory(true);
     } catch (error) {
       console.error("Erreur lors de la génération:", error);
@@ -40,6 +61,13 @@ export const PostGenerator = () => {
   const handleSchedule = () => {
     // À implémenter plus tard
     toast.info("Fonctionnalité à venir !");
+  };
+
+  const handleCustomFieldChange = (name: string, value: string) => {
+    setCustomFieldValues(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -62,6 +90,32 @@ export const PostGenerator = () => {
             <p className="text-muted-foreground">
               {selectedPostType.description}
             </p>
+
+            {selectedPostType.customFields && (
+              <div className="space-y-4">
+                {selectedPostType.customFields.map((field) => (
+                  <div key={field.name} className="space-y-2">
+                    <label className="text-sm font-medium">
+                      {field.label}
+                    </label>
+                    {field.type === 'textarea' ? (
+                      <Textarea
+                        placeholder={field.placeholder}
+                        value={customFieldValues[field.name] || ''}
+                        onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
+                      />
+                    ) : (
+                      <Input
+                        type="text"
+                        placeholder={field.placeholder}
+                        value={customFieldValues[field.name] || ''}
+                        onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
             
             <Button
               onClick={handleGenerate}
@@ -80,6 +134,7 @@ export const PostGenerator = () => {
         <Card className="p-6 min-h-[300px] bg-card/50 backdrop-blur-sm border-muted">
           {generatedContent ? (
             <div className="space-y-4">
+              <h3 className="font-medium">Résultat:</h3>
               <p className="whitespace-pre-wrap">{generatedContent}</p>
               <div className="flex gap-2">
                 <Button onClick={handleCopy} variant="secondary" size="sm">
