@@ -8,31 +8,39 @@ interface LoginCredentials {
   password: string;
 }
 
+interface LoginResponse {
+  success: boolean;
+  data?: any;
+}
+
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLoginError = (error: AuthError) => {
     console.error("Erreur de connexion:", error);
     
-    switch (error.message) {
-      case "Invalid login credentials":
-        toast.error("Email ou mot de passe incorrect");
-        break;
-      case "Email not confirmed":
-        toast.error("Veuillez confirmer votre email avant de vous connecter");
-        break;
-      default:
-        toast.error("Une erreur est survenue lors de la connexion");
+    // Gestion spécifique des erreurs d'authentification
+    if (error.message.includes("Invalid login credentials")) {
+      toast.error("Email ou mot de passe incorrect");
+      return;
     }
+    
+    if (error.message.includes("Email not confirmed")) {
+      toast.error("Veuillez confirmer votre email avant de vous connecter");
+      return;
+    }
+    
+    // Erreur par défaut
+    toast.error("Une erreur est survenue lors de la connexion");
   };
 
-  const login = async ({ email, password }: LoginCredentials) => {
+  const login = async ({ email, password }: LoginCredentials): Promise<LoginResponse> => {
     try {
       setIsLoading(true);
       
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: email.trim(),
+        password: password.trim(),
       });
 
       if (error) {

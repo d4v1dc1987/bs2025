@@ -41,12 +41,12 @@ export const LoginForm = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    const { success } = await login({
+    const response = await login({
       email: values.email,
       password: values.password,
     });
 
-    if (success) {
+    if (response.success) {
       const returnUrl = searchParams.get("returnUrl");
       navigate(returnUrl ? decodeURIComponent(returnUrl) : "/dashboard");
     }
