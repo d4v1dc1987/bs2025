@@ -16,48 +16,44 @@ const UpdatePassword = () => {
 
   useEffect(() => {
     const validateToken = async () => {
-      const searchParams = new URLSearchParams(location.search);
-      const token_hash = searchParams.get("token_hash");
-      const type = searchParams.get("type");
+      try {
+        // Récupérer les paramètres de l'URL
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+        const type = params.get("type");
 
-      if (!token_hash || !type || type !== "recovery") {
-        console.error("Invalid token parameters:", { token_hash, type });
-        toast.error("Lien invalide. Veuillez réessayer.");
+        console.log("Token parameters:", { token, type });
+
+        if (!token || type !== "recovery") {
+          console.error("Invalid token parameters:", { token, type });
+          toast.error("Lien invalide. Veuillez réessayer.");
+          navigate("/auth?mode=login");
+          return;
+        }
+
+        setIsValidToken(true);
+      } catch (error) {
+        console.error("Token validation error:", error);
+        toast.error("Une erreur est survenue. Veuillez réessayer.");
         navigate("/auth?mode=login");
-        return;
       }
-
-      setIsValidToken(true);
     };
 
     validateToken();
-  }, [location.search, navigate]);
+  }, [navigate]);
 
   const handlePasswordUpdate = async (values: { password: string }) => {
     try {
       setIsLoading(true);
       console.log("Attempting to update password...");
 
-      const searchParams = new URLSearchParams(location.search);
-      const token_hash = searchParams.get("token_hash");
-      const type = searchParams.get("type");
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+      const type = params.get("type");
 
-      if (!token_hash || !type || type !== "recovery") {
-        console.error("Invalid or missing URL parameters:", { token_hash, type });
+      if (!token || type !== "recovery") {
+        console.error("Invalid or missing URL parameters:", { token, type });
         toast.error("Lien invalide. Veuillez réessayer.");
-        navigate("/auth?mode=login");
-        return;
-      }
-
-      // Vérifier le token OTP
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        token_hash,
-        type: "recovery",
-      });
-
-      if (verifyError) {
-        console.error("Error verifying token:", verifyError);
-        toast.error("Le lien a expiré ou est invalide. Veuillez réessayer.");
         navigate("/auth?mode=login");
         return;
       }
