@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useProgressAnimation } from '@/hooks/useProgressAnimation';
 import { useAIProfileGeneration } from '@/hooks/useAIProfileGeneration';
 import { AIProfileReview } from './AIProfileReview';
@@ -26,6 +26,8 @@ export const AIProfileGenerator = ({
     generateAIProfile,
     setGeneratedProfile
   } = useAIProfileGeneration();
+  
+  const generationPromise = useRef<Promise<string> | null>(null);
 
   useEffect(() => {
     const handleGeneration = async () => {
@@ -42,21 +44,34 @@ export const AIProfileGenerator = ({
           .replace('{firstName}', firstName)
           .replace('{answers}', formattedAnswers);
 
-        const profile = await generateAIProfile(prompt);
-        
-        // Ensure we wait at least 7 seconds for the animation
-        await new Promise(resolve => setTimeout(resolve, 7000));
+        // Stocker la promesse de génération pour éviter les générations multiples
+        if (!generationPromise.current) {
+          generationPromise.current = generateAIProfile(prompt);
+        }
+
+        // Attendre la génération ET l'animation
+        const [profile] = await Promise.all([
+          generationPromise.current,
+          new Promise(resolve => setTimeout(resolve, 7000))
+        ]);
         
         stopAnimation();
         setIsSubmitting(false);
+        generationPromise.current = null;
       } catch (error) {
         console.error('Error generating profile:', error);
         stopAnimation();
         setIsSubmitting(false);
+        generationPromise.current = null;
       }
     };
 
     handleGeneration();
+
+    // Cleanup
+    return () => {
+      generationPromise.current = null;
+    };
   }, [isSubmitting, firstName, answers, generateAIProfile, startAnimation, stopAnimation]);
 
   useEffect(() => {

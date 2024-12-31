@@ -7,10 +7,10 @@ export const useAIProfileGeneration = () => {
   const [generatedProfile, setGeneratedProfile] = useState<string | null>(null);
 
   const generateAIProfile = async (prompt: string): Promise<string> => {
-    setIsGeneratingProfile(true);
-    setGeneratedProfile(null); // Reset the profile before generating a new one
-
     try {
+      setIsGeneratingProfile(true);
+      setGeneratedProfile(null); // Reset avant chaque génération
+
       const aiResponse = await supabase.functions.invoke('generate-with-ai', {
         body: { prompt }
       });
@@ -18,6 +18,8 @@ export const useAIProfileGeneration = () => {
       if (aiResponse.error) throw aiResponse.error;
       
       const generatedText = aiResponse.data.generatedText;
+      
+      // S'assurer qu'une seule mise à jour est effectuée
       setGeneratedProfile(generatedText);
       return generatedText;
     } catch (error: any) {

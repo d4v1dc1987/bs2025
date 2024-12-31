@@ -6,6 +6,7 @@ export const useProgressAnimation = (duration: number = 7000) => {
   const startTimeRef = useRef<number>(0);
 
   const startAnimation = () => {
+    // Reset progress and start time
     setProgress(0);
     startTimeRef.current = Date.now();
 
@@ -20,7 +21,11 @@ export const useProgressAnimation = (duration: number = 7000) => {
       }
     };
 
-    cancelAnimationFrame(animationFrameRef.current!);
+    // Cancel any existing animation before starting new one
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    
     animationFrameRef.current = requestAnimationFrame(animate);
   };
 
@@ -31,6 +36,7 @@ export const useProgressAnimation = (duration: number = 7000) => {
     setProgress(100);
   };
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (animationFrameRef.current) {
