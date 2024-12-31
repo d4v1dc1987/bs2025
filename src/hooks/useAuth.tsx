@@ -29,7 +29,6 @@ export const useAuth = () => {
           return;
         }
         
-        // Only set user if we have a session
         if (session?.user) {
           setUser(session.user);
           // Only redirect to dashboard if not on auth-related pages and not handling password reset
@@ -40,6 +39,12 @@ export const useAuth = () => {
           }
         } else {
           setUser(null);
+          // If not on auth page and no session, redirect to login
+          if (!location.pathname.includes('/auth') && 
+              !location.pathname.includes('/reset-password') && 
+              !location.pathname.includes('/update-password')) {
+            navigate("/auth?mode=login");
+          }
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
@@ -60,14 +65,19 @@ export const useAuth = () => {
       if (event === "SIGNED_OUT" || (event === "TOKEN_REFRESHED" && !session)) {
         forceClearAuth();
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        setUser(session?.user ?? null);
-        // Only redirect to dashboard if not on auth-related pages and not handling password reset
-        if (!location.pathname.includes('/auth') && 
-            !location.pathname.includes('/reset-password') && 
-            !location.pathname.includes('/update-password')) {
-          if (event === "SIGNED_IN") {
-            navigate("/dashboard");
+        if (session?.user) {
+          setUser(session.user);
+          // Only redirect to dashboard if not on auth-related pages and not handling password reset
+          if (!location.pathname.includes('/auth') && 
+              !location.pathname.includes('/reset-password') && 
+              !location.pathname.includes('/update-password')) {
+            if (event === "SIGNED_IN") {
+              navigate("/dashboard");
+            }
           }
+        } else {
+          setUser(null);
+          navigate("/auth?mode=login");
         }
       }
     });

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { AuthError } from "@supabase/supabase-js";
 
 interface LoginCredentials {
   email: string;
@@ -28,7 +27,6 @@ export const useLogin = () => {
       const cleanPassword = password.trim();
       
       if (!cleanEmail || !cleanPassword) {
-        console.error("Email ou mot de passe manquant");
         return {
           success: false,
           error: {
@@ -52,7 +50,6 @@ export const useLogin = () => {
           status: error.status
         });
 
-        // Gestion spécifique des erreurs d'authentification
         if (error.message.includes("Invalid login credentials")) {
           return {
             success: false,
@@ -73,7 +70,6 @@ export const useLogin = () => {
           };
         }
 
-        // Erreur par défaut
         return {
           success: false,
           error: {
