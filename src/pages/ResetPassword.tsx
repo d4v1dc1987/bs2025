@@ -1,79 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBolt } from "@fortawesome/free-solid-svg-icons";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-
-const resetSchema = z.object({
-  email: z.string().email("Email invalide"),
-});
-
-type ResetFormValues = z.infer<typeof resetSchema>;
+import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
+import { initiatePasswordReset } from "@/services/auth/resetPassword";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<ResetFormValues>({
-    resolver: zodResolver(resetSchema),
-    defaultValues: {
-      email: "",
-    },
-  });
-
-  const onSubmit = async (values: ResetFormValues) => {
+  const handleSubmit = async (values: { email: string }) => {
     try {
       setIsLoading(true);
-      console.log("Starting password reset process for:", values.email);
-
-      // Important: On désactive complètement l'email automatique de Supabase
-      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
-        redirectTo: null,
-      });
-
-      if (error) {
-        if (error.message.includes("rate_limit") || error.status === 429) {
-          toast.error("Veuillez patienter quelques secondes avant de réessayer");
-          return;
-        }
-        throw error;
-      }
-
-      // On génère un token unique pour la réinitialisation
-      const resetToken = crypto.randomUUID();
-      const resetLink = `${window.location.origin}/update-password#token=${resetToken}`;
-      
-      console.log("Sending custom reset email with link:", resetLink);
-      
-      const response = await supabase.functions.invoke('send-reset-email', {
-        body: { 
-          email: values.email, 
-          resetLink,
-          resetToken
-        },
-      });
-
-      if (response.error) throw response.error;
-
+      await initiatePasswordReset(values.email);
       toast.success("Un email de réinitialisation vous a été envoyé");
       navigate("/auth?mode=login");
     } catch (error: any) {
-      console.error("Reset password error:", error);
-      toast.error("Une erreur est survenue lors de l'envoi de l'email");
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -95,47 +39,10 @@ const ResetPassword = () => {
             </p>
           </div>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-foreground/90">Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="votre@email.com"
-                        className="bg-background/50 border-foreground/20"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button 
-                type="submit" 
-                className="w-full bg-primary hover:bg-primary/90"
-                disabled={isLoading}
-              >
-                {isLoading ? "Envoi en cours..." : "Réinitialiser le mot de passe"}
-              </Button>
-
-              <div className="text-center">
-                <Button
-                  type="button"
-                  variant="link"
-                  className="text-sm text-[#c299ff] hover:text-[#c299ff]/90"
-                  onClick={() => navigate("/auth?mode=login")}
-                >
-                  Retour à la connexion
-                </Button>
-              </div>
-            </form>
-          </Form>
+          <ResetPasswordForm 
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+          />
         </div>
       </div>
     </div>

@@ -26,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { email, resetLink, resetToken }: EmailRequest = await req.json();
     console.log("Processing reset request for:", email);
 
-    // Créer un client Supabase avec le rôle de service pour générer un OTP
+    // Créer un client Supabase avec le rôle de service
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
     
     // Générer un OTP pour la réinitialisation
