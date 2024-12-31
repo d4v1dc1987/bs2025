@@ -95,6 +95,9 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error(`Resend API error: ${error}`);
     }
 
+    const data = await res.json();
+    console.log("Email sent successfully:", data);
+
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

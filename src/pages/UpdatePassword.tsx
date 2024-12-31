@@ -55,16 +55,31 @@ const UpdatePassword = () => {
   const onSubmit = async (values: UpdateFormValues) => {
     try {
       setIsLoading(true);
+      console.log("Attempting to update password...");
+
       const { error } = await supabase.auth.updateUser({
         password: values.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating password:", error);
+        
+        // Gestion spécifique des erreurs
+        if (error.message.includes("auth")) {
+          toast.error("Erreur d'authentification. Le lien a peut-être expiré, veuillez réessayer.");
+          navigate("/auth?mode=reset");
+          return;
+        }
+        
+        throw error;
+      }
 
+      console.log("Password updated successfully");
       toast.success("Votre mot de passe a été mis à jour");
       navigate("/auth?mode=login");
     } catch (error: any) {
-      toast.error("Une erreur est survenue");
+      console.error("Caught error:", error);
+      toast.error(error.message || "Une erreur est survenue lors de la mise à jour du mot de passe");
     } finally {
       setIsLoading(false);
     }
