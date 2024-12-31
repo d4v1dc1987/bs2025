@@ -38,7 +38,7 @@ export const useAuth = () => {
         forceClearAuth();
       } else if (event === "SIGNED_IN") {
         setUser(session?.user ?? null);
-        navigate("/");
+        navigate("/dashboard");
       }
     });
 

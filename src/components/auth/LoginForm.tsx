@@ -60,7 +60,7 @@ export const LoginForm = () => {
 
       if (error) throw error;
 
-      navigate("/");
+      navigate("/dashboard");
     } catch (error: any) {
       toast.error("Email ou mot de passe incorrect");
     }
