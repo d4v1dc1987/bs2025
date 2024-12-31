@@ -14,6 +14,8 @@ export const useAIBusinessSummary = (
 
     try {
       setIsGenerating(true);
+      console.log('Generating AI summary for business profile:', formData);
+      
       const { data, error } = await supabase.functions.invoke("generate-with-ai", {
         body: {
           prompt: `En tant qu'expert en marketing digital, crée un résumé professionnel détaillé et complet (6-8 phrases) de cette entreprise en ligne, en utilisant "Je" ou "Mon" comme si c'était l'entrepreneur qui parlait. Mets l'accent sur la valeur unique, les résultats concrets et l'histoire de l'entreprise. N'oublie aucun détail important. Utilise ces informations:
@@ -36,6 +38,7 @@ export const useAIBusinessSummary = (
       if (error) throw error;
 
       const aiSummary = data.generatedText;
+      console.log('Generated AI summary:', aiSummary);
       
       // Mise à jour du résumé AI dans la base de données
       const { error: updateError } = await supabase

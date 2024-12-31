@@ -24,7 +24,10 @@ export const useBusinessProfile = (userId: string | undefined) => {
   const [formData, setFormData] = useState<BusinessProfile>(defaultBusinessProfile);
 
   const fetchBusinessProfile = async () => {
-    if (!userId) return;
+    if (!userId) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
       console.log('Fetching business profile for user:', userId);
@@ -32,7 +35,7 @@ export const useBusinessProfile = (userId: string | undefined) => {
         .from("business_profiles")
         .select("*")
         .eq("id", userId)
-        .maybeSingle();
+        .single();
 
       if (error) {
         console.error("Error fetching business profile:", error);
@@ -40,21 +43,12 @@ export const useBusinessProfile = (userId: string | undefined) => {
       }
 
       console.log('Fetched business profile:', data);
+      
+      // Merge the fetched data with default values to ensure all fields are defined
       if (data) {
         setFormData({
-          business_name: data.business_name || "",
-          business_type: data.business_type,
-          business_ownership: data.business_ownership,
-          industry: data.industry || "",
-          main_product: data.main_product || "",
-          target_audience: data.target_audience || "",
-          problem_solved: data.problem_solved || "",
-          goals: data.goals || "",
-          client_results: data.client_results || "",
-          company_age: data.company_age || "",
-          company_story: data.company_story || "",
-          company_values: data.company_values || "",
-          ai_summary: data.ai_summary,
+          ...defaultBusinessProfile,
+          ...data,
         });
       }
     } catch (error) {
@@ -66,9 +60,7 @@ export const useBusinessProfile = (userId: string | undefined) => {
   };
 
   useEffect(() => {
-    if (userId) {
-      fetchBusinessProfile();
-    }
+    fetchBusinessProfile();
   }, [userId]);
 
   return {
