@@ -6,7 +6,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const SENDGRID_API_KEY = Deno.env.get("SENDGRID_API_KEY");
 
 interface EmailRequest {
   email: string;
@@ -74,29 +74,42 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
+        Authorization: `Bearer ${SENDGRID_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Bobby Social <noreply@bobbysocial.com>",
-        to: [email],
+        personalizations: [
+          {
+            to: [{ email }],
+          },
+        ],
+        from: {
+          email: "noreply@bobbysocial.com",
+          name: "Bobby Social",
+        },
         subject: "Réinitialisation de votre mot de passe - Bobby Social",
-        html: emailHtml,
+        content: [
+          {
+            type: "text/html",
+            value: emailHtml,
+          },
+        ],
       }),
     });
 
     if (!res.ok) {
-      throw new Error("Failed to send email");
+      const error = await res.text();
+      throw new Error(`SendGrid API error: ${error}`);
     }
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error sending reset email:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
