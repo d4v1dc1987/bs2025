@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -43,6 +43,41 @@ const UpdatePassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash) {
+      console.error("No hash found in URL");
+      toast.error("Lien invalide. Veuillez réessayer.");
+      navigate("/auth?mode=reset");
+      return;
+    }
+
+    const accessToken = hash.split("=")[1];
+    if (!accessToken) {
+      console.error("No access token found in hash");
+      toast.error("Lien invalide. Veuillez réessayer.");
+      navigate("/auth?mode=reset");
+      return;
+    }
+
+    // Récupérer la session avec le token
+    const getSession = async () => {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: accessToken,
+        type: 'recovery',
+        token: accessToken,
+      });
+
+      if (error) {
+        console.error("Error verifying OTP:", error);
+        toast.error("Le lien a expiré. Veuillez réessayer.");
+        navigate("/auth?mode=reset");
+      }
+    };
+
+    getSession();
+  }, [navigate]);
 
   const form = useForm<UpdateFormValues>({
     resolver: zodResolver(updateSchema),
