@@ -31,10 +31,10 @@ export const MultipleChoice = ({
       <div
         onClick={() => onCheckedChange(!isChecked, localCustomValue)}
         className={cn(
-          "flex items-center space-x-2 px-4 py-3 rounded-lg cursor-pointer transition-all",
+          "flex items-center space-x-2 px-4 py-3 rounded-lg cursor-pointer transition-all border",
           isChecked 
-            ? "bg-primary/20 ring-2 ring-primary" 
-            : "bg-background/10 hover:bg-background/20"
+            ? "bg-primary/20 border-primary" 
+            : "bg-primary/10 hover:bg-primary/20 border-primary/20"
         )}
       >
         <div className={cn(

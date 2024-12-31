@@ -19,7 +19,7 @@ export const AIProfileGenerator = ({
   onComplete 
 }: AIProfileGeneratorProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { progress, isAnimating, startAnimation } = useProgressAnimation(7000);
+  const { progress, isAnimating, startAnimation, stopAnimation } = useProgressAnimation(7000);
   const {
     isGeneratingProfile,
     generatedProfile,
@@ -33,7 +33,6 @@ export const AIProfileGenerator = ({
     const handleGeneration = async () => {
       startAnimation();
       
-      // Préparer la requête OpenAI pendant l'animation
       const formattedAnswers = Object.entries(answers)
         .map(([key, value]) => `${key}: ${formatAnswerValue(value)}`)
         .join('\n');
@@ -42,12 +41,16 @@ export const AIProfileGenerator = ({
         .replace('{firstName}', firstName)
         .replace('{answers}', formattedAnswers);
 
-      // Attendre que la barre de progression atteigne 80% avant d'envoyer la requête
-      // Cela correspond au moment où le message "Génération de votre profil..." s'affiche
-      await new Promise(resolve => setTimeout(resolve, 5600)); // 80% de 7000ms
-      
-      await generateAIProfile(prompt);
-      setIsSubmitting(false);
+      try {
+        const profile = await generateAIProfile(prompt);
+        // Arrêter l'animation une fois que le profil est généré
+        stopAnimation();
+        setIsSubmitting(false);
+      } catch (error) {
+        console.error('Error generating profile:', error);
+        stopAnimation();
+        setIsSubmitting(false);
+      }
     };
 
     handleGeneration();
@@ -59,8 +62,8 @@ export const AIProfileGenerator = ({
 
   return (
     <AIProfileReview
-      isGenerating={isSubmitting || isGeneratingProfile}
-      progress={isSubmitting ? progress : (isGeneratingProfile ? 100 : 0)}
+      isGenerating={isSubmitting && !generatedProfile}
+      progress={progress}
       generatedProfile={generatedProfile}
       onEdit={onEdit}
       onConfirm={onComplete}

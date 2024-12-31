@@ -17,7 +17,7 @@ export const useProgressAnimation = (duration: number = 7000) => {
       
       setProgress(newProgress);
 
-      if (elapsed < duration) {
+      if (elapsed < duration && isAnimating) {
         animationFrameRef.current = requestAnimationFrame(animate);
       } else {
         setIsAnimating(false);
@@ -25,6 +25,14 @@ export const useProgressAnimation = (duration: number = 7000) => {
     };
 
     animationFrameRef.current = requestAnimationFrame(animate);
+  };
+
+  const stopAnimation = () => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    setProgress(100);
+    setIsAnimating(false);
   };
 
   useEffect(() => {
@@ -38,6 +46,7 @@ export const useProgressAnimation = (duration: number = 7000) => {
   return {
     progress,
     isAnimating,
-    startAnimation
+    startAnimation,
+    stopAnimation
   };
 };
