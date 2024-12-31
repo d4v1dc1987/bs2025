@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 export const initiatePasswordReset = async (email: string) => {
   try {
@@ -7,7 +6,7 @@ export const initiatePasswordReset = async (email: string) => {
 
     // 1. Désactiver complètement l'email automatique de Supabase
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: null,
+      redirectTo: `${window.location.origin}/update-password`,
     });
 
     if (resetError) {
@@ -17,18 +16,11 @@ export const initiatePasswordReset = async (email: string) => {
       throw resetError;
     }
 
-    // 2. Générer un token unique et sécurisé pour la réinitialisation
-    const resetToken = crypto.randomUUID();
-    const resetLink = `${window.location.origin}/update-password#token=${resetToken}`;
-    
-    console.log("Sending custom reset email with link:", resetLink);
-    
-    // 3. Envoyer l'email via notre edge function
+    // 2. Envoyer l'email via notre edge function
     const response = await supabase.functions.invoke('send-reset-email', {
       body: { 
-        email, 
-        resetLink,
-        resetToken
+        email,
+        resetLink: `${window.location.origin}/update-password`
       },
     });
 

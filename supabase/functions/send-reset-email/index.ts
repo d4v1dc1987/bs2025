@@ -14,7 +14,6 @@ const corsHeaders = {
 interface EmailRequest {
   email: string;
   resetLink: string;
-  resetToken: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -23,14 +22,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, resetLink, resetToken }: EmailRequest = await req.json();
+    const { email, resetLink }: EmailRequest = await req.json();
     console.log("Processing reset request for:", email);
 
     // Créer un client Supabase avec le rôle de service
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
     
-    // Générer un OTP pour la réinitialisation
-    const { error: otpError } = await supabase.auth.admin.generateLink({
+    // Générer un lien de réinitialisation
+    const { data, error: linkError } = await supabase.auth.admin.generateLink({
       type: 'recovery',
       email: email,
       options: {
@@ -38,9 +37,15 @@ const handler = async (req: Request): Promise<Response> => {
       }
     });
 
-    if (otpError) {
-      console.error("Error generating OTP:", otpError);
-      throw otpError;
+    if (linkError) {
+      console.error("Error generating reset link:", linkError);
+      throw linkError;
+    }
+
+    const resetUrl = data.properties?.action_link;
+    
+    if (!resetUrl) {
+      throw new Error("No reset URL generated");
     }
 
     const emailHtml = `
@@ -70,7 +75,7 @@ const handler = async (req: Request): Promise<Response> => {
                     Pour procéder à la réinitialisation, cliquez sur le bouton ci-dessous.
                   </p>
                   <div style="text-align: center; margin: 30px 0;">
-                    <a href="${resetLink}" 
+                    <a href="${resetUrl}" 
                        style="display: inline-block; padding: 14px 28px; background-color: #7b27fb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
                       Réinitialiser mon mot de passe
                     </a>
