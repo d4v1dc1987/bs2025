@@ -11,14 +11,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Loader2, Building } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
+type BusinessType = "coach" | "consultant" | "influencer" | "network_marketer" | "online_trainer" | "course_creator" | "freelancer" | "other";
+
 type BusinessProfile = {
   business_name: string | null;
-  business_type: string | null;
+  business_type: BusinessType | null;
   target_audience: string | null;
   main_product: string | null;
   product_description: string | null;
@@ -59,22 +61,24 @@ export const BusinessSection = () => {
         .from("business_profiles")
         .select("*")
         .eq("id", user.id)
-        .single();
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
 
       if (error) throw error;
 
-      setFormData({
-        business_name: data.business_name || "",
-        business_type: data.business_type || null,
-        target_audience: data.target_audience || "",
-        main_product: data.main_product || "",
-        product_description: data.product_description || "",
-        price_range: data.price_range || "",
-        unique_value: data.unique_value || "",
-        goals: data.goals || "",
-        challenges: data.challenges || "",
-        ai_summary: data.ai_summary || null,
-      });
+      if (data) {
+        setFormData({
+          business_name: data.business_name || "",
+          business_type: data.business_type as BusinessType || null,
+          target_audience: data.target_audience || "",
+          main_product: data.main_product || "",
+          product_description: data.product_description || "",
+          price_range: data.price_range || "",
+          unique_value: data.unique_value || "",
+          goals: data.goals || "",
+          challenges: data.challenges || "",
+          ai_summary: data.ai_summary || null,
+        });
+      }
     } catch (error) {
       console.error("Error fetching business profile:", error);
       toast.error("Erreur lors du chargement du profil business");
@@ -204,7 +208,7 @@ export const BusinessSection = () => {
                 </Label>
                 <Select
                   value={formData.business_type || ""}
-                  onValueChange={(value) =>
+                  onValueChange={(value: BusinessType) =>
                     handleInputChange("business_type", value)
                   }
                 >
