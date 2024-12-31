@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { UpdatePasswordForm } from "@/components/auth/UpdatePasswordForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,56 +9,14 @@ import { Button } from "@/components/ui/button";
 
 const UpdatePassword = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isValidToken, setIsValidToken] = useState(false);
-
-  useEffect(() => {
-    const validateToken = async () => {
-      try {
-        // Récupérer les paramètres de l'URL
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get("token");
-        const type = params.get("type");
-
-        console.log("Token parameters:", { token, type });
-
-        if (!token || type !== "recovery") {
-          console.error("Invalid token parameters:", { token, type });
-          toast.error("Lien invalide. Veuillez réessayer.");
-          navigate("/auth?mode=login");
-          return;
-        }
-
-        setIsValidToken(true);
-      } catch (error) {
-        console.error("Token validation error:", error);
-        toast.error("Une erreur est survenue. Veuillez réessayer.");
-        navigate("/auth?mode=login");
-      }
-    };
-
-    validateToken();
-  }, [navigate]);
 
   const handlePasswordUpdate = async (values: { password: string }) => {
     try {
       setIsLoading(true);
-      console.log("Attempting to update password...");
-
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get("token");
-      const type = params.get("type");
-
-      if (!token || type !== "recovery") {
-        console.error("Invalid or missing URL parameters:", { token, type });
-        toast.error("Lien invalide. Veuillez réessayer.");
-        navigate("/auth?mode=login");
-        return;
-      }
-
-      // Mettre à jour le mot de passe
+      
+      // Mettre à jour le mot de passe directement
       const { error: updateError } = await supabase.auth.updateUser({
         password: values.password
       });
@@ -82,10 +40,6 @@ const UpdatePassword = () => {
       setIsLoading(false);
     }
   };
-
-  if (!isValidToken) {
-    return null;
-  }
 
   if (isSuccess) {
     return (
