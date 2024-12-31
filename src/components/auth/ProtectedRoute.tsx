@@ -18,9 +18,10 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }, [user, loading, navigate, location.pathname]);
 
   if (loading) {
-    return null; // Or a loading spinner
+    return null;
   }
 
+  // Allow access to password reset pages without authentication
   const isAuthPage = location.pathname.includes('/auth');
   const isPasswordReset = location.pathname.includes('/reset-password') || 
                          location.pathname.includes('/update-password');
