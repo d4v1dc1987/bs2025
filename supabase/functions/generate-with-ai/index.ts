@@ -10,23 +10,28 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  console.log('Function called with method:', req.method);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('Handling OPTIONS request');
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
     if (!openAIApiKey) {
+      console.error('OpenAI API key not found');
       throw new Error('OpenAI API key is not configured');
     }
 
     const { prompt } = await req.json();
     
     if (!prompt) {
+      console.error('No prompt provided in request');
       throw new Error('No prompt provided');
     }
 
-    console.log('Sending request to OpenAI with prompt:', prompt);
+    console.log('Sending request to OpenAI with prompt length:', prompt.length);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -57,7 +62,7 @@ serve(async (req) => {
     const data = await response.json();
     const generatedText = data.choices[0].message.content;
 
-    console.log('Successfully generated text');
+    console.log('Successfully generated text of length:', generatedText.length);
 
     return new Response(
       JSON.stringify({ generatedText }),
