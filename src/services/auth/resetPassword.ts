@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const initiatePasswordReset = async (email: string) => {
   try {
     console.log("Starting password reset process for:", email);
+    console.log("Redirect URL:", `${window.location.origin}/update-password`);
 
     const { error } = await supabase.auth.resetPasswordForEmail(
       email,

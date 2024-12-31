@@ -31,8 +31,8 @@ function AppRoutes() {
       <Route path="/" element={<MainLayout />}>
         <Route index element={user ? <Navigate to="/dashboard" /> : <Index />} />
         <Route path="auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
-        <Route path="reset-password" element={user ? <Navigate to="/dashboard" /> : <ResetPassword />} />
-        <Route path="update-password" element={user ? <Navigate to="/dashboard" /> : <UpdatePassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
+        <Route path="update-password" element={<UpdatePassword />} />
       </Route>
 
       {/* Protected routes */}
