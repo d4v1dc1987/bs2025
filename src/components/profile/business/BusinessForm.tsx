@@ -1,3 +1,4 @@
+import React from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { BusinessOwnership } from "./form/BusinessOwnership";
 import type { BusinessProfile } from "./types";
-import type { BusinessType } from "./types";
 
 interface BusinessFormProps {
   formData: BusinessProfile;
@@ -49,7 +49,7 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           </Label>
           <Select
             value={formData.business_type || ""}
-            onValueChange={(value: BusinessType) =>
+            onValueChange={(value) =>
               handleInputChange("business_type", value)
             }
           >
@@ -126,8 +126,8 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           id="target_audience"
           value={formData.target_audience || ""}
           onChange={(e) => handleInputChange("target_audience", e.target.value)}
-          placeholder="Décris ton audience cible de manière détaillée"
-          maxLength={500}
+          placeholder="Décris ton audience cible"
+          maxLength={1000}
           className="bg-background/50 border-foreground/20 min-h-[100px] text-sm"
         />
         <p className="text-sm text-muted-foreground mt-1">

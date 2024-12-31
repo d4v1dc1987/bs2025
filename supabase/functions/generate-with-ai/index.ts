@@ -28,12 +28,12 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'Tu es un expert en marketing digital qui résume des profils business de manière concise et personnelle. Utilise toujours "Je" ou "Mon" dans tes résumés, comme si c\'était l\'entrepreneur qui parlait. Garde le résumé court et impactant, en 3-4 phrases maximum.'
+            content: 'Tu es un expert en marketing digital qui résume des profils business de manière concise et personnelle. Utilise toujours "Je" ou "Mon" dans tes résumés, comme si c\'était l\'entrepreneur qui parlait. Crée un résumé détaillé et complet (6-8 phrases) en mettant l\'accent sur la valeur unique, les résultats concrets et l\'histoire de l\'entreprise. N\'oublie aucun détail important.'
           },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 800,
       }),
     });
 
