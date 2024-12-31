@@ -16,6 +16,7 @@ export const postTypes: PostType[] = [
     icon: <Quote className="text-blue-500" />,
     prompt: "Donne-moi 1 idée de citations motivantes pour mon audience. La citation doit être propre, professionnelle, et contenir entre 10 et 20 mots. Utilise un ton amical, familier, conversationnel et authentique. Toujours utiliser le tutoiement. Évite les jurons. Enrichis d'un ou deux émojis pertinents. Ne mets pas de hashtags.",
   },
+  {
     id: "funny-quotes",
     label: "Citations humoristiques",
     description: "Illumine la journée de ton audience avec de l'humour piquant. Des citations amusantes qui détendent et créent un lien de complicité.",
