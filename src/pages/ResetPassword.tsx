@@ -38,11 +38,19 @@ const ResetPassword = () => {
   const onSubmit = async (values: ResetFormValues) => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase.auth.resetPasswordForEmail(values.email, {
+
+      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
         redirectTo: `${window.location.origin}/auth/update-password`,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Gestion spécifique de l'erreur de rate limit
+        if (error.message.includes("rate_limit") || error.status === 429) {
+          toast.error("Veuillez patienter quelques secondes avant de réessayer");
+          return;
+        }
+        throw error;
+      }
 
       // Appel à notre fonction Edge pour envoyer l'email personnalisé
       const resetLink = `${window.location.origin}/auth/update-password`;
@@ -55,8 +63,8 @@ const ResetPassword = () => {
       toast.success("Un email de réinitialisation vous a été envoyé");
       navigate("/auth?mode=login");
     } catch (error: any) {
-      toast.error("Une erreur est survenue lors de l'envoi de l'email");
       console.error("Reset password error:", error);
+      toast.error("Une erreur est survenue lors de l'envoi de l'email");
     } finally {
       setIsLoading(false);
     }
