@@ -17,7 +17,7 @@ const PromptViewer = () => {
     
     // Redirect if not authenticated
     if (!user && !loading) {
-      navigate('/dashboard');
+      navigate('/auth');
       return;
     }
 
@@ -58,6 +58,22 @@ const PromptViewer = () => {
         <Card>
           <CardHeader>
             <CardTitle>Chargement...</CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show auth required message if not authenticated
+  if (!user) {
+    return (
+      <div className="container mx-auto py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Authentification requise</CardTitle>
+            <CardDescription>
+              Veuillez vous connecter pour voir l'historique des prompts.
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
