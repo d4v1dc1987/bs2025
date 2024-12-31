@@ -44,9 +44,40 @@ export const PostGenerator = () => {
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
+      {/* Section Options */}
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Choisis un type de publication</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Quel type de post veux-tu faire?
+          </p>
+          <PostTypeSelect 
+            value={selectedType}
+            onValueChange={setSelectedType}
+          />
+        </div>
+
+        {selectedPostType && (
+          <div className="space-y-4">
+            <p className="text-muted-foreground">
+              {selectedPostType.description}
+            </p>
+            
+            <Button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="w-full bg-primary hover:bg-primary/90"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              {isGenerating ? "Génération en cours..." : (generatedContent ? "Générer une autre publication" : "Générer une publication")}
+            </Button>
+          </div>
+        )}
+      </div>
+
       {/* Section Résultat */}
       <div className="space-y-4">
-        <Card className="p-6 min-h-[300px] bg-card/50 backdrop-blur-sm">
+        <Card className="p-6 min-h-[300px] bg-card/50 backdrop-blur-sm border-muted">
           {generatedContent ? (
             <div className="space-y-4">
               <p className="whitespace-pre-wrap">{generatedContent}</p>
@@ -79,34 +110,6 @@ export const PostGenerator = () => {
             </div>
           )}
         </Card>
-      </div>
-
-      {/* Section Options */}
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Choisis un type de publications</h2>
-          <PostTypeSelect 
-            value={selectedType}
-            onValueChange={setSelectedType}
-          />
-        </div>
-
-        {selectedPostType && (
-          <div className="space-y-4">
-            <p className="text-muted-foreground">
-              {selectedPostType.description}
-            </p>
-            
-            <Button
-              onClick={handleGenerate}
-              disabled={isGenerating}
-              className="w-full"
-            >
-              <Send className="w-4 h-4 mr-2" />
-              {generatedContent ? "Générer une autre publication" : "Générer une publication"}
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );
