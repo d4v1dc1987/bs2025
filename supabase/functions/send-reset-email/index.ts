@@ -1,12 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
-
-const SENDGRID_API_KEY = Deno.env.get("SENDGRID_API_KEY");
 
 interface EmailRequest {
   email: string;
@@ -14,6 +14,7 @@ interface EmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -74,35 +75,23 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+    const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${SENDGRID_API_KEY}`,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        personalizations: [
-          {
-            to: [{ email }],
-          },
-        ],
-        from: {
-          email: "noreply@bobbysocial.com",
-          name: "Bobby Social",
-        },
+        from: "Bobby Social <noreply@bobbysocial.com>",
+        to: [email],
         subject: "Réinitialisation de votre mot de passe - Bobby Social",
-        content: [
-          {
-            type: "text/html",
-            value: emailHtml,
-          },
-        ],
+        html: emailHtml,
       }),
     });
 
     if (!res.ok) {
       const error = await res.text();
-      throw new Error(`SendGrid API error: ${error}`);
+      throw new Error(`Resend API error: ${error}`);
     }
 
     return new Response(JSON.stringify({ success: true }), {
