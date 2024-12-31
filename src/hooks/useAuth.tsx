@@ -11,50 +11,58 @@ export const useAuth = () => {
 
   // Function to force clear all Supabase auth data
   const forceClearAuth = () => {
-    // Clear all Supabase related items from storage
     localStorage.removeItem("sb-jxqeoenhiqdtzzqbjwqz-auth-token");
     sessionStorage.removeItem("sb-jxqeoenhiqdtzzqbjwqz-auth-token");
-    
-    // Clear session state
     setUser(null);
-    
-    // Redirect to auth page
     navigate("/auth?mode=login");
   };
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error("Session error:", error);
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Session error:", error);
+          forceClearAuth();
+          return;
+        }
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error("Auth initialization error:", error);
         forceClearAuth();
-        return;
+      } finally {
+        setLoading(false);
       }
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    };
 
-    // Listen for changes
+    initializeAuth();
+
+    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
-      if (event === "SIGNED_OUT" || event === "TOKEN_REFRESHED" && !session) {
+      
+      if (event === "SIGNED_OUT" || (event === "TOKEN_REFRESHED" && !session)) {
         forceClearAuth();
-      } else if (event === "SIGNED_IN") {
+      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
         setUser(session?.user ?? null);
-        navigate("/dashboard");
+        if (event === "SIGNED_IN") {
+          navigate("/dashboard");
+        }
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
-        // If we get a 403 or user_not_found error, force clear the auth state
         if (error.status === 403 || error.message.includes("user_not_found")) {
           console.log("Forcing auth clear due to deleted user");
           forceClearAuth();
@@ -67,7 +75,6 @@ export const useAuth = () => {
       toast.success("Déconnexion réussie");
     } catch (error: any) {
       console.error("Logout error:", error);
-      // Even if there's an error, force clear the auth state
       forceClearAuth();
       toast.success("Session terminée");
     }
