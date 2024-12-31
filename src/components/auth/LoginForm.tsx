@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useLogin } from "@/hooks/useLogin";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
@@ -30,6 +31,7 @@ export const LoginForm = () => {
   const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const { login, isLoading } = useLogin();
+  const [error, setError] = useState<string | null>(null);
   
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -41,6 +43,9 @@ export const LoginForm = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
+    setError(null);
+    console.log("Soumission du formulaire avec email:", values.email);
+    
     const response = await login({
       email: values.email,
       password: values.password,
@@ -49,12 +54,30 @@ export const LoginForm = () => {
     if (response.success) {
       const returnUrl = searchParams.get("returnUrl");
       navigate(returnUrl ? decodeURIComponent(returnUrl) : "/dashboard");
+    } else {
+      // Gestion spécifique des erreurs
+      switch (response.error) {
+        case "credentials":
+          setError("Identifiants incorrects. Veuillez vérifier votre email et mot de passe.");
+          break;
+        case "email_not_confirmed":
+          setError("Veuillez confirmer votre email avant de vous connecter.");
+          break;
+        default:
+          setError("Une erreur est survenue. Veuillez réessayer plus tard.");
+      }
     }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
         <div className="space-y-4">
           <FormField
             control={form.control}
