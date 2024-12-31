@@ -10,7 +10,10 @@ interface LoginCredentials {
 
 interface LoginResponse {
   success: boolean;
-  error?: string;
+  error?: {
+    code: string;
+    message: string;
+  };
 }
 
 export const useLogin = () => {
@@ -19,48 +22,90 @@ export const useLogin = () => {
   const login = async ({ email, password }: LoginCredentials): Promise<LoginResponse> => {
     try {
       setIsLoading(true);
-      console.log("Tentative de connexion pour:", email);
       
-      // Nettoyage des entrées
+      // Nettoyage et validation des entrées
       const cleanEmail = email.trim().toLowerCase();
       const cleanPassword = password.trim();
       
-      console.log("Envoi de la requête à Supabase...");
+      if (!cleanEmail || !cleanPassword) {
+        console.error("Email ou mot de passe manquant");
+        return {
+          success: false,
+          error: {
+            code: "missing_credentials",
+            message: "Veuillez remplir tous les champs"
+          }
+        };
+      }
+
+      console.log("Tentative de connexion avec:", cleanEmail);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
-        password: cleanPassword,
+        password: cleanPassword
       });
 
       if (error) {
-        console.error("Erreur Supabase:", {
+        console.error("Erreur d'authentification:", {
+          name: error.name,
           message: error.message,
-          status: error.status,
-          name: error.name
+          status: error.status
         });
-        
+
         // Gestion spécifique des erreurs d'authentification
         if (error.message.includes("Invalid login credentials")) {
-          toast.error("Email ou mot de passe incorrect");
-          return { success: false, error: "credentials" };
+          return {
+            success: false,
+            error: {
+              code: "invalid_credentials",
+              message: "Email ou mot de passe incorrect"
+            }
+          };
         }
-        
+
         if (error.message.includes("Email not confirmed")) {
-          toast.error("Veuillez confirmer votre email avant de vous connecter");
-          return { success: false, error: "email_not_confirmed" };
+          return {
+            success: false,
+            error: {
+              code: "email_not_confirmed",
+              message: "Veuillez confirmer votre email avant de vous connecter"
+            }
+          };
         }
-        
+
         // Erreur par défaut
-        toast.error("Une erreur est survenue lors de la connexion");
-        return { success: false, error: "unknown" };
+        return {
+          success: false,
+          error: {
+            code: "unknown_error",
+            message: "Une erreur est survenue lors de la connexion"
+          }
+        };
+      }
+
+      if (!data.session) {
+        console.error("Session manquante après connexion réussie");
+        return {
+          success: false,
+          error: {
+            code: "no_session",
+            message: "Erreur lors de la création de la session"
+          }
+        };
       }
 
       console.log("Connexion réussie pour:", cleanEmail);
       return { success: true };
       
-    } catch (error: any) {
-      console.error("Erreur inattendue lors de la connexion:", error);
-      toast.error("Une erreur inattendue est survenue");
-      return { success: false, error: "unexpected" };
+    } catch (error) {
+      console.error("Erreur inattendue:", error);
+      return {
+        success: false,
+        error: {
+          code: "unexpected_error",
+          message: "Une erreur inattendue est survenue"
+        }
+      };
     } finally {
       setIsLoading(false);
     }

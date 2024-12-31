@@ -43,29 +43,24 @@ export const LoginForm = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    setError(null);
-    console.log("Soumission du formulaire avec email:", values.email);
-    
-    const response = await login({
-      email: values.email,
-      password: values.password,
-    });
+    try {
+      setError(null);
+      console.log("Tentative de connexion avec:", values.email);
+      
+      const response = await login({
+        email: values.email,
+        password: values.password,
+      });
 
-    if (response.success) {
-      const returnUrl = searchParams.get("returnUrl");
-      navigate(returnUrl ? decodeURIComponent(returnUrl) : "/dashboard");
-    } else {
-      // Gestion spécifique des erreurs
-      switch (response.error) {
-        case "credentials":
-          setError("Identifiants incorrects. Veuillez vérifier votre email et mot de passe.");
-          break;
-        case "email_not_confirmed":
-          setError("Veuillez confirmer votre email avant de vous connecter.");
-          break;
-        default:
-          setError("Une erreur est survenue. Veuillez réessayer plus tard.");
+      if (response.success) {
+        const returnUrl = searchParams.get("returnUrl");
+        navigate(returnUrl ? decodeURIComponent(returnUrl) : "/dashboard");
+      } else if (response.error) {
+        setError(response.error.message);
       }
+    } catch (error) {
+      console.error("Erreur lors de la soumission:", error);
+      setError("Une erreur inattendue est survenue");
     }
   };
 
@@ -73,7 +68,7 @@ export const LoginForm = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {error && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
@@ -94,6 +89,7 @@ export const LoginForm = () => {
                     className="bg-background/50 border-foreground/20"
                     {...field}
                     disabled={isLoading}
+                    autoComplete="email"
                   />
                 </FormControl>
                 <FormMessage />
@@ -114,6 +110,7 @@ export const LoginForm = () => {
                       className="bg-background/50 border-foreground/20 pr-10"
                       {...field}
                       disabled={isLoading}
+                      autoComplete="current-password"
                     />
                     <button
                       type="button"
