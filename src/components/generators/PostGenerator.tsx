@@ -65,6 +65,19 @@ export const PostGenerator = () => {
         aiBusinessSummary
       );
 
+      // Store the prompt in localStorage with timestamp
+      const promptEntry = {
+        prompt,
+        timestamp: new Date().toISOString()
+      };
+      const storedPrompts = localStorage.getItem('aiPrompts');
+      const prompts = storedPrompts ? JSON.parse(storedPrompts) : [];
+      prompts.unshift(promptEntry); // Add new prompt at the beginning
+      localStorage.setItem('aiPrompts', JSON.stringify(prompts.slice(0, 100))); // Keep last 100 prompts
+
+      // Dispatch event to notify PromptViewer
+      window.dispatchEvent(new Event('aiPromptAdded'));
+
       const { data, error } = await supabase.functions.invoke("generate-with-ai", {
         body: { prompt }
       });
