@@ -68,6 +68,12 @@ export const PostGenerator = () => {
         aiBusinessSummary
       );
 
+      // Ajout des logs pour voir le prompt exact
+      console.log('Type de post sélectionné:', selectedPostType.label);
+      console.log('Prompt de base:', basePrompt);
+      console.log('Valeurs des champs personnalisés:', customFieldValues);
+      console.log('Prompt final envoyé à OpenAI:', prompt);
+
       // Store the prompt in localStorage and trigger custom event
       const promptEntry = {
         prompt,
