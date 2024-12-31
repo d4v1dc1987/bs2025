@@ -31,26 +31,41 @@ export const useBusinessProfile = (userId: string | undefined) => {
 
     try {
       console.log('Fetching business profile for user:', userId);
-      const { data, error } = await supabase
+      
+      // First, ensure the business profile exists
+      const { data: existingProfile, error: checkError } = await supabase
         .from("business_profiles")
         .select("*")
         .eq("id", userId)
         .maybeSingle();
 
-      if (error) {
-        console.error("Error fetching business profile:", error);
-        throw error;
+      if (checkError) {
+        throw checkError;
       }
 
-      console.log('Fetched business profile:', data);
-      
-      // Merge the fetched data with default values to ensure all fields are defined
-      setFormData({
-        ...defaultBusinessProfile,
-        ...data,
-      });
+      // If no profile exists, create one
+      if (!existingProfile) {
+        console.log('No business profile found, creating one...');
+        const { error: insertError } = await supabase
+          .from("business_profiles")
+          .insert([{ id: userId }]);
+
+        if (insertError) {
+          throw insertError;
+        }
+
+        // Set default values after creating profile
+        setFormData(defaultBusinessProfile);
+      } else {
+        console.log('Found existing business profile:', existingProfile);
+        // Merge existing data with defaults to ensure all fields are defined
+        setFormData({
+          ...defaultBusinessProfile,
+          ...existingProfile,
+        });
+      }
     } catch (error) {
-      console.error("Error fetching business profile:", error);
+      console.error("Error fetching/creating business profile:", error);
       toast.error("Erreur lors du chargement du profil business");
     } finally {
       setIsLoading(false);

@@ -49,7 +49,8 @@ export const BusinessSection = () => {
 
       const { error } = await supabase
         .from("business_profiles")
-        .update({
+        .upsert({
+          id: user.id,
           business_name: formData.business_name,
           business_type: formData.business_type,
           business_ownership: formData.business_ownership,
@@ -63,8 +64,7 @@ export const BusinessSection = () => {
           company_story: formData.company_story,
           company_values: formData.company_values,
           ai_summary: formData.ai_summary,
-        })
-        .eq("id", user.id);
+        });
 
       if (error) throw error;
 
