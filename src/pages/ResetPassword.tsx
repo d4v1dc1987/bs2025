@@ -43,10 +43,6 @@ const ResetPassword = () => {
       // Important: On désactive complètement l'email automatique de Supabase
       const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
         redirectTo: null,
-        options: {
-          // Cette option est cruciale pour désactiver l'email automatique
-          emailRedirectTo: null,
-        }
       });
 
       if (error) {
