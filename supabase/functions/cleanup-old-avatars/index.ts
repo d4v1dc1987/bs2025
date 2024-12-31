@@ -30,8 +30,8 @@ serve(async (req) => {
     console.log(`Starting cleanup for user ${userId}`)
     console.log(`Current avatar URL: ${currentAvatarUrl}`)
 
-    // 1. Get all files in the avatars bucket
-    const { data: allFiles, error: listError } = await supabase.storage
+    // 1. Get all files in the user's directory
+    const { data: userFiles, error: listError } = await supabase.storage
       .from('avatars')
       .list(userId, {
         limit: 100,
@@ -47,18 +47,18 @@ serve(async (req) => {
       )
     }
 
-    console.log(`Found ${allFiles?.length || 0} files in user directory`)
+    console.log(`Found ${userFiles?.length || 0} files in user directory`)
 
     // Get the current avatar filename from the URL if it exists
     const currentAvatarPath = currentAvatarUrl ? new URL(currentAvatarUrl).pathname.split('/').pop() : null
     console.log(`Current avatar filename: ${currentAvatarPath}`)
 
-    // Filter out the current avatar and prepare paths for deletion
-    const filesToDelete = allFiles
+    // Delete all files except the current avatar
+    const filesToDelete = userFiles
       ?.filter(file => file.name !== currentAvatarPath)
       .map(file => `${userId}/${file.name}`) || []
 
-    console.log(`Files to delete: ${filesToDelete.length}`)
+    console.log(`Files to delete for user ${userId}: ${filesToDelete.length}`)
     
     if (filesToDelete.length > 0) {
       const { error: deleteError } = await supabase.storage
@@ -73,10 +73,10 @@ serve(async (req) => {
         )
       }
 
-      console.log(`Successfully deleted ${filesToDelete.length} files`)
+      console.log(`Successfully deleted ${filesToDelete.length} old avatar files for user ${userId}`)
     }
 
-    // 2. Clean up empty folders for inactive users
+    // 2. Clean up folders for deleted users
     const { data: activeUsers, error: usersError } = await supabase
       .from('profiles')
       .select('id')
@@ -113,15 +113,15 @@ serve(async (req) => {
 
     console.log(`Found ${inactiveFolders.length} inactive user folders`)
 
-    // Delete folders for inactive users
+    // Delete all files in folders of inactive users
     for (const folderId of inactiveFolders) {
       const { data: folderFiles } = await supabase.storage
         .from('avatars')
         .list(folderId)
 
-      const filePaths = folderFiles?.map(file => `${folderId}/${file.name}`) || []
-      
-      if (filePaths.length > 0) {
+      if (folderFiles && folderFiles.length > 0) {
+        const filePaths = folderFiles.map(file => `${folderId}/${file.name}`)
+        
         const { error: cleanupError } = await supabase.storage
           .from('avatars')
           .remove(filePaths)
