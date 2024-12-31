@@ -34,10 +34,14 @@ export const AIProfileGenerator = ({
 
   useEffect(() => {
     const handleGeneration = async () => {
-      if (!isSubmitting || isGenerating.current) return;
+      if (!isSubmitting || isGenerating.current) {
+        console.log('Skipping generation: already in progress or not submitting');
+        return;
+      }
 
       try {
         isGenerating.current = true;
+        console.log('Starting profile generation...');
         startAnimation();
         
         const formattedAnswers = Object.entries(answers)
@@ -49,7 +53,10 @@ export const AIProfileGenerator = ({
           .replace('{answers}', formattedAnswers);
 
         if (!generationPromise.current) {
+          console.log('Initiating new generation promise');
           generationPromise.current = generateAIProfile(prompt);
+        } else {
+          console.log('Using existing generation promise');
         }
 
         const [generatedText] = await Promise.all([
@@ -57,7 +64,7 @@ export const AIProfileGenerator = ({
           new Promise(resolve => setTimeout(resolve, 7000))
         ]);
         
-        // Ensure we only update the profile once
+        console.log('Generation complete, updating profile');
         setGeneratedProfile(generatedText);
         
         stopAnimation();
@@ -71,12 +78,14 @@ export const AIProfileGenerator = ({
         generationPromise.current = null;
       } finally {
         isGenerating.current = false;
+        console.log('Generation process completed');
       }
     };
 
     handleGeneration();
 
     return () => {
+      console.log('Cleaning up generation process');
       generationPromise.current = null;
       isGenerating.current = false;
     };

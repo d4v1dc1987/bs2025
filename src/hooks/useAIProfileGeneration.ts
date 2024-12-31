@@ -9,6 +9,11 @@ export const useAIProfileGeneration = () => {
 
   const generateAIProfile = async (prompt: string): Promise<string> => {
     try {
+      if (isGeneratingProfile) {
+        console.log('Generation already in progress, skipping...');
+        throw new Error('Une génération est déjà en cours');
+      }
+
       setIsGeneratingProfile(true);
       setError(null);
 
