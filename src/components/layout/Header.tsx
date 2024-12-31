@@ -55,6 +55,11 @@ export const Header = () => {
                 variant="ghost" 
                 className="relative h-10 px-3 flex items-center gap-2 hover:bg-primary/10 group"
                 data-state="closed"
+                onPointerEnter={(e) => {
+                  if (window.innerWidth >= 768) {
+                    e.currentTarget.click();
+                  }
+                }}
               >
                 <Avatar className="h-8 w-8">
                   <AvatarImage 
@@ -83,6 +88,10 @@ export const Header = () => {
                 if (window.innerWidth >= 768) {
                   const trigger = document.querySelector('[data-state="open"]');
                   if (trigger) trigger.setAttribute('data-state', 'closed');
+                  // Close the dropdown menu
+                  const closeEvent = new Event('keydown');
+                  Object.defineProperty(closeEvent, 'key', {value: 'Escape'});
+                  document.dispatchEvent(closeEvent);
                 }
               }}
             >
