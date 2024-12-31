@@ -21,6 +21,7 @@ const UpdatePassword = () => {
       const type = searchParams.get("type");
 
       if (!token_hash || !type || type !== "recovery") {
+        console.error("Invalid token parameters:", { token_hash, type });
         toast.error("Lien invalide. Veuillez réessayer.");
         navigate("/auth?mode=login");
         return;
