@@ -30,33 +30,42 @@ const handler = async (req: Request): Promise<Response> => {
         <head>
           <meta charset="utf-8">
           <title>Réinitialisation de mot de passe - Bobby Social</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
         </head>
-        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4; color: #403E43;">
           <table role="presentation" style="width: 100%; border-collapse: collapse;">
             <tr>
               <td style="padding: 40px 0; text-align: center; background-color: #7b27fb;">
-                <h1 style="color: white; margin: 0;">Bobby Social</h1>
+                <h1 style="color: white; margin: 0; font-size: 28px;">Bobby Social</h1>
               </td>
             </tr>
             <tr>
-              <td style="padding: 40px 20px; background-color: white;">
-                <div style="max-width: 600px; margin: 0 auto; text-align: center;">
-                  <h2 style="color: #333; margin-bottom: 20px;">Réinitialisation de votre mot de passe</h2>
-                  <p style="color: #666; margin-bottom: 30px;">
-                    Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe.
+              <td style="padding: 40px 20px;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                  <h2 style="color: #7b27fb; margin-bottom: 20px; text-align: center; font-size: 24px;">
+                    Réinitialisation de votre mot de passe
+                  </h2>
+                  <p style="color: #403E43; margin-bottom: 30px; line-height: 1.6; font-size: 16px;">
+                    Bonjour,<br><br>
+                    Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte Bobby Social. 
+                    Pour procéder à la réinitialisation, cliquez sur le bouton ci-dessous.
                   </p>
-                  <a href="${resetLink}" style="display: inline-block; padding: 12px 24px; background-color: #7b27fb; color: white; text-decoration: none; border-radius: 4px; margin-bottom: 30px;">
-                    Réinitialiser mon mot de passe
-                  </a>
-                  <p style="color: #999; font-size: 12px;">
-                    Si vous n'avez pas demandé la réinitialisation de votre mot de passe, vous pouvez ignorer cet email.
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="${resetLink}" 
+                       style="display: inline-block; padding: 14px 28px; background-color: #7b27fb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+                      Réinitialiser mon mot de passe
+                    </a>
+                  </div>
+                  <p style="color: #666; font-size: 14px; margin-top: 30px; text-align: center; line-height: 1.6;">
+                    Si vous n'avez pas demandé la réinitialisation de votre mot de passe, vous pouvez ignorer cet email.<br>
+                    Ce lien expirera dans 24 heures pour des raisons de sécurité.
                   </p>
                 </div>
               </td>
             </tr>
             <tr>
               <td style="padding: 20px; text-align: center; background-color: #f8f8f8;">
-                <p style="color: #999; font-size: 12px; margin: 0;">
+                <p style="color: #666; font-size: 12px; margin: 0;">
                   © 2024 Bobby Social. Tous droits réservés.
                 </p>
               </td>
