@@ -105,7 +105,7 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
 
       <div className="space-y-2">
         <Label htmlFor="price_range" className="text-[#c299ff]">
-          Quel est ton ticket moyen ?
+          Combien coûtent tes services en moyenne ?
         </Label>
         <Input
           id="price_range"
