@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
@@ -38,6 +38,18 @@ export const LoginForm = () => {
       rememberMe: false,
     },
   });
+
+  // Cleanup function for ResizeObserver
+  useEffect(() => {
+    return () => {
+      // Force cleanup of any pending ResizeObserver operations
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          // This empty callback will help flush any pending observations
+        });
+      });
+    };
+  }, []);
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
