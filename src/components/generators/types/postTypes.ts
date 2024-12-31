@@ -16,7 +16,13 @@ export type PostType = {
   customFields?: CustomField[];
 };
 
-export const createPromptWithUserContext = (basePrompt: string, aiPersonalitySummary: string | null, aiBusinessSummary: string | null) => {
+export const createPromptWithUserContext = (
+  basePrompt: string,
+  aiPersonalitySummary: string | null,
+  aiBusinessSummary: string | null,
+  selectedPostType: PostType | null,
+  customFieldValues: Record<string, string>
+) => {
   let fullPrompt = basePrompt;
 
   if (selectedPostType?.customFields) {

@@ -24,7 +24,12 @@ export const useAuth = () => {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("Session error:", error);
+        forceClearAuth();
+        return;
+      }
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -34,7 +39,7 @@ export const useAuth = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
-      if (event === "SIGNED_OUT") {
+      if (event === "SIGNED_OUT" || event === "TOKEN_REFRESHED" && !session) {
         forceClearAuth();
       } else if (event === "SIGNED_IN") {
         setUser(session?.user ?? null);
