@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { UpdatePasswordForm } from "@/components/auth/UpdatePasswordForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,42 +9,54 @@ import { Button } from "@/components/ui/button";
 
 const UpdatePassword = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isValidSession, setIsValidSession] = useState(false);
+  const [isValidToken, setIsValidToken] = useState(false);
 
   useEffect(() => {
-    const checkSession = async () => {
+    const validateToken = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        // Récupérer le token et le type depuis l'URL
+        const hashParams = new URLSearchParams(location.hash.substring(1));
+        const queryParams = new URLSearchParams(location.search);
         
-        if (error) {
-          console.error("Session check error:", error);
-          toast.error("Session invalide. Veuillez réessayer.");
+        const accessToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token");
+        const type = queryParams.get("type");
+
+        console.log("Token validation:", { accessToken, type });
+
+        if (!accessToken || type !== "recovery") {
+          console.error("Invalid token or type");
+          toast.error("Lien de réinitialisation invalide");
           navigate("/auth?mode=login");
           return;
         }
 
-        if (!session) {
-          const params = new URLSearchParams(window.location.search);
-          if (!params.get("token") || params.get("type") !== "recovery") {
-            console.error("No valid recovery token found");
-            toast.error("Lien invalide. Veuillez réessayer.");
-            navigate("/auth?mode=login");
-            return;
-          }
+        // Définir la session avec le token de réinitialisation
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken || "",
+        });
+
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          toast.error("Session invalide");
+          navigate("/auth?mode=login");
+          return;
         }
 
-        setIsValidSession(true);
+        setIsValidToken(true);
       } catch (error) {
-        console.error("Session validation error:", error);
-        toast.error("Une erreur est survenue. Veuillez réessayer.");
+        console.error("Token validation error:", error);
+        toast.error("Une erreur est survenue");
         navigate("/auth?mode=login");
       }
     };
 
-    checkSession();
-  }, [navigate]);
+    validateToken();
+  }, [navigate, location]);
 
   const handlePasswordUpdate = async (values: { password: string }) => {
     try {
@@ -67,14 +79,14 @@ const UpdatePassword = () => {
       setIsSuccess(true);
       
     } catch (error: any) {
-      console.error("Caught error:", error);
+      console.error("Password update error:", error);
       toast.error(error.message || "Une erreur est survenue lors de la mise à jour du mot de passe");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (!isValidSession) {
+  if (!isValidToken) {
     return null;
   }
 
