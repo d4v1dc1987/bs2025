@@ -104,7 +104,8 @@ export const ProfileSection = ({
   };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Empêcher le comportement par défaut du formulaire
+    
     try {
       setIsLoading(true);
 
