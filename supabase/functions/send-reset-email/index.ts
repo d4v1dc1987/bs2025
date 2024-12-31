@@ -17,6 +17,7 @@ interface EmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -24,6 +25,10 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { email, resetLink }: EmailRequest = await req.json();
     console.log("Processing reset request for:", email);
+
+    if (!email || !resetLink) {
+      throw new Error("Email and resetLink are required");
+    }
 
     // Créer un client Supabase avec le rôle de service
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
@@ -47,6 +52,8 @@ const handler = async (req: Request): Promise<Response> => {
     if (!resetUrl) {
       throw new Error("No reset URL generated");
     }
+
+    console.log("Reset URL generated successfully");
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -99,6 +106,8 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
+    console.log("Sending email via Resend...");
+
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -127,7 +136,7 @@ const handler = async (req: Request): Promise<Response> => {
       status: 200,
     });
   } catch (error: any) {
-    console.error("Error sending reset email:", error);
+    console.error("Error in send-reset-email function:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

@@ -7,6 +7,13 @@ export const initiatePasswordReset = async (email: string) => {
     // 1. Désactiver complètement l'email automatique de Supabase
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/update-password`,
+      options: {
+        // Désactiver l'email automatique de Supabase
+        emailRedirectTo: `${window.location.origin}/update-password`,
+        data: {
+          disableEmail: true,
+        },
+      },
     });
 
     if (resetError) {
@@ -17,14 +24,21 @@ export const initiatePasswordReset = async (email: string) => {
     }
 
     // 2. Envoyer l'email via notre edge function
-    const response = await supabase.functions.invoke('send-reset-email', {
+    const { data, error: functionError } = await supabase.functions.invoke('send-reset-email', {
       body: { 
         email,
         resetLink: `${window.location.origin}/update-password`
       },
     });
 
-    if (response.error) throw response.error;
+    if (functionError) {
+      console.error("Edge function error:", functionError);
+      throw new Error("Une erreur est survenue lors de l'envoi de l'email");
+    }
+
+    if (!data?.success) {
+      throw new Error("Une erreur est survenue lors de l'envoi de l'email");
+    }
 
     return { success: true };
   } catch (error: any) {
