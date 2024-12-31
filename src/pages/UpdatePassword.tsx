@@ -26,7 +26,7 @@ const UpdatePassword = () => {
         return;
       }
 
-      // Update the password directly
+      // Update the password
       const { error } = await supabase.auth.updateUser({
         password: values.password
       });
@@ -39,11 +39,19 @@ const UpdatePassword = () => {
       }
 
       console.log("Password updated successfully");
-      toast.success("Votre mot de passe a été mis à jour");
       
-      // Sign out the user to ensure a clean state
+      // Sign out the user
       await supabase.auth.signOut();
-      navigate("/auth?mode=login");
+      
+      // Show success message and redirect to login
+      toast.success("Votre mot de passe a été mis à jour avec succès. Veuillez vous reconnecter avec votre nouveau mot de passe.", {
+        duration: 5000
+      });
+      
+      // Redirect to login page after a short delay to ensure the toast is visible
+      setTimeout(() => {
+        navigate("/auth?mode=login");
+      }, 1000);
       
     } catch (error: any) {
       console.error("Caught error:", error);
