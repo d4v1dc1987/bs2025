@@ -31,24 +31,18 @@ export const ProfileSection = ({
 
   const cleanupOldAvatars = async (userId: string, currentAvatarUrl: string | null) => {
     try {
-      const response = await fetch('/functions/v1/cleanup-old-avatars', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        },
-        body: JSON.stringify({
+      const { error } = await supabase.functions.invoke('cleanup-old-avatars', {
+        body: {
           userId,
           currentAvatarUrl
-        })
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to cleanup old avatars');
+      if (error) {
+        throw error;
       }
 
-      const data = await response.json();
-      console.log('Cleanup result:', data);
+      console.log('Cleanup completed successfully');
     } catch (error) {
       console.error('Error cleaning up old avatars:', error);
     }

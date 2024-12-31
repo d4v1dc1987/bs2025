@@ -1,4 +1,4 @@
 project_id = "jxqeoenhiqdtzzqbjwqz"
 
-[functions.generate-with-ai]
-verify_jwt = false
+[functions.cleanup-old-avatars]
+verify_jwt = true
