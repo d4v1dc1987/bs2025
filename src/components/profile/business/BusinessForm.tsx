@@ -19,7 +19,7 @@ interface BusinessFormProps {
 export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps) => {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="business_name" className="text-[#c299ff]">
             Quel est le nom de ton entreprise ou de la compagnie que tu représentes?
@@ -28,10 +28,13 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
             id="business_name"
             value={formData.business_name || ""}
             onChange={(e) => handleInputChange("business_name", e.target.value)}
-            placeholder="Ex: Melaleuca, ta propre entreprise, ou autre"
+            placeholder="Nom de ton entreprise"
             maxLength={100}
-            className="bg-background/50 border-foreground/20"
+            className="bg-background/50 border-foreground/20 text-sm"
           />
+          <p className="text-sm text-muted-foreground mt-1">
+            Exemple : Melaleuca, ta propre entreprise, ou autre.
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -65,14 +68,31 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
         <Label htmlFor="industry" className="text-[#c299ff]">
           Dans quel domaine ou industrie ton entreprise évolue-t-elle?
         </Label>
-        <Input
-          id="industry"
+        <Select
           value={formData.industry || ""}
-          onChange={(e) => handleInputChange("industry", e.target.value)}
-          placeholder="Ex: bien-être, coaching, marketing, beauté, technologie"
-          maxLength={100}
-          className="bg-background/50 border-foreground/20"
-        />
+          onValueChange={(value) => handleInputChange("industry", value)}
+        >
+          <SelectTrigger className="bg-background/50 border-foreground/20">
+            <SelectValue placeholder="Choisis ton industrie" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="bien-etre">Bien-être et santé</SelectItem>
+            <SelectItem value="coaching-personnel">Coaching personnel</SelectItem>
+            <SelectItem value="coaching-business">Coaching business</SelectItem>
+            <SelectItem value="marketing">Marketing digital</SelectItem>
+            <SelectItem value="beaute">Beauté et cosmétiques</SelectItem>
+            <SelectItem value="technologie">Technologie</SelectItem>
+            <SelectItem value="education">Éducation et formation</SelectItem>
+            <SelectItem value="finance">Finance et investissement</SelectItem>
+            <SelectItem value="immobilier">Immobilier</SelectItem>
+            <SelectItem value="e-commerce">E-commerce</SelectItem>
+            <SelectItem value="alimentation">Alimentation et nutrition</SelectItem>
+            <SelectItem value="sport">Sport et fitness</SelectItem>
+            <SelectItem value="art-creativite">Art et créativité</SelectItem>
+            <SelectItem value="developpement-personnel">Développement personnel</SelectItem>
+            <SelectItem value="autre">Autre</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
@@ -83,10 +103,13 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           id="main_product"
           value={formData.main_product || ""}
           onChange={(e) => handleInputChange("main_product", e.target.value)}
-          placeholder="Ex: produits de santé, outils pour réseaux sociaux, formations en ligne"
+          placeholder="Ton produit ou service principal"
           maxLength={200}
-          className="bg-background/50 border-foreground/20"
+          className="bg-background/50 border-foreground/20 text-sm"
         />
+        <p className="text-sm text-muted-foreground mt-1">
+          Exemple : produits de santé, outils pour réseaux sociaux, formations en ligne
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -97,10 +120,13 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           id="target_audience"
           value={formData.target_audience || ""}
           onChange={(e) => handleInputChange("target_audience", e.target.value)}
-          placeholder="Ex: familles, entrepreneurs, sportifs, étudiants, etc."
+          placeholder="Décris ton audience cible de manière détaillée"
           maxLength={500}
-          className="bg-background/50 border-foreground/20 min-h-[100px]"
+          className="bg-background/50 border-foreground/20 min-h-[100px] text-sm"
         />
+        <p className="text-sm text-muted-foreground mt-1">
+          Sois le plus précis possible : âge, profession, situation familiale, intérêts, besoins spécifiques. Par exemple : "femmes de 25-40 ans, mères de famille, intéressées par le bien-être et les produits naturels"
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -111,10 +137,13 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           id="problem_solved"
           value={formData.problem_solved || ""}
           onChange={(e) => handleInputChange("problem_solved", e.target.value)}
-          placeholder="Ex: fatigue, besoin de revenus supplémentaires, organisation, etc."
+          placeholder="Les problèmes que tu résous"
           maxLength={500}
-          className="bg-background/50 border-foreground/20 min-h-[100px]"
+          className="bg-background/50 border-foreground/20 min-h-[100px] text-sm"
         />
+        <p className="text-sm text-muted-foreground mt-1">
+          Exemple : fatigue, besoin de revenus supplémentaires, organisation, etc.
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -125,10 +154,13 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           id="goals"
           value={formData.goals || ""}
           onChange={(e) => handleInputChange("goals", e.target.value)}
-          placeholder="Ex: aider les gens à économiser, à être en meilleure santé, à réussir en ligne"
+          placeholder="L'objectif de ton entreprise"
           maxLength={500}
-          className="bg-background/50 border-foreground/20 min-h-[100px]"
+          className="bg-background/50 border-foreground/20 min-h-[100px] text-sm"
         />
+        <p className="text-sm text-muted-foreground mt-1">
+          Exemple : aider les gens à économiser, à être en meilleure santé, à réussir en ligne
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -139,10 +171,13 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           id="client_results"
           value={formData.client_results || ""}
           onChange={(e) => handleInputChange("client_results", e.target.value)}
-          placeholder="Ex: plus d'énergie, plus de revenus, meilleure santé, plus de temps libre"
+          placeholder="Les résultats obtenus par tes clients"
           maxLength={500}
-          className="bg-background/50 border-foreground/20 min-h-[100px]"
+          className="bg-background/50 border-foreground/20 min-h-[100px] text-sm"
         />
+        <p className="text-sm text-muted-foreground mt-1">
+          Exemple : plus d'énergie, plus de revenus, meilleure santé, plus de temps libre
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -153,10 +188,13 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           id="company_age"
           value={formData.company_age || ""}
           onChange={(e) => handleInputChange("company_age", e.target.value)}
-          placeholder="Ex: moins d'un an, 1-3 ans, plus de 5 ans"
+          placeholder="L'âge de ton entreprise"
           maxLength={50}
-          className="bg-background/50 border-foreground/20"
+          className="bg-background/50 border-foreground/20 text-sm"
         />
+        <p className="text-sm text-muted-foreground mt-1">
+          Exemple : moins d'un an, 1-3 ans, plus de 5 ans
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -167,10 +205,13 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           id="company_story"
           value={formData.company_story || ""}
           onChange={(e) => handleInputChange("company_story", e.target.value)}
-          placeholder="Ex: aider les gens à se sentir mieux, proposer des solutions simples et accessibles"
+          placeholder="L'histoire de ton entreprise"
           maxLength={1000}
-          className="bg-background/50 border-foreground/20 min-h-[100px]"
+          className="bg-background/50 border-foreground/20 min-h-[100px] text-sm"
         />
+        <p className="text-sm text-muted-foreground mt-1">
+          Exemple : aider les gens à se sentir mieux, proposer des solutions simples et accessibles
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -181,10 +222,13 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           id="company_values"
           value={formData.company_values || ""}
           onChange={(e) => handleInputChange("company_values", e.target.value)}
-          placeholder="Ex: qualité, transparence, innovation, respect de l'environnement"
+          placeholder="Les valeurs de ton entreprise"
           maxLength={500}
-          className="bg-background/50 border-foreground/20 min-h-[100px]"
+          className="bg-background/50 border-foreground/20 min-h-[100px] text-sm"
         />
+        <p className="text-sm text-muted-foreground mt-1">
+          Exemple : qualité, transparence, innovation, respect de l'environnement
+        </p>
       </div>
     </div>
   );

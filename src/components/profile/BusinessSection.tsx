@@ -71,7 +71,7 @@ export const BusinessSection = () => {
       setIsGenerating(true);
       const { data, error } = await supabase.functions.invoke("generate-with-ai", {
         body: {
-          prompt: `En tant qu'expert en marketing digital, crée un résumé professionnel et concis (3-4 phrases maximum) de cette entreprise en ligne, en utilisant "Je" ou "Mon" comme si c'était l'entrepreneur qui parlait. Utilise ces informations:
+          prompt: `En tant qu'expert en marketing digital, crée un résumé professionnel détaillé (4-6 phrases) de cette entreprise en ligne, en utilisant "Je" ou "Mon" comme si c'était l'entrepreneur qui parlait. Mets l'accent sur la valeur unique et les résultats concrets. Utilise ces informations:
           
           Nom de l'entreprise: ${formData.business_name}
           Type d'entreprise: ${formData.business_type}
