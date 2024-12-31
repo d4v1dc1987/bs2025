@@ -1,48 +1,113 @@
 import { useState } from "react";
-import { Send } from "lucide-react";
+import { Send, Copy, CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PostTypeSelect, getPostTypeById } from "./PostTypeSelect";
+import { Card } from "@/components/ui/card";
+import { toast } from "sonner";
 
 export const PostGenerator = () => {
-  const [topic, setTopic] = useState("");
+  const [selectedType, setSelectedType] = useState<string>();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState<string>();
+  const [hasHistory, setHasHistory] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // La logique de génération sera ajoutée plus tard
-    console.log("Generating post ideas for:", topic);
+  const selectedPostType = selectedType ? getPostTypeById(selectedType) : undefined;
+
+  const handleGenerate = async () => {
+    if (!selectedType) return;
+    
+    setIsGenerating(true);
+    try {
+      // Temporairement, on simule la génération
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setGeneratedContent("Voici un exemple de contenu généré pour votre publication Facebook ! 🎉");
+      setHasHistory(true);
+    } catch (error) {
+      console.error("Erreur lors de la génération:", error);
+      toast.error("Une erreur est survenue lors de la génération");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCopy = () => {
+    if (!generatedContent) return;
+    
+    navigator.clipboard.writeText(generatedContent);
+    toast.success("Texte copié !");
+  };
+
+  const handleSchedule = () => {
+    // À implémenter plus tard
+    toast.info("Fonctionnalité à venir !");
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-sidebar-foreground">
-        Générateur d'idées de posts
-      </h1>
-      <p className="text-sidebar-foreground/70 mb-8">
-        Décrivez votre sujet ou votre objectif, et laissez Bobby Social vous
-        proposer des idées de publications engageantes.
-      </p>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="grid gap-6 lg:grid-cols-2">
+      {/* Section Résultat */}
+      <div className="space-y-4">
+        <Card className="p-6 min-h-[300px] bg-card/50 backdrop-blur-sm">
+          {generatedContent ? (
+            <div className="space-y-4">
+              <p className="whitespace-pre-wrap">{generatedContent}</p>
+              <div className="flex gap-2">
+                <Button onClick={handleCopy} variant="secondary" size="sm">
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copier le texte
+                </Button>
+                <Button onClick={handleSchedule} variant="secondary" size="sm">
+                  <CalendarDays className="w-4 h-4 mr-2" />
+                  Programmer
+                </Button>
+              </div>
+              {hasHistory && (
+                <div className="flex gap-2 mt-4">
+                  <Button variant="outline" size="sm">
+                    <ChevronLeft className="w-4 h-4 mr-2" />
+                    Précédent
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Suivant
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full text-muted-foreground">
+              Sélectionne un type de publication pour commencer
+            </div>
+          )}
+        </Card>
+      </div>
+
+      {/* Section Options */}
+      <div className="space-y-6">
         <div>
-          <label htmlFor="topic" className="block text-sm font-medium text-sidebar-foreground mb-2">
-            Sujet ou objectif
-          </label>
-          <textarea
-            id="topic"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            className="w-full p-3 bg-sidebar border border-sidebar-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sidebar-foreground placeholder:text-sidebar-foreground/50"
-            rows={4}
-            placeholder="Ex: Je veux promouvoir mon nouveau service de coaching en développement personnel..."
+          <h2 className="text-lg font-semibold mb-2">Choisis un type de publications</h2>
+          <PostTypeSelect 
+            value={selectedType}
+            onValueChange={setSelectedType}
           />
         </div>
-        
-        <button
-          type="submit"
-          className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
-        >
-          Générer des idées
-          <Send className="w-5 h-5" />
-        </button>
-      </form>
+
+        {selectedPostType && (
+          <div className="space-y-4">
+            <p className="text-muted-foreground">
+              {selectedPostType.description}
+            </p>
+            
+            <Button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="w-full"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              {generatedContent ? "Générer une autre publication" : "Générer une publication"}
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
