@@ -10,6 +10,7 @@ interface NavButtonProps {
   isActive: boolean;
   isOpen: boolean;
   onClick: () => void;
+  className?: string;
 }
 
 export const NavButton = ({ 
@@ -18,7 +19,8 @@ export const NavButton = ({
   label, 
   isActive, 
   isOpen, 
-  onClick 
+  onClick,
+  className 
 }: NavButtonProps) => {
   return (
     <Button
@@ -29,7 +31,8 @@ export const NavButton = ({
         "hover:bg-primary/20 hover:text-white",
         isActive && "bg-primary/30 text-white border border-primary/30",
         !isOpen && "md:justify-center",
-        "mb-1" // Réduction de la marge en bas pour un espacement plus uniforme
+        "mb-1",
+        className
       )}
       asChild
       onClick={onClick}

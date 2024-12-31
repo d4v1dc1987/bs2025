@@ -22,7 +22,7 @@ export const MainNavigation = ({ isOpen, onLinkClick, isDisabled }: MainNavigati
           isOpen={isOpen}
           onClick={onLinkClick}
           className={cn(
-            isDisabled && "opacity-50 pointer-events-none cursor-not-allowed"
+            isDisabled && "opacity-50 pointer-events-none"
           )}
         />
       ))}
