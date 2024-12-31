@@ -27,9 +27,9 @@ const UpdatePassword = () => {
         return;
       }
 
-      // Verify the token
+      // Verify the token using token hash method
       const { error: verifyError } = await supabase.auth.verifyOtp({
-        token,
+        token_hash: token,
         type: 'recovery'
       });
 
