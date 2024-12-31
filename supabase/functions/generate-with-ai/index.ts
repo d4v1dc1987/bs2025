@@ -43,7 +43,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that generates professional social media profiles based on user information. Keep the tone professional but friendly.'
+            content: 'You are a helpful assistant that generates professional business profiles based on user information. Keep the tone professional but friendly.'
           },
           { role: 'user', content: prompt }
         ],

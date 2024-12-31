@@ -4,7 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileSection } from "@/components/profile/ProfileSection";
 import { SecuritySection } from "@/components/profile/SecuritySection";
 import { PersonalitySection } from "@/components/profile/PersonalitySection";
-import { PersonStanding, User, Shield } from "lucide-react";
+import { BusinessSection } from "@/components/profile/BusinessSection";
+import { PersonStanding, User, Shield, Building } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
@@ -75,6 +76,13 @@ const Profile = () => {
                 Personnalité
               </TabsTrigger>
               <TabsTrigger 
+                value="business" 
+                className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none whitespace-nowrap"
+              >
+                <Building className="mr-2 h-4 w-4" />
+                Ma Business
+              </TabsTrigger>
+              <TabsTrigger 
                 value="security" 
                 className="relative h-12 rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-3 font-medium text-muted-foreground shadow-none transition-none data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none whitespace-nowrap"
               >
@@ -97,6 +105,10 @@ const Profile = () => {
 
           <TabsContent value="personality" className="m-0">
             <PersonalitySection />
+          </TabsContent>
+
+          <TabsContent value="business" className="m-0">
+            <BusinessSection />
           </TabsContent>
           
           <TabsContent value="security" className="m-0">

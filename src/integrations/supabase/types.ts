@@ -9,6 +9,57 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      business_profiles: {
+        Row: {
+          ai_summary: string | null
+          business_name: string | null
+          business_type: Database["public"]["Enums"]["business_type"] | null
+          challenges: string | null
+          created_at: string
+          goals: string | null
+          id: string
+          main_product: string | null
+          price_range: string | null
+          product_description: string | null
+          social_links: Json | null
+          target_audience: string | null
+          unique_value: string | null
+          updated_at: string
+        }
+        Insert: {
+          ai_summary?: string | null
+          business_name?: string | null
+          business_type?: Database["public"]["Enums"]["business_type"] | null
+          challenges?: string | null
+          created_at?: string
+          goals?: string | null
+          id: string
+          main_product?: string | null
+          price_range?: string | null
+          product_description?: string | null
+          social_links?: Json | null
+          target_audience?: string | null
+          unique_value?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ai_summary?: string | null
+          business_name?: string | null
+          business_type?: Database["public"]["Enums"]["business_type"] | null
+          challenges?: string | null
+          created_at?: string
+          goals?: string | null
+          id?: string
+          main_product?: string | null
+          price_range?: string | null
+          product_description?: string | null
+          social_links?: Json | null
+          target_audience?: string | null
+          unique_value?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       onboarding: {
         Row: {
           ai_summary: string | null
@@ -77,6 +128,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      business_type:
+        | "coach"
+        | "consultant"
+        | "influencer"
+        | "network_marketer"
+        | "online_trainer"
+        | "course_creator"
+        | "freelancer"
+        | "other"
       onboarding_status: "not_started" | "in_progress" | "completed"
       user_role: "user" | "admin" | "super-admin"
     }
