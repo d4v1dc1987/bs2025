@@ -31,25 +31,41 @@ export const BusinessSection = () => {
   });
 
   useEffect(() => {
-    fetchBusinessProfile();
-  }, [user]);
+    if (user?.id) {
+      fetchBusinessProfile();
+    }
+  }, [user?.id]);
 
   const fetchBusinessProfile = async () => {
-    if (!user) return;
-
     try {
+      console.log('Fetching business profile for user:', user?.id);
       const { data, error } = await supabase
         .from("business_profiles")
         .select("*")
-        .eq("id", user.id)
+        .eq("id", user?.id)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching business profile:", error);
+        throw error;
+      }
 
+      console.log('Fetched business profile:', data);
       if (data) {
         setFormData({
-          ...data,
+          business_name: data.business_name || "",
+          business_type: data.business_type || null,
           business_ownership: data.business_ownership || null,
+          industry: data.industry || "",
+          main_product: data.main_product || "",
+          target_audience: data.target_audience || "",
+          problem_solved: data.problem_solved || "",
+          goals: data.goals || "",
+          client_results: data.client_results || "",
+          company_age: data.company_age || "",
+          company_story: data.company_story || "",
+          company_values: data.company_values || "",
+          ai_summary: data.ai_summary || null,
         });
       }
     } catch (error) {
@@ -97,6 +113,7 @@ export const BusinessSection = () => {
       const aiSummary = data.generatedText;
       setFormData((prev) => ({ ...prev, ai_summary: aiSummary }));
 
+      // Mise à jour du résumé AI dans la base de données
       const { error: updateError } = await supabase
         .from("business_profiles")
         .update({ ai_summary: aiSummary })
@@ -115,10 +132,11 @@ export const BusinessSection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user?.id) return;
 
     try {
       setIsSaving(true);
+      console.log('Saving business profile:', formData);
 
       const { error } = await supabase
         .from("business_profiles")
@@ -135,12 +153,15 @@ export const BusinessSection = () => {
           company_age: formData.company_age,
           company_story: formData.company_story,
           company_values: formData.company_values,
+          ai_summary: formData.ai_summary,
         })
         .eq("id", user.id);
 
       if (error) throw error;
 
       toast.success("Profil business mis à jour avec succès");
+      // Recharger les données après la sauvegarde pour s'assurer que tout est à jour
+      await fetchBusinessProfile();
     } catch (error) {
       console.error("Error updating business profile:", error);
       toast.error("Erreur lors de la mise à jour du profil business");
