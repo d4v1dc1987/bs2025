@@ -1,30 +1,43 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { supabase } from "@/integrations/supabase/client";
 
 const PromptViewer = () => {
   const [prompts, setPrompts] = useState<{ prompt: string; timestamp: string }[]>([]);
 
   useEffect(() => {
-    // Subscribe to changes in localStorage
-    const handleStorageChange = () => {
+    // Function to load prompts from localStorage
+    const loadPrompts = () => {
       const storedPrompts = localStorage.getItem('aiPrompts');
       if (storedPrompts) {
-        setPrompts(JSON.parse(storedPrompts));
+        try {
+          const parsedPrompts = JSON.parse(storedPrompts);
+          setPrompts(parsedPrompts);
+          console.log('Loaded prompts:', parsedPrompts); // Debug log
+        } catch (error) {
+          console.error('Error parsing prompts:', error);
+        }
       }
     };
 
-    // Initial load
-    handleStorageChange();
+    // Load initial prompts
+    loadPrompts();
 
-    // Listen for changes
+    // Listen for storage events
+    const handleStorageChange = (event: StorageEvent | Event) => {
+      if ((event as StorageEvent).key === null || (event as StorageEvent).key === 'aiPrompts') {
+        loadPrompts();
+      }
+    };
+
     window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('aiPromptAdded', handleStorageChange);
+    
+    // Also listen for local storage changes in the same window
+    window.addEventListener('storage', handleStorageChange);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('aiPromptAdded', handleStorageChange);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 
@@ -39,16 +52,22 @@ const PromptViewer = () => {
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[600px] rounded-md border p-4">
-            {prompts.map((entry, index) => (
-              <div key={index} className="mb-6 last:mb-0">
-                <div className="text-sm text-muted-foreground mb-2">
-                  {new Date(entry.timestamp).toLocaleString()}
-                </div>
-                <div className="whitespace-pre-wrap bg-muted p-4 rounded-md">
-                  {entry.prompt}
-                </div>
+            {prompts.length === 0 ? (
+              <div className="text-center text-muted-foreground">
+                Aucun prompt n'a encore été généré. Générez du contenu pour voir les prompts apparaître ici.
               </div>
-            ))}
+            ) : (
+              prompts.map((entry, index) => (
+                <div key={index} className="mb-6 last:mb-0">
+                  <div className="text-sm text-muted-foreground mb-2">
+                    {new Date(entry.timestamp).toLocaleString()}
+                  </div>
+                  <div className="whitespace-pre-wrap bg-muted p-4 rounded-md">
+                    {entry.prompt}
+                  </div>
+                </div>
+              ))
+            )}
           </ScrollArea>
         </CardContent>
       </Card>

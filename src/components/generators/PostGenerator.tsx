@@ -48,7 +48,6 @@ export const PostGenerator = () => {
     try {
       let basePrompt = selectedPostType.prompt;
       
-      // Add custom field values to the prompt if they exist
       if (selectedPostType.customFields) {
         const fieldValues = selectedPostType.customFields
           .map(field => customFieldValues[field.name])
@@ -65,18 +64,18 @@ export const PostGenerator = () => {
         aiBusinessSummary
       );
 
-      // Store the prompt in localStorage with timestamp
+      // Store the prompt in localStorage and trigger storage event
       const promptEntry = {
         prompt,
         timestamp: new Date().toISOString()
       };
       const storedPrompts = localStorage.getItem('aiPrompts');
       const prompts = storedPrompts ? JSON.parse(storedPrompts) : [];
-      prompts.unshift(promptEntry); // Add new prompt at the beginning
-      localStorage.setItem('aiPrompts', JSON.stringify(prompts.slice(0, 100))); // Keep last 100 prompts
-
-      // Dispatch event to notify PromptViewer
-      window.dispatchEvent(new Event('aiPromptAdded'));
+      prompts.unshift(promptEntry);
+      localStorage.setItem('aiPrompts', JSON.stringify(prompts.slice(0, 100)));
+      
+      // Dispatch storage event manually for same window
+      window.dispatchEvent(new Event('storage'));
 
       const { data, error } = await supabase.functions.invoke("generate-with-ai", {
         body: { prompt }
