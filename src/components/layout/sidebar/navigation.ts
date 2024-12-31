@@ -1,9 +1,30 @@
-import { BookOpen, MessageSquare, MessageCircleReply, Calendar, CheckSquare, LayoutDashboard } from "lucide-react";
+import { 
+  BookOpen, 
+  MessageSquare, 
+  MessageCircleReply, 
+  Calendar, 
+  CheckSquare, 
+  LayoutDashboard,
+  UserRound,
+  Building2
+} from "lucide-react";
 
 export const dashboardLink = {
   to: "/dashboard",
   icon: LayoutDashboard,
   label: "Tableau de bord",
+  subLinks: [
+    {
+      to: "/profile?tab=personality",
+      icon: UserRound,
+      label: "Ma personnalité",
+    },
+    {
+      to: "/profile?tab=business",
+      icon: Building2,
+      label: "Ma Business",
+    },
+  ],
 };
 
 export const navigationLinks = [

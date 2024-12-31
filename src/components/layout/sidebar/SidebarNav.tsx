@@ -54,16 +54,36 @@ export const SidebarNav = () => {
   if (onboardingCompleted === null) {
     return null;
   }
+
+  const currentTab = new URLSearchParams(location.pathname === '/profile' ? location.search : '').get('tab');
   
   return (
     <nav className="grid gap-2 px-3 py-2">
       {/* Dashboard Section - Not protected */}
-      <NavButton
-        {...dashboardLink}
-        isActive={location.pathname === dashboardLink.to}
-        isOpen={isOpen}
-        onClick={() => handleLinkClick(false)}
-      />
+      <div className="space-y-1">
+        <NavButton
+          {...dashboardLink}
+          isActive={location.pathname === dashboardLink.to}
+          isOpen={isOpen}
+          onClick={() => handleLinkClick(false)}
+        />
+        
+        {/* Sub-links */}
+        {dashboardLink.subLinks && (
+          <div className="ml-4 space-y-1">
+            {dashboardLink.subLinks.map((subLink) => (
+              <NavButton
+                key={subLink.to}
+                {...subLink}
+                isActive={location.pathname === '/profile' && currentTab === subLink.to.split('=')[1]}
+                isOpen={isOpen}
+                onClick={() => handleLinkClick(false)}
+                className="h-8 text-sm"
+              />
+            ))}
+          </div>
+        )}
+      </div>
       
       {/* Separator with consistent margin */}
       <Separator className="my-2 bg-gray-700/50" />

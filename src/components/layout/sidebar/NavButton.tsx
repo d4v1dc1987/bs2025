@@ -31,7 +31,6 @@ export const NavButton = ({
         "hover:bg-primary/20 hover:text-white",
         isActive && "bg-primary/30 text-white border border-primary/30",
         !isOpen && "md:justify-center",
-        "mb-1",
         className
       )}
       asChild
@@ -41,7 +40,8 @@ export const NavButton = ({
         <Icon className={cn(
           "h-5 w-5 shrink-0",
           !isOpen && "md:w-5 md:h-5",
-          isActive ? "text-white" : "text-gray-400 group-hover:text-white"
+          isActive ? "text-white" : "text-gray-400 group-hover:text-white",
+          className?.includes("text-sm") && "h-4 w-4"
         )} />
         <span className={cn(
           "transition-all duration-300",
