@@ -8,7 +8,11 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   useEffect(() => {
-    if (!loading && !user && !location.pathname.includes('/update-password')) {
+    const isAuthPage = location.pathname.includes('/auth') || 
+                      location.pathname.includes('/reset-password') || 
+                      location.pathname.includes('/update-password');
+                      
+    if (!loading && !user && !isAuthPage) {
       navigate("/auth?mode=login");
     }
   }, [user, loading, navigate, location.pathname]);
@@ -17,5 +21,9 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return null; // Or a loading spinner
   }
 
-  return (!loading && (user || location.pathname.includes('/update-password'))) ? <>{children}</> : null;
+  const isAuthPage = location.pathname.includes('/auth') || 
+                    location.pathname.includes('/reset-password') || 
+                    location.pathname.includes('/update-password');
+
+  return (!loading && (user || isAuthPage)) ? <>{children}</> : null;
 };

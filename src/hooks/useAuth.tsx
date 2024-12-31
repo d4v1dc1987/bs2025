@@ -29,13 +29,14 @@ export const useAuth = () => {
           return;
         }
         
-        // Only set user and redirect if we're not on the update-password page
-        if (session?.user && !location.pathname.includes('/update-password')) {
+        // Only set user and redirect if we're not on specific auth pages
+        if (session?.user && 
+            !location.pathname.includes('/update-password') && 
+            !location.pathname.includes('/auth') && 
+            !location.pathname.includes('/reset-password')) {
           setUser(session.user);
-          if (!location.pathname.includes('/auth')) {
-            navigate("/dashboard");
-          }
-        } else {
+          navigate("/dashboard");
+        } else if (!session?.user) {
           setUser(null);
         }
       } catch (error) {
@@ -57,10 +58,12 @@ export const useAuth = () => {
       if (event === "SIGNED_OUT" || (event === "TOKEN_REFRESHED" && !session)) {
         forceClearAuth();
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        // Only set user and redirect if we're not on the update-password page
-        if (!location.pathname.includes('/update-password')) {
+        // Only set user and redirect if we're not on specific auth pages
+        if (!location.pathname.includes('/update-password') && 
+            !location.pathname.includes('/auth') && 
+            !location.pathname.includes('/reset-password')) {
           setUser(session?.user ?? null);
-          if (event === "SIGNED_IN" && !location.pathname.includes('/auth')) {
+          if (event === "SIGNED_IN") {
             navigate("/dashboard");
           }
         }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { UpdatePasswordForm } from "@/components/auth/UpdatePasswordForm";
@@ -12,13 +12,31 @@ const UpdatePassword = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isValidToken, setIsValidToken] = useState(false);
+
+  useEffect(() => {
+    const validateToken = async () => {
+      const searchParams = new URLSearchParams(location.search);
+      const token_hash = searchParams.get("token_hash");
+      const type = searchParams.get("type");
+
+      if (!token_hash || !type || type !== "recovery") {
+        toast.error("Lien invalide. Veuillez réessayer.");
+        navigate("/auth?mode=login");
+        return;
+      }
+
+      setIsValidToken(true);
+    };
+
+    validateToken();
+  }, [location.search, navigate]);
 
   const handlePasswordUpdate = async (values: { password: string }) => {
     try {
       setIsLoading(true);
       console.log("Attempting to update password...");
 
-      // Récupérer les paramètres de l'URL
       const searchParams = new URLSearchParams(location.search);
       const token_hash = searchParams.get("token_hash");
       const type = searchParams.get("type");
@@ -67,6 +85,10 @@ const UpdatePassword = () => {
       setIsLoading(false);
     }
   };
+
+  if (!isValidToken) {
+    return null;
+  }
 
   if (isSuccess) {
     return (
