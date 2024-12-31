@@ -26,6 +26,8 @@ export const SidebarNav = () => {
           .maybeSingle();
 
         if (error) throw error;
+        
+        console.log('Onboarding status:', data?.status);
         setOnboardingCompleted(data?.status === 'completed');
       } catch (error) {
         console.error('Error checking onboarding status:', error);
@@ -41,7 +43,7 @@ export const SidebarNav = () => {
       close();
     }
 
-    if (isProtected && !onboardingCompleted) {
+    if (isProtected && onboardingCompleted === false) {
       toast.error("Veuillez d'abord compléter le questionnaire de personnalisation");
       return false;
     }
@@ -50,7 +52,7 @@ export const SidebarNav = () => {
   };
   
   if (onboardingCompleted === null) {
-    return null; // Or a loading state if you prefer
+    return null;
   }
   
   return (
@@ -70,7 +72,7 @@ export const SidebarNav = () => {
       <MainNavigation 
         isOpen={isOpen}
         onLinkClick={() => handleLinkClick(true)}
-        isDisabled={!onboardingCompleted}
+        isDisabled={onboardingCompleted === false}
       />
     </nav>
   );
