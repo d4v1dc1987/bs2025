@@ -150,7 +150,7 @@ export const LoginForm = () => {
             type="button"
             variant="link"
             className="text-sm text-[#c299ff] hover:text-[#c299ff]/90"
-            onClick={() => navigate("/auth/reset-password")}
+            onClick={() => navigate("/reset-password")}
           >
             Mot de passe oublié?
           </Button>
