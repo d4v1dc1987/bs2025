@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
@@ -30,6 +30,7 @@ export const LoginForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -40,26 +41,16 @@ export const LoginForm = () => {
     },
   });
 
-  // Cleanup function for ResizeObserver
-  useEffect(() => {
-    return () => {
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => {
-          // This empty callback will help flush any pending observations
-        });
-      });
-    };
-  }, []);
-
   const onSubmit = async (values: LoginFormValues) => {
     try {
+      setIsLoading(true);
+      
       const { error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
 
       if (error) {
-        // Gérer spécifiquement les différents types d'erreurs
         if (error.message === "Invalid login credentials") {
           toast.error("Email ou mot de passe incorrect");
           return;
@@ -68,13 +59,12 @@ export const LoginForm = () => {
           toast.error("Veuillez confirmer votre email avant de vous connecter");
           return;
         }
-        // Pour toute autre erreur
-        toast.error("Une erreur est survenue lors de la connexion");
+        
         console.error("Erreur de connexion:", error);
+        toast.error("Une erreur est survenue lors de la connexion");
         return;
       }
 
-      // Si la connexion réussit
       const returnUrl = searchParams.get("returnUrl");
       if (returnUrl) {
         navigate(decodeURIComponent(returnUrl));
@@ -85,6 +75,8 @@ export const LoginForm = () => {
     } catch (error: any) {
       console.error("Erreur inattendue:", error);
       toast.error("Une erreur inattendue est survenue");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -106,6 +98,7 @@ export const LoginForm = () => {
                     placeholder="votre@email.com"
                     className="bg-background/50 border-foreground/20"
                     {...field}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -125,11 +118,13 @@ export const LoginForm = () => {
                       type={showPassword ? "text" : "password"}
                       className="bg-background/50 border-foreground/20 pr-10"
                       {...field}
+                      disabled={isLoading}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/70 hover:text-foreground"
+                      disabled={isLoading}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -153,6 +148,7 @@ export const LoginForm = () => {
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormLabel className="text-sm font-normal cursor-pointer">
@@ -163,8 +159,12 @@ export const LoginForm = () => {
           />
         </div>
 
-        <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-          Connexion
+        <Button 
+          type="submit" 
+          className="w-full bg-primary hover:bg-primary/90"
+          disabled={isLoading}
+        >
+          {isLoading ? "Connexion en cours..." : "Connexion"}
         </Button>
 
         <div className="text-center space-y-4">
@@ -173,6 +173,7 @@ export const LoginForm = () => {
             variant="link"
             className="text-sm text-[#c299ff] hover:text-[#c299ff]/90"
             onClick={() => navigate("/reset-password")}
+            disabled={isLoading}
           >
             Mot de passe oublié?
           </Button>
@@ -184,6 +185,7 @@ export const LoginForm = () => {
               variant="link"
               className="text-[#c299ff] hover:text-[#c299ff]/90 p-0"
               onClick={() => navigate("/auth?mode=signup")}
+              disabled={isLoading}
             >
               Créer un compte
             </Button>
