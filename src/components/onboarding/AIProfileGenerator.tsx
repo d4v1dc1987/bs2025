@@ -30,12 +30,14 @@ export const AIProfileGenerator = ({
   } = useAIProfileGeneration();
   
   const generationPromise = useRef<Promise<string> | null>(null);
+  const isGenerating = useRef(false);
 
   useEffect(() => {
     const handleGeneration = async () => {
-      if (!isSubmitting) return;
+      if (!isSubmitting || isGenerating.current) return;
 
       try {
+        isGenerating.current = true;
         startAnimation();
         
         const formattedAnswers = Object.entries(answers)
@@ -50,10 +52,13 @@ export const AIProfileGenerator = ({
           generationPromise.current = generateAIProfile(prompt);
         }
 
-        await Promise.all([
+        const [generatedText] = await Promise.all([
           generationPromise.current,
           new Promise(resolve => setTimeout(resolve, 7000))
         ]);
+        
+        // Ensure we only update the profile once
+        setGeneratedProfile(generatedText);
         
         stopAnimation();
         setIsSubmitting(false);
@@ -64,6 +69,8 @@ export const AIProfileGenerator = ({
         stopAnimation();
         setIsSubmitting(false);
         generationPromise.current = null;
+      } finally {
+        isGenerating.current = false;
       }
     };
 
@@ -71,8 +78,9 @@ export const AIProfileGenerator = ({
 
     return () => {
       generationPromise.current = null;
+      isGenerating.current = false;
     };
-  }, [isSubmitting, firstName, answers, generateAIProfile, startAnimation, stopAnimation]);
+  }, [isSubmitting, firstName, answers, generateAIProfile, startAnimation, stopAnimation, setGeneratedProfile]);
 
   useEffect(() => {
     setIsSubmitting(true);

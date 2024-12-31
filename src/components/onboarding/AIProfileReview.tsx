@@ -39,11 +39,12 @@ export const AIProfileReview = ({
     }
   }, [progress]);
 
+  // Update editedProfile only when generatedProfile changes and we're not editing
   useEffect(() => {
-    if (generatedProfile) {
+    if (generatedProfile && !isEditing) {
       setEditedProfile(generatedProfile);
     }
-  }, [generatedProfile]);
+  }, [generatedProfile, isEditing]);
 
   const handleSave = () => {
     if (!editedProfile.trim()) {

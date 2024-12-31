@@ -10,7 +10,6 @@ export const useAIProfileGeneration = () => {
   const generateAIProfile = async (prompt: string): Promise<string> => {
     try {
       setIsGeneratingProfile(true);
-      setGeneratedProfile(null);
       setError(null);
 
       console.log('Generating AI profile with prompt length:', prompt.length);
@@ -32,6 +31,7 @@ export const useAIProfileGeneration = () => {
 
       console.log('Successfully generated profile of length:', generatedText.length);
       
+      // Set the generated profile only once when generation is complete
       setGeneratedProfile(generatedText);
       return generatedText;
     } catch (error: any) {
