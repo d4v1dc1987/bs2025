@@ -8,13 +8,16 @@ const PROMPT_ADDED_EVENT = 'PROMPT_ADDED';
 
 const PromptViewer = () => {
   const [prompts, setPrompts] = useState<{ prompt: string; timestamp: string }[]>([]);
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Wait for auth to be initialized
+    if (loading) return;
+    
     // Redirect if not authenticated
-    if (!user) {
-      navigate('/auth');
+    if (!user && !loading) {
+      navigate('/dashboard');
       return;
     }
 
@@ -46,7 +49,20 @@ const PromptViewer = () => {
     return () => {
       window.removeEventListener(PROMPT_ADDED_EVENT, handlePromptAdded);
     };
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
+
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Chargement...</CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-8">
