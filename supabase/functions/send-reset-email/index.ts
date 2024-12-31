@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,8 +7,6 @@ const corsHeaders = {
 };
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
 
 interface EmailRequest {
   email: string;
@@ -23,6 +20,8 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { email, resetLink }: EmailRequest = await req.json();
+    console.log("Sending reset email to:", email);
+    console.log("Reset link:", resetLink);
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -98,6 +97,7 @@ const handler = async (req: Request): Promise<Response> => {
       status: 200,
     });
   } catch (error) {
+    console.error("Error sending reset email:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

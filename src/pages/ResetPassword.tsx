@@ -38,16 +38,25 @@ const ResetPassword = () => {
   const onSubmit = async (values: ResetFormValues) => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(values.email, {
         redirectTo: `${window.location.origin}/auth/update-password`,
       });
 
       if (error) throw error;
 
+      // Appel à notre fonction Edge pour envoyer l'email personnalisé
+      const resetLink = `${window.location.origin}/auth/update-password`;
+      const response = await supabase.functions.invoke('send-reset-email', {
+        body: { email: values.email, resetLink },
+      });
+
+      if (response.error) throw response.error;
+
       toast.success("Un email de réinitialisation vous a été envoyé");
       navigate("/auth?mode=login");
     } catch (error: any) {
-      toast.error("Une erreur est survenue");
+      toast.error("Une erreur est survenue lors de l'envoi de l'email");
+      console.error("Reset password error:", error);
     } finally {
       setIsLoading(false);
     }
