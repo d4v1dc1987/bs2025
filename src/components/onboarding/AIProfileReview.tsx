@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Loader2, Pencil, Save } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 interface AIProfileReviewProps {
   isGenerating: boolean;
@@ -34,11 +35,21 @@ export const AIProfileReview = ({
     } else if (progress < 80) {
       setLoadingMessage("Optimisation de votre profil entrepreneurial...");
     } else {
-      setLoadingMessage("Génération de votre profil...");
+      setLoadingMessage("Finalisation de votre profil...");
     }
   }, [progress]);
 
+  useEffect(() => {
+    if (generatedProfile) {
+      setEditedProfile(generatedProfile);
+    }
+  }, [generatedProfile]);
+
   const handleSave = () => {
+    if (!editedProfile.trim()) {
+      toast.error("Le profil ne peut pas être vide");
+      return;
+    }
     setIsEditing(false);
     onConfirm(editedProfile);
   };
@@ -63,8 +74,8 @@ export const AIProfileReview = ({
       <CardContent className="space-y-6">
         {isGenerating ? (
           <div className="space-y-4 py-8">
-            <Progress value={progress} className="w-full" />
-            <p className="text-center text-sm text-muted-foreground">
+            <Progress value={progress} className="w-full h-2" />
+            <p className="text-center text-sm text-muted-foreground animate-pulse">
               {loadingMessage}
             </p>
           </div>
@@ -76,6 +87,7 @@ export const AIProfileReview = ({
                   value={editedProfile}
                   onChange={(e) => setEditedProfile(e.target.value)}
                   className="min-h-[200px] whitespace-pre-line"
+                  placeholder="Votre profil personnalisé..."
                 />
                 <div className="flex flex-col md:flex-row gap-4">
                   <Button
@@ -128,7 +140,7 @@ export const AIProfileReview = ({
           </>
         ) : (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-8 h-8 animate-spin" />
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         )}
       </CardContent>

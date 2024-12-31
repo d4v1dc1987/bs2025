@@ -4,6 +4,7 @@ import { useAIProfileGeneration } from '@/hooks/useAIProfileGeneration';
 import { AIProfileReview } from './AIProfileReview';
 import type { OnboardingAnswers } from '@/types/onboarding';
 import { AI_PROFILE_PROMPT } from '@/types/onboarding';
+import { toast } from 'sonner';
 
 interface AIProfileGeneratorProps {
   firstName: string;
@@ -24,7 +25,8 @@ export const AIProfileGenerator = ({
     isGeneratingProfile,
     generatedProfile,
     generateAIProfile,
-    setGeneratedProfile
+    setGeneratedProfile,
+    error
   } = useAIProfileGeneration();
   
   const generationPromise = useRef<Promise<string> | null>(null);
@@ -44,13 +46,11 @@ export const AIProfileGenerator = ({
           .replace('{firstName}', firstName)
           .replace('{answers}', formattedAnswers);
 
-        // Stocker la promesse de génération pour éviter les générations multiples
         if (!generationPromise.current) {
           generationPromise.current = generateAIProfile(prompt);
         }
 
-        // Attendre la génération ET l'animation
-        const [profile] = await Promise.all([
+        await Promise.all([
           generationPromise.current,
           new Promise(resolve => setTimeout(resolve, 7000))
         ]);
@@ -60,6 +60,7 @@ export const AIProfileGenerator = ({
         generationPromise.current = null;
       } catch (error) {
         console.error('Error generating profile:', error);
+        toast.error("Une erreur est survenue lors de la génération du profil");
         stopAnimation();
         setIsSubmitting(false);
         generationPromise.current = null;
@@ -68,7 +69,6 @@ export const AIProfileGenerator = ({
 
     handleGeneration();
 
-    // Cleanup
     return () => {
       generationPromise.current = null;
     };
@@ -78,13 +78,22 @@ export const AIProfileGenerator = ({
     setIsSubmitting(true);
   }, []);
 
+  const handleConfirm = async (profile: string) => {
+    try {
+      await onComplete(profile);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast.error("Une erreur est survenue lors de l'enregistrement du profil");
+    }
+  };
+
   return (
     <AIProfileReview
       isGenerating={isSubmitting}
       progress={progress}
       generatedProfile={generatedProfile}
       onEdit={onEdit}
-      onConfirm={onComplete}
+      onConfirm={handleConfirm}
     />
   );
 };

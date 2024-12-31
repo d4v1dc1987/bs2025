@@ -5,26 +5,40 @@ import { toast } from "sonner";
 export const useAIProfileGeneration = () => {
   const [isGeneratingProfile, setIsGeneratingProfile] = useState(false);
   const [generatedProfile, setGeneratedProfile] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const generateAIProfile = async (prompt: string): Promise<string> => {
     try {
       setIsGeneratingProfile(true);
-      setGeneratedProfile(null); // Reset avant chaque génération
+      setGeneratedProfile(null);
+      setError(null);
+
+      console.log('Generating AI profile with prompt length:', prompt.length);
 
       const aiResponse = await supabase.functions.invoke('generate-with-ai', {
         body: { prompt }
       });
 
-      if (aiResponse.error) throw aiResponse.error;
+      if (aiResponse.error) {
+        console.error('Error from Edge Function:', aiResponse.error);
+        throw new Error(aiResponse.error.message || 'Error generating profile');
+      }
       
       const generatedText = aiResponse.data.generatedText;
       
-      // S'assurer qu'une seule mise à jour est effectuée
+      if (!generatedText) {
+        throw new Error('No text was generated');
+      }
+
+      console.log('Successfully generated profile of length:', generatedText.length);
+      
       setGeneratedProfile(generatedText);
       return generatedText;
     } catch (error: any) {
       console.error('Error generating AI summary:', error);
-      toast.error("Erreur lors de la génération du profil");
+      const errorMessage = error.message || "Erreur lors de la génération du profil";
+      setError(errorMessage);
+      toast.error(errorMessage);
       throw error;
     } finally {
       setIsGeneratingProfile(false);
@@ -34,6 +48,7 @@ export const useAIProfileGeneration = () => {
   return {
     isGeneratingProfile,
     generatedProfile,
+    error,
     generateAIProfile,
     setGeneratedProfile,
   };
