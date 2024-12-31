@@ -4,17 +4,13 @@ export const initiatePasswordReset = async (email: string) => {
   try {
     console.log("Starting password reset process for:", email);
 
-    // 1. Désactiver complètement l'email automatique de Supabase
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/update-password`,
-      options: {
-        // Désactiver l'email automatique de Supabase
-        emailRedirectTo: `${window.location.origin}/update-password`,
-        data: {
-          disableEmail: true,
-        },
-      },
-    });
+    // 1. Call Supabase's reset password function
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo: `${window.location.origin}/update-password`,
+      }
+    );
 
     if (resetError) {
       if (resetError.message.includes("rate_limit") || resetError.status === 429) {
