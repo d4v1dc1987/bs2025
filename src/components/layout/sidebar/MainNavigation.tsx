@@ -1,17 +1,19 @@
 import { useLocation } from "react-router-dom";
-import { navigationLinks } from "./navigation";
 import { NavButton } from "./NavButton";
+import { navigationLinks } from "./navigation";
+import { cn } from "@/lib/utils";
 
 interface MainNavigationProps {
   isOpen: boolean;
-  onLinkClick: () => void;
+  onLinkClick: () => boolean;
+  isDisabled?: boolean;
 }
 
-export const MainNavigation = ({ isOpen, onLinkClick }: MainNavigationProps) => {
+export const MainNavigation = ({ isOpen, onLinkClick, isDisabled }: MainNavigationProps) => {
   const location = useLocation();
-
+  
   return (
-    <div className="space-y-2">
+    <div className="grid gap-1">
       {navigationLinks.map((link) => (
         <NavButton
           key={link.to}
@@ -19,6 +21,9 @@ export const MainNavigation = ({ isOpen, onLinkClick }: MainNavigationProps) => 
           isActive={location.pathname === link.to}
           isOpen={isOpen}
           onClick={onLinkClick}
+          className={cn(
+            isDisabled && "opacity-50 pointer-events-none cursor-not-allowed"
+          )}
         />
       ))}
     </div>
