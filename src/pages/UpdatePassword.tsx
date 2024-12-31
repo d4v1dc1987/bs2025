@@ -16,31 +16,18 @@ const UpdatePassword = () => {
       setIsLoading(true);
       console.log("Attempting to update password...");
 
+      // Récupérer le token de l'URL
       const searchParams = new URLSearchParams(location.search);
-      const token_hash = searchParams.get("token_hash");
-      const type = searchParams.get("type");
+      const token = searchParams.get("token");
 
-      if (!token_hash || !type) {
-        console.error("No token_hash or type found in URL");
+      if (!token) {
+        console.error("No token found in URL");
         toast.error("Lien invalide. Veuillez réessayer.");
         navigate("/auth?mode=reset");
         return;
       }
 
-      // First verify the token hash
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        token_hash,
-        type: "recovery",
-      });
-
-      if (verifyError) {
-        console.error("Error verifying token:", verifyError);
-        toast.error("Le lien a expiré ou est invalide. Veuillez réessayer.");
-        navigate("/auth?mode=reset");
-        return;
-      }
-
-      // If verification successful, update the password
+      // Mettre à jour le mot de passe
       const { error } = await supabase.auth.updateUser({
         password: values.password
       });
@@ -53,15 +40,15 @@ const UpdatePassword = () => {
 
       console.log("Password updated successfully");
       
-      // Sign out the user
+      // Déconnecter l'utilisateur
       await supabase.auth.signOut();
       
-      // Show success message and redirect to login
+      // Afficher le message de succès et rediriger
       toast.success("Votre mot de passe a été mis à jour avec succès. Veuillez vous reconnecter avec votre nouveau mot de passe.", {
         duration: 5000
       });
       
-      // Redirect to login page after a short delay to ensure the toast is visible
+      // Rediriger vers la page de connexion après un court délai
       setTimeout(() => {
         navigate("/auth?mode=login");
       }, 1000);
