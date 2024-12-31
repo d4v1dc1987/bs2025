@@ -27,10 +27,17 @@ serve(async (req) => {
       )
     }
 
-    // List all files in the user's folder
-    const { data: files, error: listError } = await supabase.storage
+    console.log(`Starting cleanup for user ${userId}`)
+    console.log(`Current avatar URL: ${currentAvatarUrl}`)
+
+    // 1. Get all files in the avatars bucket
+    const { data: allFiles, error: listError } = await supabase.storage
       .from('avatars')
-      .list(userId)
+      .list(userId, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' },
+      })
 
     if (listError) {
       console.error('Error listing files:', listError)
@@ -40,17 +47,19 @@ serve(async (req) => {
       )
     }
 
+    console.log(`Found ${allFiles?.length || 0} files in user directory`)
+
     // Get the current avatar filename from the URL if it exists
     const currentAvatarPath = currentAvatarUrl ? new URL(currentAvatarUrl).pathname.split('/').pop() : null
+    console.log(`Current avatar filename: ${currentAvatarPath}`)
 
-    // Filter out the current avatar and delete all other files
-    const filesToDelete = files
-      .map(file => `${userId}/${file.name}`)
-      .filter(filePath => {
-        const fileName = filePath.split('/').pop()
-        return fileName !== currentAvatarPath
-      })
+    // Filter out the current avatar and prepare paths for deletion
+    const filesToDelete = allFiles
+      ?.filter(file => file.name !== currentAvatarPath)
+      .map(file => `${userId}/${file.name}`) || []
 
+    console.log(`Files to delete: ${filesToDelete.length}`)
+    
     if (filesToDelete.length > 0) {
       const { error: deleteError } = await supabase.storage
         .from('avatars')
@@ -63,12 +72,73 @@ serve(async (req) => {
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
         )
       }
+
+      console.log(`Successfully deleted ${filesToDelete.length} files`)
+    }
+
+    // 2. Clean up empty folders for inactive users
+    const { data: activeUsers, error: usersError } = await supabase
+      .from('profiles')
+      .select('id')
+
+    if (usersError) {
+      console.error('Error fetching active users:', usersError)
+      return new Response(
+        JSON.stringify({ error: 'Failed to fetch active users' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
+    }
+
+    // Get all folders in the avatars bucket
+    const { data: allFolders, error: foldersError } = await supabase.storage
+      .from('avatars')
+      .list('', {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' },
+      })
+
+    if (foldersError) {
+      console.error('Error listing folders:', foldersError)
+      return new Response(
+        JSON.stringify({ error: 'Failed to list folders' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
+    }
+
+    const activeUserIds = activeUsers.map(user => user.id)
+    const inactiveFolders = allFolders
+      ?.filter(folder => !activeUserIds.includes(folder.name))
+      .map(folder => folder.name) || []
+
+    console.log(`Found ${inactiveFolders.length} inactive user folders`)
+
+    // Delete folders for inactive users
+    for (const folderId of inactiveFolders) {
+      const { data: folderFiles } = await supabase.storage
+        .from('avatars')
+        .list(folderId)
+
+      const filePaths = folderFiles?.map(file => `${folderId}/${file.name}`) || []
+      
+      if (filePaths.length > 0) {
+        const { error: cleanupError } = await supabase.storage
+          .from('avatars')
+          .remove(filePaths)
+
+        if (cleanupError) {
+          console.error(`Error cleaning up folder ${folderId}:`, cleanupError)
+        } else {
+          console.log(`Cleaned up folder for inactive user ${folderId}`)
+        }
+      }
     }
 
     return new Response(
       JSON.stringify({ 
         message: 'Cleanup completed successfully',
-        deletedCount: filesToDelete.length 
+        deletedFiles: filesToDelete.length,
+        cleanedFolders: inactiveFolders.length
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
@@ -76,7 +146,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error:', error)
     return new Response(
-      JSON.stringify({ error: 'An unexpected error occurred' }),
+      JSON.stringify({ error: 'An unexpected error occurred', details: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
