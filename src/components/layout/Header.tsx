@@ -31,24 +31,26 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-primary/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-[0_1px_3px_0_rgba(123,38,251,0.1)]">
-      <div className="flex h-14 max-w-screen-2xl items-center px-4 md:container md:px-6">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggle}
-          className="h-10 w-10 text-muted-foreground hover:text-foreground"
-        >
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle Sidebar</span>
-        </Button>
+      <div className="container flex h-14 items-center justify-between px-4">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggle}
+            className="h-10 w-10 text-muted-foreground hover:text-foreground"
+          >
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle Sidebar</span>
+          </Button>
+          
+          {user?.user_metadata && (
+            <span className="text-sm text-muted-foreground truncate max-w-[150px] md:max-w-none">
+              {getGreeting()} {user.user_metadata.first_name || user.email}!
+            </span>
+          )}
+        </div>
         
-        {user?.user_metadata && (
-          <span className="ml-4 text-sm text-muted-foreground truncate max-w-[150px] md:max-w-none">
-            {getGreeting()} {user.user_metadata.first_name || user.email}!
-          </span>
-        )}
-        
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
@@ -57,7 +59,8 @@ export const Header = () => {
                 data-state="closed"
                 onPointerEnter={(e) => {
                   if (window.innerWidth >= 768) {
-                    e.currentTarget.click();
+                    const trigger = e.currentTarget;
+                    trigger.click();
                   }
                 }}
               >
@@ -71,7 +74,7 @@ export const Header = () => {
                     {user?.user_metadata?.avatar_url ? getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name) : <User className="h-4 w-4" />}
                   </AvatarFallback>
                 </Avatar>
-                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-hover:rotate-180" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
@@ -87,11 +90,12 @@ export const Header = () => {
               onPointerLeave={(e) => {
                 if (window.innerWidth >= 768) {
                   const trigger = document.querySelector('[data-state="open"]');
-                  if (trigger) trigger.setAttribute('data-state', 'closed');
-                  // Close the dropdown menu
-                  const closeEvent = new Event('keydown');
-                  Object.defineProperty(closeEvent, 'key', {value: 'Escape'});
-                  document.dispatchEvent(closeEvent);
+                  if (trigger) {
+                    trigger.setAttribute('data-state', 'closed');
+                    // Fermer le menu
+                    const closeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+                    document.dispatchEvent(closeEvent);
+                  }
                 }
               }}
             >
