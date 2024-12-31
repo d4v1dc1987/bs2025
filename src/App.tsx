@@ -17,7 +17,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<MainLayout />}>
+        <Route element={<MainLayout />}>
           <Route index element={<Index />} />
           <Route path="auth" element={<Auth />} />
           <Route path="generator" element={<Generator />} />
