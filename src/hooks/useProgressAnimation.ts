@@ -13,7 +13,7 @@ export const useProgressAnimation = (duration: number = 7000) => {
 
     const animate = () => {
       const elapsed = Date.now() - startTimeRef.current;
-      const newProgress = Math.min((elapsed / duration) * 100, 98); // Stop at 98% until complete
+      const newProgress = Math.min((elapsed / duration) * 100, 98);
       
       setProgress(newProgress);
 
@@ -22,7 +22,7 @@ export const useProgressAnimation = (duration: number = 7000) => {
       }
     };
 
-    animationFrameRef.current = requestAnimationFrame(animate);
+    animate(); // Start the animation immediately
   };
 
   const stopAnimation = () => {
@@ -33,6 +33,7 @@ export const useProgressAnimation = (duration: number = 7000) => {
     setIsAnimating(false);
   };
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (animationFrameRef.current) {

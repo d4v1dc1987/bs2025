@@ -28,9 +28,9 @@ export const AIProfileGenerator = ({
   } = useAIProfileGeneration();
 
   useEffect(() => {
-    if (!isSubmitting) return;
-    
     const handleGeneration = async () => {
+      if (!isSubmitting) return;
+
       startAnimation();
       
       const formattedAnswers = Object.entries(answers)
@@ -42,17 +42,14 @@ export const AIProfileGenerator = ({
         .replace('{answers}', formattedAnswers);
 
       try {
-        // Start both the profile generation and the animation
         const profilePromise = generateAIProfile(prompt);
-        
-        // We ensure the animation runs for at least 7 seconds for a smooth experience
-        // This matches the duration set in useProgressAnimation
-        await Promise.all([
+        const animationPromise = new Promise(resolve => setTimeout(resolve, 7000));
+
+        const [profile] = await Promise.all([
           profilePromise,
-          new Promise(resolve => setTimeout(resolve, 7000))
+          animationPromise
         ]);
-        
-        // Only stop the animation after both promises are resolved
+
         stopAnimation();
         setIsSubmitting(false);
       } catch (error) {
@@ -63,7 +60,7 @@ export const AIProfileGenerator = ({
     };
 
     handleGeneration();
-  }, [isSubmitting]);
+  }, [isSubmitting, firstName, answers, generateAIProfile, startAnimation, stopAnimation]);
 
   useEffect(() => {
     setIsSubmitting(true);
