@@ -127,7 +127,7 @@ export const BusinessForm = ({ formData, handleInputChange }: BusinessFormProps)
           value={formData.target_audience || ""}
           onChange={(e) => handleInputChange("target_audience", e.target.value)}
           placeholder="Décris ton audience cible"
-          maxLength={1000}
+          maxLength={1500}
           className="bg-background/50 border-foreground/20 min-h-[100px] text-sm"
         />
         <p className="text-sm text-muted-foreground mt-1">
