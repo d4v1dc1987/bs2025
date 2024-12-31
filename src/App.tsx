@@ -27,7 +27,7 @@ function AppRoutes() {
 
   return (
     <Routes>
-      {/* Public routes */}
+      {/* Public routes - pas besoin d'authentification */}
       <Route path="/" element={<MainLayout />}>
         <Route index element={user ? <Navigate to="/dashboard" /> : <Index />} />
         <Route path="auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
@@ -35,7 +35,7 @@ function AppRoutes() {
         <Route path="update-password" element={<UpdatePassword />} />
       </Route>
 
-      {/* Protected routes */}
+      {/* Protected routes - nécessitent une authentification */}
       <Route
         path="/"
         element={
