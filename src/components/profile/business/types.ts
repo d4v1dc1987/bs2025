@@ -3,12 +3,14 @@ export type BusinessType = "coach" | "consultant" | "influencer" | "network_mark
 export type BusinessProfile = {
   business_name: string | null;
   business_type: BusinessType | null;
-  target_audience: string | null;
+  industry: string | null;
   main_product: string | null;
-  product_description: string | null;
-  price_range: string | null;
-  unique_value: string | null;
+  target_audience: string | null;
+  problem_solved: string | null;
   goals: string | null;
-  challenges: string | null;
+  client_results: string | null;
+  company_age: string | null;
+  company_story: string | null;
+  company_values: string | null;
   ai_summary: string | null;
 };

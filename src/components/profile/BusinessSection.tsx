@@ -17,13 +17,15 @@ export const BusinessSection = () => {
   const [formData, setFormData] = useState<BusinessProfile>({
     business_name: "",
     business_type: null,
-    target_audience: "",
+    industry: "",
     main_product: "",
-    product_description: "",
-    price_range: "",
-    unique_value: "",
+    target_audience: "",
+    problem_solved: "",
     goals: "",
-    challenges: "",
+    client_results: "",
+    company_age: "",
+    company_story: "",
+    company_values: "",
     ai_summary: null,
   });
 
@@ -69,17 +71,19 @@ export const BusinessSection = () => {
       setIsGenerating(true);
       const { data, error } = await supabase.functions.invoke("generate-with-ai", {
         body: {
-          prompt: `En tant qu'expert en marketing digital, crée un résumé professionnel et concis de cette entreprise en ligne, en utilisant "Je" ou "Mon" comme si c'était l'entrepreneur qui parlait. Utilise ces informations:
+          prompt: `En tant qu'expert en marketing digital, crée un résumé professionnel et concis (3-4 phrases maximum) de cette entreprise en ligne, en utilisant "Je" ou "Mon" comme si c'était l'entrepreneur qui parlait. Utilise ces informations:
           
           Nom de l'entreprise: ${formData.business_name}
           Type d'entreprise: ${formData.business_type}
-          Public cible: ${formData.target_audience}
+          Industrie: ${formData.industry}
           Produit principal: ${formData.main_product}
-          Description du produit: ${formData.product_description}
-          Ticket moyen: ${formData.price_range}
-          Ce qui me rend unique: ${formData.unique_value}
-          Mes objectifs: ${formData.goals}
-          Mes défis: ${formData.challenges}`,
+          Public cible: ${formData.target_audience}
+          Problèmes résolus: ${formData.problem_solved}
+          Objectifs: ${formData.goals}
+          Résultats clients: ${formData.client_results}
+          Âge de l'entreprise: ${formData.company_age}
+          Histoire: ${formData.company_story}
+          Valeurs: ${formData.company_values}`,
         },
       });
 
@@ -116,13 +120,15 @@ export const BusinessSection = () => {
         .update({
           business_name: formData.business_name,
           business_type: formData.business_type,
-          target_audience: formData.target_audience,
+          industry: formData.industry,
           main_product: formData.main_product,
-          product_description: formData.product_description,
-          price_range: formData.price_range,
-          unique_value: formData.unique_value,
+          target_audience: formData.target_audience,
+          problem_solved: formData.problem_solved,
           goals: formData.goals,
-          challenges: formData.challenges,
+          client_results: formData.client_results,
+          company_age: formData.company_age,
+          company_story: formData.company_story,
+          company_values: formData.company_values,
         })
         .eq("id", user.id);
 
