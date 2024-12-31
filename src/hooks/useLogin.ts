@@ -35,6 +35,8 @@ export const useLogin = () => {
         };
       }
 
+      console.log("Tentative de connexion avec:", cleanEmail);
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
         password: cleanPassword
@@ -43,7 +45,8 @@ export const useLogin = () => {
       if (error) {
         console.error("Erreur d'authentification:", error);
 
-        if (error.message.includes("Invalid login credentials")) {
+        // Gestion spécifique des erreurs d'authentification
+        if (error.message === "Invalid login credentials") {
           return {
             success: false,
             error: {
@@ -53,10 +56,11 @@ export const useLogin = () => {
           };
         }
 
+        // Gestion des autres types d'erreurs
         return {
           success: false,
           error: {
-            code: "unknown_error",
+            code: error.name || "unknown_error",
             message: "Une erreur est survenue lors de la connexion"
           }
         };

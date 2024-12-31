@@ -45,7 +45,6 @@ export const LoginForm = () => {
   const onSubmit = async (values: LoginFormValues) => {
     try {
       setError(null);
-      console.log("Tentative de connexion avec:", values.email);
       
       const response = await login({
         email: values.email,
