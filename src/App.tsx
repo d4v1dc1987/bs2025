@@ -14,7 +14,9 @@ import Profile from "@/pages/Profile";
 import ResetPassword from "@/pages/ResetPassword";
 import UpdatePassword from "@/pages/UpdatePassword";
 import Close from "@/pages/Close";
-import PromptViewer from "@/pages/PromptViewer";
+import Comment from "@/pages/Comment";
+import Reply from "@/pages/Reply";
+import Calendar from "@/pages/Calendar";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +36,9 @@ function App() {
                 <Route path="reset-password" element={<ResetPassword />} />
                 <Route path="update-password" element={<UpdatePassword />} />
                 <Route path="close" element={<Close />} />
-                <Route path="prompt-viewer" element={<PromptViewer />} />
+                <Route path="comment" element={<Comment />} />
+                <Route path="reply" element={<Reply />} />
+                <Route path="calendar" element={<Calendar />} />
               </Route>
             </Routes>
           </Router>
