@@ -5,53 +5,60 @@ import { UpdatePasswordForm } from "@/components/auth/UpdatePasswordForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBolt } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 const UpdatePassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handlePasswordUpdate = async (values: { password: string }) => {
     try {
       setIsLoading(true);
       console.log("Attempting to update password...");
 
-      // Récupérer le token de l'URL
+      // Récupérer les paramètres de l'URL
       const searchParams = new URLSearchParams(location.search);
-      const token = searchParams.get("token");
+      const token_hash = searchParams.get("token_hash");
+      const type = searchParams.get("type");
 
-      if (!token) {
-        console.error("No token found in URL");
+      if (!token_hash || !type || type !== "recovery") {
+        console.error("Invalid or missing URL parameters:", { token_hash, type });
         toast.error("Lien invalide. Veuillez réessayer.");
-        navigate("/auth?mode=reset");
+        navigate("/auth?mode=login");
+        return;
+      }
+
+      // Vérifier le token OTP
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        token_hash,
+        type: "recovery",
+      });
+
+      if (verifyError) {
+        console.error("Error verifying token:", verifyError);
+        toast.error("Le lien a expiré ou est invalide. Veuillez réessayer.");
+        navigate("/auth?mode=login");
         return;
       }
 
       // Mettre à jour le mot de passe
-      const { error } = await supabase.auth.updateUser({
+      const { error: updateError } = await supabase.auth.updateUser({
         password: values.password
       });
 
-      if (error) {
-        console.error("Error updating password:", error);
+      if (updateError) {
+        console.error("Error updating password:", updateError);
         toast.error("Une erreur est survenue lors de la mise à jour du mot de passe");
         return;
       }
 
-      console.log("Password updated successfully");
-      
       // Déconnecter l'utilisateur
       await supabase.auth.signOut();
       
-      // Afficher le message de succès et rediriger
-      toast.success("Votre mot de passe a été mis à jour avec succès. Veuillez vous reconnecter avec votre nouveau mot de passe.", {
-        duration: 5000
-      });
-      
-      // Rediriger vers la page de connexion après un court délai
-      setTimeout(() => {
-        navigate("/auth?mode=login");
-      }, 1000);
+      // Afficher la confirmation
+      setIsSuccess(true);
       
     } catch (error: any) {
       console.error("Caught error:", error);
@@ -60,6 +67,32 @@ const UpdatePassword = () => {
       setIsLoading(false);
     }
   };
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[url('/background.jpg')] bg-cover bg-center bg-fixed">
+        <div className="w-full max-w-md mx-auto p-6">
+          <div className="rounded-lg backdrop-blur-sm bg-background/80 p-8 shadow-xl">
+            <div className="text-center mb-8">
+              <div className="flex flex-col items-center gap-4">
+                <FontAwesomeIcon icon={faBolt} className="text-[#7b27fb] text-4xl" />
+                <h1 className="text-4xl font-bold text-white">Bobby Social</h1>
+              </div>
+              <p className="text-foreground/80 mt-4">
+                Votre mot de passe a été mis à jour avec succès !
+              </p>
+            </div>
+            <Button 
+              onClick={() => navigate("/auth?mode=login")}
+              className="w-full bg-primary hover:bg-primary/90"
+            >
+              Se connecter avec le nouveau mot de passe
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[url('/background.jpg')] bg-cover bg-center bg-fixed">

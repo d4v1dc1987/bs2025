@@ -32,7 +32,9 @@ export const useAuth = () => {
         // Only set user and redirect if we're not on the update-password page
         if (session?.user && !location.pathname.includes('/update-password')) {
           setUser(session.user);
-          navigate("/dashboard");
+          if (!location.pathname.includes('/auth')) {
+            navigate("/dashboard");
+          }
         } else {
           setUser(null);
         }
@@ -58,7 +60,7 @@ export const useAuth = () => {
         // Only set user and redirect if we're not on the update-password page
         if (!location.pathname.includes('/update-password')) {
           setUser(session?.user ?? null);
-          if (event === "SIGNED_IN") {
+          if (event === "SIGNED_IN" && !location.pathname.includes('/auth')) {
             navigate("/dashboard");
           }
         }

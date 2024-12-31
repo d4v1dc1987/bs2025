@@ -1,20 +1,21 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !user && !location.pathname.includes('/update-password')) {
       navigate("/auth?mode=login");
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, location.pathname]);
 
   if (loading) {
     return null; // Or a loading spinner
   }
 
-  return user ? <>{children}</> : null;
+  return (!loading && (user || location.pathname.includes('/update-password'))) ? <>{children}</> : null;
 };
