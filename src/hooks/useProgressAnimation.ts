@@ -13,7 +13,7 @@ export const useProgressAnimation = (duration: number = 7000) => {
 
     const animate = () => {
       const elapsed = Date.now() - startTimeRef.current;
-      const newProgress = Math.min((elapsed / duration) * 100, 100);
+      const newProgress = Math.min((elapsed / duration) * 100, 98); // Stop at 98% until complete
       
       setProgress(newProgress);
 

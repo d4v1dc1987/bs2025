@@ -42,14 +42,17 @@ export const AIProfileGenerator = ({
         .replace('{answers}', formattedAnswers);
 
       try {
+        // Start both the profile generation and the animation
         const profilePromise = generateAIProfile(prompt);
         
-        // Ensure the animation runs for at least 3 seconds for a smooth experience
+        // We ensure the animation runs for at least 7 seconds for a smooth experience
+        // This matches the duration set in useProgressAnimation
         await Promise.all([
           profilePromise,
-          new Promise(resolve => setTimeout(resolve, 3000))
+          new Promise(resolve => setTimeout(resolve, 7000))
         ]);
         
+        // Only stop the animation after both promises are resolved
         stopAnimation();
         setIsSubmitting(false);
       } catch (error) {
