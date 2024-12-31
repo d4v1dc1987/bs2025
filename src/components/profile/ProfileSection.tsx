@@ -29,6 +29,31 @@ export const ProfileSection = ({
     setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
+  const cleanupOldAvatars = async (userId: string, currentAvatarUrl: string | null) => {
+    try {
+      const response = await fetch('/functions/v1/cleanup-old-avatars', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        },
+        body: JSON.stringify({
+          userId,
+          currentAvatarUrl
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to cleanup old avatars');
+      }
+
+      const data = await response.json();
+      console.log('Cleanup result:', data);
+    } catch (error) {
+      console.error('Error cleaning up old avatars:', error);
+    }
+  };
+
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setIsLoading(true);
@@ -65,6 +90,9 @@ export const ProfileSection = ({
         .eq('id', user?.id);
 
       if (updateProfileError) throw updateProfileError;
+
+      // Clean up old avatars after successful update
+      await cleanupOldAvatars(user?.id || '', publicUrl);
 
       setFormData(prev => ({ ...prev, avatar_url: publicUrl }));
       toast.success("Photo de profil mise à jour avec succès");
