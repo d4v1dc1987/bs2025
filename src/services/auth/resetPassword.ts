@@ -6,12 +6,9 @@ export const initiatePasswordReset = async (email: string) => {
     const redirectUrl = `${window.location.origin}/update-password`;
     console.log("Redirect URL:", redirectUrl);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      email,
-      {
-        redirectTo: redirectUrl,
-      }
-    );
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
+    });
 
     if (error) {
       console.error("Reset password error:", error);
@@ -24,6 +21,8 @@ export const initiatePasswordReset = async (email: string) => {
     return { success: true };
   } catch (error: any) {
     console.error("Reset password error:", error);
-    throw new Error(error.message || "Une erreur est survenue lors de l'envoi de l'email");
+    throw new Error(
+      error.message || "Une erreur est survenue lors de l'envoi de l'email"
+    );
   }
 };
